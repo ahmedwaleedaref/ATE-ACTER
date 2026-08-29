@@ -1,0 +1,103 @@
+{
+  "generated_by": "src/stats/s01_lengths.py",
+  "config": {
+    "data_root": "/home/ahmed-walled/Projects/ATE-ACTER/ate-acter/data/raw/ACTER",
+    "language": "en",
+    "train_domains": [
+      "corp",
+      "equi",
+      "wind"
+    ],
+    "test_domain": "htfl",
+    "sequential_scheme": "iob_annotations",
+    "ne_variant": "without_named_entities"
+  },
+  "domains": {
+    "corp": {
+      "n_sentences": 2002,
+      "n_tokens": 50845,
+      "min": 1,
+      "max": 281,
+      "n_sentences_le_2_tokens": 228,
+      "p50": 22,
+      "p90": 49,
+      "p95": 61,
+      "p99": 98,
+      "n_documents": 12
+    },
+    "equi": {
+      "n_sentences": 3090,
+      "n_tokens": 58203,
+      "min": 1,
+      "max": 95,
+      "n_sentences_le_2_tokens": 255,
+      "p50": 18,
+      "p90": 33,
+      "p95": 39,
+      "p99": 52,
+      "n_documents": 34
+    },
+    "wind": {
+      "n_sentences": 6638,
+      "n_tokens": 57766,
+      "min": 1,
+      "max": 258,
+      "n_sentences_le_2_tokens": 4048,
+      "p50": 1,
+      "p90": 27,
+      "p95": 36,
+      "p99": 62,
+      "n_documents": 5
+    },
+    "htfl": {
+      "n_sentences": 2432,
+      "n_tokens": 55467,
+      "min": 1,
+      "max": 171,
+      "n_sentences_le_2_tokens": 338,
+      "p50": 20,
+      "p90": 43,
+      "p95": 54,
+      "p99": 78,
+      "n_documents": 190
+    }
+  },
+  "pooled": {
+    "n_sentences": 14162,
+    "n_tokens": 222281,
+    "min": 1,
+    "max": 281,
+    "n_sentences_le_2_tokens": 4869,
+    "p50": 13,
+    "p90": 36,
+    "p95": 46,
+    "p99": 72,
+    "n_documents": 241
+  },
+  "inventory_ratio": [
+    {
+      "domain": "corp",
+      "paired_tokens": 50845,
+      "corpus_tokens": 181923,
+      "ratio": 0.2794863761041759
+    },
+    {
+      "domain": "equi",
+      "paired_tokens": 58203,
+      "corpus_tokens": 109387,
+      "ratio": 0.5320833371424393
+    },
+    {
+      "domain": "wind",
+      "paired_tokens": 57766,
+      "corpus_tokens": 319887,
+      "ratio": 0.18058251820173998
+    },
+    {
+      "domain": "htfl",
+      "paired_tokens": 55467,
+      "corpus_tokens": 55467,
+      "ratio": 1.0
+    }
+  ]
+}
