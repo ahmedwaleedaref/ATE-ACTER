@@ -1,0 +1,373 @@
+{
+  "generated_by": "src/stats/s04_label_distribution.py",
+  "note": "fixed invariant of ACTER v1.5; a different positive rate downstream means broken label alignment",
+  "per_domain": {
+    "corp": {
+      "n_documents": 12,
+      "n_sentences": 2002,
+      "n_tokens": 50845,
+      "B": 4180,
+      "I": 2239,
+      "O": 44426,
+      "pct_B": 8.221064018094207,
+      "pct_I": 4.4035795063428065,
+      "pct_O": 87.37535647556298,
+      "positive_rate": 0.12624643524437015,
+      "mean_term_occurrence_len": 1.5356459330143541,
+      "n_zero_positive_sentences": 607,
+      "pct_zero_positive_sentences": 30.31968031968032
+    },
+    "equi": {
+      "n_documents": 34,
+      "n_sentences": 3090,
+      "n_tokens": 58203,
+      "B": 8662,
+      "I": 1940,
+      "O": 47601,
+      "pct_B": 14.88239437829665,
+      "pct_I": 3.3331615208838032,
+      "pct_O": 81.78444410081954,
+      "positive_rate": 0.18215555899180455,
+      "mean_term_occurrence_len": 1.223966751327638,
+      "n_zero_positive_sentences": 467,
+      "pct_zero_positive_sentences": 15.11326860841424
+    },
+    "wind": {
+      "n_documents": 5,
+      "n_sentences": 6638,
+      "n_tokens": 57766,
+      "B": 5053,
+      "I": 3354,
+      "O": 49359,
+      "pct_B": 8.747360038777135,
+      "pct_I": 5.8061835681889,
+      "pct_O": 85.44645639303397,
+      "positive_rate": 0.14553543606966035,
+      "mean_term_occurrence_len": 1.663764100534336,
+      "n_zero_positive_sentences": 4905,
+      "pct_zero_positive_sentences": 73.89273877673998
+    },
+    "htfl": {
+      "n_documents": 190,
+      "n_sentences": 2432,
+      "n_tokens": 55467,
+      "B": 9636,
+      "I": 4806,
+      "O": 41025,
+      "pct_B": 17.372491751852454,
+      "pct_I": 8.664611390556548,
+      "pct_O": 73.962896857591,
+      "positive_rate": 0.26037103142409,
+      "mean_term_occurrence_len": 1.4987546699875467,
+      "n_zero_positive_sentences": 443,
+      "pct_zero_positive_sentences": 18.21546052631579
+    },
+    "pooled": {
+      "n_documents": 241,
+      "n_sentences": 14162,
+      "n_tokens": 222281,
+      "B": 27531,
+      "I": 12339,
+      "O": 182411,
+      "pct_B": 12.385673989229849,
+      "pct_I": 5.551081738880066,
+      "pct_O": 82.06324427189008,
+      "positive_rate": 0.17936755728109915,
+      "mean_term_occurrence_len": 1.4481856815952925,
+      "n_zero_positive_sentences": 6422,
+      "pct_zero_positive_sentences": 45.346702443157746
+    }
+  },
+  "short_prose_split": {
+    "corp": {
+      "short": {
+        "n_sentences": 228,
+        "pct_of_domain_sentences": 11.38861138861139,
+        "n_tokens": 429,
+        "pct_of_domain_tokens": 0.8437407808044055,
+        "B": 14,
+        "I": 3,
+        "O": 412,
+        "positive_rate": 0.039627039627039624,
+        "pct_of_domain_B": 0.3349282296650718
+      },
+      "prose": {
+        "n_sentences": 1774,
+        "pct_of_domain_sentences": 88.6113886113886,
+        "n_tokens": 50416,
+        "pct_of_domain_tokens": 99.15625921919559,
+        "B": 4166,
+        "I": 2236,
+        "O": 44014,
+        "positive_rate": 0.12698349730244368,
+        "pct_of_domain_B": 99.66507177033493
+      }
+    },
+    "equi": {
+      "short": {
+        "n_sentences": 255,
+        "pct_of_domain_sentences": 8.25242718446602,
+        "n_tokens": 470,
+        "pct_of_domain_tokens": 0.8075185127914368,
+        "B": 77,
+        "I": 19,
+        "O": 374,
+        "positive_rate": 0.20425531914893616,
+        "pct_of_domain_B": 0.88894019856846
+      },
+      "prose": {
+        "n_sentences": 2835,
+        "pct_of_domain_sentences": 91.74757281553399,
+        "n_tokens": 57733,
+        "pct_of_domain_tokens": 99.19248148720857,
+        "B": 8585,
+        "I": 1921,
+        "O": 47227,
+        "positive_rate": 0.18197564651066114,
+        "pct_of_domain_B": 99.11105980143154
+      }
+    },
+    "wind": {
+      "short": {
+        "n_sentences": 4048,
+        "pct_of_domain_sentences": 60.982223561313646,
+        "n_tokens": 4275,
+        "pct_of_domain_tokens": 7.40054703458782,
+        "B": 44,
+        "I": 8,
+        "O": 4223,
+        "positive_rate": 0.012163742690058479,
+        "pct_of_domain_B": 0.8707698396991886
+      },
+      "prose": {
+        "n_sentences": 2590,
+        "pct_of_domain_sentences": 39.017776438686354,
+        "n_tokens": 53491,
+        "pct_of_domain_tokens": 92.59945296541218,
+        "B": 5009,
+        "I": 3346,
+        "O": 45136,
+        "positive_rate": 0.15619450000934737,
+        "pct_of_domain_B": 99.1292301603008
+      }
+    },
+    "htfl": {
+      "short": {
+        "n_sentences": 338,
+        "pct_of_domain_sentences": 13.898026315789474,
+        "n_tokens": 674,
+        "pct_of_domain_tokens": 1.2151369282636522,
+        "B": 2,
+        "I": 0,
+        "O": 672,
+        "positive_rate": 0.002967359050445104,
+        "pct_of_domain_B": 0.020755500207555
+      },
+      "prose": {
+        "n_sentences": 2094,
+        "pct_of_domain_sentences": 86.10197368421052,
+        "n_tokens": 54793,
+        "pct_of_domain_tokens": 98.78486307173635,
+        "B": 9634,
+        "I": 4806,
+        "O": 40353,
+        "positive_rate": 0.2635373131604402,
+        "pct_of_domain_B": 99.97924449979244
+      }
+    }
+  },
+  "wind_short_bucket_top_sentences": [
+    {
+      "count": 3499,
+      "tokens": [
+        "."
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 13,
+      "tokens": [
+        "2"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 9,
+      "tokens": [
+        "λ"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 9,
+      "tokens": [
+        "D-80.1-GP.SD.03-A-A-GB"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 8,
+      "tokens": [
+        "2002-09-10"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 6,
+      "tokens": [
+        "8"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 6,
+      "tokens": [
+        "1"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 5,
+      "tokens": [
+        "3"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 5,
+      "tokens": [
+        "4"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 5,
+      "tokens": [
+        "Cp",
+        "="
+      ],
+      "labels": [
+        "B",
+        "O"
+      ]
+    },
+    {
+      "count": 5,
+      "tokens": [
+        "h"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "5",
+        "."
+      ],
+      "labels": [
+        "O",
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "i"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "5"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "2",
+        "."
+      ],
+      "labels": [
+        "O",
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "•"
+      ],
+      "labels": [
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "3",
+        "."
+      ],
+      "labels": [
+        "O",
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "4",
+        "."
+      ],
+      "labels": [
+        "O",
+        "O"
+      ]
+    },
+    {
+      "count": 4,
+      "tokens": [
+        "6",
+        "."
+      ],
+      "labels": [
+        "O",
+        "O"
+      ]
+    },
+    {
+      "count": 3,
+      "tokens": [
+        "v"
+      ],
+      "labels": [
+        "O"
+      ]
+    }
+  ]
+}

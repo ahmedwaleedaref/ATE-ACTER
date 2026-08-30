@@ -399,41 +399,112 @@ PubMedBERT, which must not be used.
 
 ---
 
-## 6. Open questions
+## 6. s04 — label distribution
 
-### 6.1 [OPEN] Do wind's 4,048 fragments contain terms?
+Dataset-token space, no tokenizer. B, I, O counted separately — B is the term
+*occurrence* count, which §7 item 4 needs.
 
-wind's ≤2-token "sentences" are table cells. Whether they can be dropped from
-training depends on how many gold terms live in them — a number not yet
-measured.
+| domain | n_tokens | B | I | O | pos. rate | mean occ. len | zero-pos sents |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| corp | 50,845 | 4,180 (8.2%) | 2,239 (4.4%) | 44,426 (87.4%) | 0.1262 | 1.54 | 607 (30.3%) |
+| equi | 58,203 | 8,662 (14.9%) | 1,940 (3.3%) | 47,601 (81.8%) | 0.1822 | 1.22 | 467 (15.1%) |
+| wind | 57,766 | 5,053 (8.7%) | 3,354 (5.8%) | 49,359 (85.4%) | 0.1455 | 1.66 | 4,905 (73.9%) |
+| htfl | 55,467 | 9,636 (17.4%) | 4,806 (8.7%) | 41,025 (74.0%) | 0.2604 | 1.50 | 443 (18.2%) |
+| pooled | 222,281 | 27,531 (12.4%) | 12,339 (5.6%) | 182,411 (82.1%) | 0.1794 | 1.45 | 6,422 (45.3%) |
 
-- **Few terms (~5% of wind's occurrences)** → structural noise. Filter them
-  out with a one-line rule.
-- **Many terms (20%+)** → wind's terminology lives in tables. Dropping them
-  discards a quarter of wind's training signal.
+### 6.1 These rates are an alignment invariant
 
-The second case is likely, not hypothetical. A cell reading `Rotor diameter`
-is entirely term. Tables are where terminology concentrates in technical
-documents, so fragments may have *higher* positive-label density than prose,
-not lower.
+The imbalance itself needs no handling — 13–26% positive requires no loss
+weighting. The value of these numbers is as a **fixed reference constant**.
 
-**Resolves in §7 item 6** (class imbalance) — compute the ≤2-token subset
-separately there. **Do not filter before measuring:** it would silently change
-every wind number.
+The week-2 dataloader will tokenize, apply first-subword labelling, and set
+continuation subwords to `-100`. Exactly one position per dataset token is
+scored, so the positive rate computed over the batched tensors (ignoring
+`-100`) must reproduce the table above **exactly**. htfl must come out at
+0.2604.
 
-### 6.2 [OPEN] Is wind the best test of the document-context hypothesis?
+If it does not, label alignment is broken — and nothing crashes when that
+happens. Assert against these four numbers once the dataloader exists.
 
-A table cell has no sentence context. So if wind's terms concentrate in
-fragments, wind is where sentence-level input is weakest — and therefore where
-document-level context has the most room to help.
+### 6.2 wind's ≤2-token sentences are filterable
 
-That would make wind the project's sharpest evidence rather than its noisiest
-domain. It would also be a per-domain effect that pooled reporting hides,
-reinforcing §4.2.
+Short (≤2 dataset tokens) versus prose (≥3), per domain:
 
-Depends on 6.1. Not actionable this week.
+| domain | bucket | n_sent | % dom sent | n_tok | B | pos. rate | B % of domain B |
+|---|---|--:|--:|--:|--:|--:|--:|
+| corp | short | 228 | 11.4% | 429 | 14 | 0.0396 | 0.3% |
+| corp | prose | 1,774 | 88.6% | 50,416 | 4,166 | 0.1270 | 99.7% |
+| equi | short | 255 | 8.3% | 470 | 77 | 0.2043 | 0.9% |
+| equi | prose | 2,835 | 91.7% | 57,733 | 8,585 | 0.1820 | 99.1% |
+| wind | short | 4,048 | 61.0% | 4,275 | 44 | 0.0122 | 0.9% |
+| wind | prose | 2,590 | 39.0% | 53,491 | 5,009 | 0.1562 | 99.1% |
+| htfl | short | 338 | 13.9% | 674 | 2 | 0.0030 | 0.0% |
+| htfl | prose | 2,094 | 86.1% | 54,793 | 9,634 | 0.2635 | 100.0% |
 
-### 6.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
+**wind's short bucket holds 0.9% of wind's B count**, at a positive rate of
+0.0122 — 13× below wind's prose. It is 61% of wind's sentences and 7.4% of its
+tokens.
+
+**Decision: filter sentences of ≤2 dataset tokens from wind at training time.**
+Cost is 0.9% of wind's term occurrences; benefit is removing 4,048 examples
+that carry almost no signal.
+
+The content confirms it. Of the 4,048 short sentences, **3,499 are a single
+period** — a segmentation artifact, not text. The rest are stray digits, list
+markers, single letters, and a document code:
+
+| count | tokens |
+|--:|---|
+| 3,499 | `.` |
+| 13 | `2` |
+| 9 | `λ` |
+| 9 | `D-80.1-GP.SD.03-A-A-GB` |
+| 8 | `2002-09-10` |
+| 6 | `8` |
+| 5 | `Cp =` |
+
+This also resolves the question of whether wind's terminology lives in table
+cells: it does not.
+
+### 6.3 htfl has a higher term density than any training domain
+
+| | corp | equi | wind | **htfl** |
+|---|--:|--:|--:|--:|
+| positive rate | 0.126 | 0.182 | 0.146 | **0.260** |
+| mean occurrence length | 1.54 | 1.22 | 1.66 | 1.50 |
+
+The test domain runs at 26% positive tokens against a training-domain average
+near 15%. A model fits the label prior of its training distribution, so this
+is a distribution shift in the prior itself, independent of any lexical
+question.
+
+**Predicted effect: recall suppressed on htfl, precision unaffected.** Recorded
+here so it can be checked against actual per-domain results rather than
+discovered afterwards.
+
+Consequence for T3: a decode threshold tuned on training-domain data inherits
+the wrong prior. Either use argmax and report this shift as a known
+limitation, or tune on a held-out training domain and state the value used.
+Tuning on htfl is fitting the test set.
+
+`equi` is the opposite extreme — 14.9% B against 3.3% I, mean occurrence
+length 1.22. Dressage terms are overwhelmingly single words.
+
+---
+
+## 7. Open questions
+
+### 7.1 [CLOSED] Do wind's ≤2-token sentences contain terms?
+
+No. They hold 0.9% of wind's B count and 3,499 of the 4,048 are a single
+period. Resolved in §6.2; filtering decision recorded there.
+
+### 7.2 [CLOSED] Is wind the sharpest test of the document-context hypothesis?
+
+Premise was that wind's terms live in context-free table cells. They do not —
+see §6.2. wind's terms are in its prose, like every other domain.
+
+### 7.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
 
 **Not established. Do not assume it.** Cross-sentence and document-level
 context for sequence labelling is a worked area in NLP, and ACTER-specific
@@ -443,7 +514,7 @@ What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
 that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
 
-### 6.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
+### 7.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
 
 Corpus max under BERT is 1,074 wordpieces, from a wind sentence whose
 whitespace length is far below that. The four tokenizers disagree by 2.7× on
@@ -459,7 +530,7 @@ Noted only so the figure in §5 is not mistaken for a property of the prose.
 
 ---
 
-## 7. Still to measure
+## 8. Still to measure
 
 | item | statistic | decides |
 |---|---|---|
@@ -468,5 +539,5 @@ Noted only so the figure in §5 is not mistaken for a property of the prose.
 | §7 T2-3 | term length distribution | T4 candidate n-gram cap |
 | §7 T2-4 | term frequency, hapax proportion | C-Value's ceiling; T4 reference-corpus decision |
 | §7 T2-5 | term-set overlap, train ↔ htfl | how much of any score is memorisation |
-| §7 T2-6 | positive-label proportion; **wind fragment subset (§6.1)** | training invariant; wind filtering |
+| ~~§7 T2-6~~ | ~~positive-label proportion~~ | **done — §6** |
 | §7 T2-7 | nested-term count, split 1-token vs ≥2-token; truncation ceiling at type level | NOBI's expected effect size |
