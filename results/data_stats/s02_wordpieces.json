@@ -1,0 +1,815 @@
+{
+  "generated_by": "src/stats/s02_wordpieces.py",
+  "tokenizers": [
+    {
+      "name": "bert-base-cased",
+      "repo": "google-bert/bert-base-cased",
+      "revision": "cd5ef92a9fb2f889e972770a36d4ed042daf221e"
+    },
+    {
+      "name": "roberta-base",
+      "repo": "FacebookAI/roberta-base",
+      "revision": "e2da8e2f811d1448a5b465c236feacd80ffbac7b"
+    },
+    {
+      "name": "deberta-v3-base",
+      "repo": "microsoft/deberta-v3-base",
+      "revision": "8ccc9b6f36199bec6961081d44eb72fb3f7353f3"
+    },
+    {
+      "name": "xlm-roberta-base",
+      "repo": "FacebookAI/xlm-roberta-base",
+      "revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089"
+    }
+  ],
+  "per_tokenizer_domain": {
+    "bert-base-cased/corp": {
+      "n_sentences": 2002,
+      "wp_min": 3,
+      "wp_max": 325,
+      "infl_inside_span": 1.3671911512696682,
+      "infl_outside_span": 1.1036555170395714,
+      "infl_overall": 1.1369259514209853,
+      "n_over_512": 0,
+      "n_over_256": 2,
+      "wp_p50": 27,
+      "wp_p90": 58,
+      "wp_p95": 71,
+      "wp_p99": 115
+    },
+    "bert-base-cased/equi": {
+      "n_sentences": 3090,
+      "wp_min": 3,
+      "wp_max": 136,
+      "infl_inside_span": 1.3988870024523674,
+      "infl_outside_span": 1.0753345517951303,
+      "infl_overall": 1.1342714293077676,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 22,
+      "wp_p90": 40,
+      "wp_p95": 47,
+      "wp_p99": 62
+    },
+    "bert-base-cased/wind": {
+      "n_sentences": 6638,
+      "wp_min": 3,
+      "wp_max": 1074,
+      "infl_inside_span": 1.4429641965029143,
+      "infl_outside_span": 1.2985725292996473,
+      "infl_overall": 1.3196015591165007,
+      "n_over_512": 1,
+      "n_over_256": 5,
+      "wp_p50": 3,
+      "wp_p90": 35,
+      "wp_p95": 48,
+      "wp_p99": 85
+    },
+    "bert-base-cased/htfl": {
+      "n_sentences": 2432,
+      "wp_min": 4,
+      "wp_max": 260,
+      "infl_inside_span": 2.0432765544938376,
+      "infl_outside_span": 1.2149177330895795,
+      "infl_overall": 1.4305983738078498,
+      "n_over_512": 0,
+      "n_over_256": 1,
+      "wp_p50": 30,
+      "wp_p90": 64,
+      "wp_p95": 80,
+      "wp_p99": 118
+    },
+    "bert-base-cased/all": {
+      "n_sentences": 14162,
+      "wp_min": 3,
+      "wp_max": 1074,
+      "infl_inside_span": 1.6364936042136946,
+      "infl_outside_span": 1.1740033996819652,
+      "infl_overall": 1.2569744420446365,
+      "n_over_512": 1,
+      "n_over_256": 8,
+      "wp_p50": 17,
+      "wp_p90": 47,
+      "wp_p95": 59,
+      "wp_p99": 98
+    },
+    "roberta-base/corp": {
+      "n_sentences": 2002,
+      "wp_min": 3,
+      "wp_max": 309,
+      "infl_inside_span": 1.168406293815236,
+      "infl_outside_span": 1.0621482915409894,
+      "infl_overall": 1.0755629855443014,
+      "n_over_512": 0,
+      "n_over_256": 2,
+      "wp_p50": 25,
+      "wp_p90": 55,
+      "wp_p95": 66,
+      "wp_p99": 105
+    },
+    "roberta-base/equi": {
+      "n_sentences": 3090,
+      "wp_min": 3,
+      "wp_max": 125,
+      "infl_inside_span": 1.3154121863799284,
+      "infl_outside_span": 1.057918951282536,
+      "infl_overall": 1.1048227754583098,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 21,
+      "wp_p90": 39,
+      "wp_p95": 45,
+      "wp_p99": 60
+    },
+    "roberta-base/wind": {
+      "n_sentences": 6638,
+      "wp_min": 3,
+      "wp_max": 399,
+      "infl_inside_span": 1.3444748423932438,
+      "infl_outside_span": 1.2189874187078344,
+      "infl_overall": 1.2372502856351486,
+      "n_over_512": 0,
+      "n_over_256": 3,
+      "wp_p50": 3,
+      "wp_p90": 34,
+      "wp_p95": 45,
+      "wp_p99": 80
+    },
+    "roberta-base/htfl": {
+      "n_sentences": 2432,
+      "wp_min": 3,
+      "wp_max": 232,
+      "infl_inside_span": 1.7216452014956378,
+      "infl_outside_span": 1.141304082876295,
+      "infl_overall": 1.2924080985090234,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 27,
+      "wp_p90": 59,
+      "wp_p95": 73,
+      "wp_p99": 112
+    },
+    "roberta-base/all": {
+      "n_sentences": 14162,
+      "wp_min": 3,
+      "wp_max": 399,
+      "infl_inside_span": 1.445021319287685,
+      "infl_outside_span": 1.1212865452193124,
+      "infl_overall": 1.179354060850905,
+      "n_over_512": 0,
+      "n_over_256": 5,
+      "wp_p50": 17,
+      "wp_p90": 44,
+      "wp_p95": 56,
+      "wp_p99": 92
+    },
+    "deberta-v3-base/corp": {
+      "n_sentences": 2002,
+      "wp_min": 3,
+      "wp_max": 298,
+      "infl_inside_span": 1.1001713662564263,
+      "infl_outside_span": 1.0401341556746049,
+      "infl_overall": 1.0477136394925755,
+      "n_over_512": 0,
+      "n_over_256": 2,
+      "wp_p50": 25,
+      "wp_p90": 54,
+      "wp_p95": 64,
+      "wp_p99": 104
+    },
+    "deberta-v3-base/equi": {
+      "n_sentences": 3090,
+      "wp_min": 3,
+      "wp_max": 116,
+      "infl_inside_span": 1.177136389360498,
+      "infl_outside_span": 1.0400411756055545,
+      "infl_overall": 1.0650138309021873,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 21,
+      "wp_p90": 38,
+      "wp_p95": 44,
+      "wp_p99": 59
+    },
+    "deberta-v3-base/wind": {
+      "n_sentences": 6638,
+      "wp_min": 3,
+      "wp_max": 1061,
+      "infl_inside_span": 1.1931723563696919,
+      "infl_outside_span": 1.1916570432950424,
+      "infl_overall": 1.1918775750441437,
+      "n_over_512": 1,
+      "n_over_256": 4,
+      "wp_p50": 3,
+      "wp_p90": 32,
+      "wp_p95": 42,
+      "wp_p99": 77
+    },
+    "deberta-v3-base/htfl": {
+      "n_sentences": 2432,
+      "wp_min": 3,
+      "wp_max": 224,
+      "infl_inside_span": 1.3815261044176708,
+      "infl_outside_span": 1.1021084704448507,
+      "infl_overall": 1.1748607280004326,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 25,
+      "wp_p90": 55,
+      "wp_p95": 69,
+      "wp_p99": 106
+    },
+    "deberta-v3-base/all": {
+      "n_sentences": 14162,
+      "wp_min": 3,
+      "wp_max": 1061,
+      "infl_inside_span": 1.2421620265864057,
+      "infl_outside_span": 1.0950490924341185,
+      "infl_overall": 1.1214363800774696,
+      "n_over_512": 1,
+      "n_over_256": 6,
+      "wp_p50": 16,
+      "wp_p90": 42,
+      "wp_p95": 53,
+      "wp_p99": 88
+    },
+    "xlm-roberta-base/corp": {
+      "n_sentences": 2002,
+      "wp_min": 3,
+      "wp_max": 379,
+      "infl_inside_span": 1.7110141766630316,
+      "infl_outside_span": 1.2576194120560031,
+      "infl_overall": 1.314858884846101,
+      "n_over_512": 0,
+      "n_over_256": 3,
+      "wp_p50": 31,
+      "wp_p90": 67,
+      "wp_p95": 81,
+      "wp_p99": 131
+    },
+    "xlm-roberta-base/equi": {
+      "n_sentences": 3090,
+      "wp_min": 3,
+      "wp_max": 128,
+      "infl_inside_span": 1.5942275042444822,
+      "infl_outside_span": 1.2543223881851222,
+      "infl_overall": 1.316237994605089,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 25,
+      "wp_p90": 46,
+      "wp_p95": 54,
+      "wp_p99": 72
+    },
+    "xlm-roberta-base/wind": {
+      "n_sentences": 6638,
+      "wp_min": 3,
+      "wp_max": 488,
+      "infl_inside_span": 1.7052456286427977,
+      "infl_outside_span": 1.3963410928098219,
+      "infl_overall": 1.44129764913617,
+      "n_over_512": 0,
+      "n_over_256": 3,
+      "wp_p50": 4,
+      "wp_p90": 38,
+      "wp_p95": 51,
+      "wp_p99": 86
+    },
+    "xlm-roberta-base/htfl": {
+      "n_sentences": 2432,
+      "wp_min": 3,
+      "wp_max": 251,
+      "infl_inside_span": 2.030743664312422,
+      "infl_outside_span": 1.3669713589274832,
+      "infl_overall": 1.5397984387113057,
+      "n_over_512": 0,
+      "n_over_256": 0,
+      "wp_p50": 33,
+      "wp_p90": 69,
+      "wp_p95": 86,
+      "wp_p99": 120
+    },
+    "xlm-roberta-base/all": {
+      "n_sentences": 14162,
+      "wp_min": 3,
+      "wp_max": 488,
+      "infl_inside_span": 1.7945573112616002,
+      "infl_outside_span": 1.318889759937723,
+      "infl_overall": 1.4042090866965689,
+      "n_over_512": 0,
+      "n_over_256": 6,
+      "wp_p50": 19,
+      "wp_p90": 52,
+      "wp_p95": 66,
+      "wp_p99": 102
+    }
+  },
+  "sentences_over_512": {
+    "bert-base-cased": [
+      {
+        "file_id": "wind_en_32",
+        "sentence_index": 6,
+        "n_wordpieces": 1074
+      }
+    ],
+    "roberta-base": [],
+    "deberta-v3-base": [
+      {
+        "file_id": "wind_en_32",
+        "sentence_index": 6,
+        "n_wordpieces": 1061
+      }
+    ],
+    "xlm-roberta-base": []
+  },
+  "top_fragmenting_tokens": {
+    "bert-base-cased": [
+      {
+        "token": "...............................................................................................................",
+        "subwords": 111,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..............................................................................................................",
+        "subwords": 110,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "............................................................................................................",
+        "subwords": 108,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..........................................................................................................",
+        "subwords": 106,
+        "occurrences": 2,
+        "label": "O"
+      },
+      {
+        "token": "........................................................................................................",
+        "subwords": 104,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": ".....................................................................................................",
+        "subwords": 101,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "...................................................................................................",
+        "subwords": 99,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "...............................................................................................",
+        "subwords": 95,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "........................................................................................",
+        "subwords": 88,
+        "occurrences": 2,
+        "label": "O"
+      },
+      {
+        "token": ".................................................................................",
+        "subwords": 81,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": ".............................................................................",
+        "subwords": 77,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "......................................................................",
+        "subwords": 70,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..............................................................",
+        "subwords": 62,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.dnv.com/publications/oilgas_news/oilgasnews-32006/NewDNVstandardsforwindturbinedesign.asp",
+        "subwords": 45,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.fluid.mech.ntua.gr/wind/avis/avigotem.html",
+        "subwords": 29,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.gl-group.com/brochurepdf/0E504.pdf",
+        "subwords": 28,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.ieawind.org/Annex%20XXIII/Subtask2.html",
+        "subwords": 27,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "A-K-V-E-S-H-C-M-R-B-P-F",
+        "subwords": 23,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://www.beatricewind.co.uk/home/default.asp",
+        "subwords": 20,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "1-alkyl-2-acetyl-sn-glycerol",
+        "subwords": 19,
+        "occurrences": 1,
+        "label": "B"
+      }
+    ],
+    "roberta-base": [
+      {
+        "token": "http://www.dnv.com/publications/oilgas_news/oilgasnews-32006/NewDNVstandardsforwindturbinedesign.asp",
+        "subwords": 38,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.fluid.mech.ntua.gr/wind/avis/avigotem.html",
+        "subwords": 25,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "A-K-V-E-S-H-C-M-R-B-P-F",
+        "subwords": 23,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://www.ieawind.org/Annex%20XXIII/Subtask2.html",
+        "subwords": 22,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.gl-group.com/brochurepdf/0E504.pdf",
+        "subwords": 20,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.beatricewind.co.uk/home/default.asp",
+        "subwords": 18,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "D-80.1-GP.SD.03-A-A-GB",
+        "subwords": 17,
+        "occurrences": 9,
+        "label": "O"
+      },
+      {
+        "token": "www.bwea.com/energy/briefing-sheets.html",
+        "subwords": 17,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "A-K-E-H-C-M-B-F",
+        "subwords": 15,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "1-alkyl-2-acetyl-sn-glycerol",
+        "subwords": 15,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "4.29±0.5-4.55±0.49",
+        "subwords": 15,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "4.32±0.54-4.31±0.49",
+        "subwords": 15,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "13.1-34015(17.1-9.3",
+        "subwords": 14,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "www.bwea.com/edu/calcs.html",
+        "subwords": 14,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "(123)I-meta-iodobenzylguanidine",
+        "subwords": 14,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "9.14.5.)-V4-3168",
+        "subwords": 12,
+        "occurrences": 2,
+        "label": "O"
+      },
+      {
+        "token": "faydalanılmıştır",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://raphael.mit.edu/xfoil",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.ntis.gov/ordering.htm",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "CHA₂DS₂VASc",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "B"
+      }
+    ],
+    "deberta-v3-base": [
+      {
+        "token": "...............................................................................................................",
+        "subwords": 111,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..............................................................................................................",
+        "subwords": 110,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "............................................................................................................",
+        "subwords": 108,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..........................................................................................................",
+        "subwords": 106,
+        "occurrences": 2,
+        "label": "O"
+      },
+      {
+        "token": "........................................................................................................",
+        "subwords": 104,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": ".....................................................................................................",
+        "subwords": 101,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "...................................................................................................",
+        "subwords": 99,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "...............................................................................................",
+        "subwords": 95,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "........................................................................................",
+        "subwords": 88,
+        "occurrences": 2,
+        "label": "O"
+      },
+      {
+        "token": ".................................................................................",
+        "subwords": 81,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": ".............................................................................",
+        "subwords": 77,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "......................................................................",
+        "subwords": 70,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "..............................................................",
+        "subwords": 62,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.dnv.com/publications/oilgas_news/oilgasnews-32006/NewDNVstandardsforwindturbinedesign.asp",
+        "subwords": 36,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.fluid.mech.ntua.gr/wind/avis/avigotem.html",
+        "subwords": 24,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.ieawind.org/Annex%20XXIII/Subtask2.html",
+        "subwords": 24,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "A-K-V-E-S-H-C-M-R-B-P-F",
+        "subwords": 23,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://www.gl-group.com/brochurepdf/0E504.pdf",
+        "subwords": 22,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.beatricewind.co.uk/home/default.asp",
+        "subwords": 19,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "D-80.1-GP.SD.03-A-A-GB",
+        "subwords": 17,
+        "occurrences": 9,
+        "label": "O"
+      }
+    ],
+    "xlm-roberta-base": [
+      {
+        "token": "http://www.dnv.com/publications/oilgas_news/oilgasnews-32006/NewDNVstandardsforwindturbinedesign.asp",
+        "subwords": 37,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.fluid.mech.ntua.gr/wind/avis/avigotem.html",
+        "subwords": 24,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "A-K-V-E-S-H-C-M-R-B-P-F",
+        "subwords": 23,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://www.ieawind.org/Annex%20XXIII/Subtask2.html",
+        "subwords": 22,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.gl-group.com/brochurepdf/0E504.pdf",
+        "subwords": 19,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.beatricewind.co.uk/home/default.asp",
+        "subwords": 18,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "www.bwea.com/energy/briefing-sheets.html",
+        "subwords": 18,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "D-80.1-GP.SD.03-A-A-GB",
+        "subwords": 15,
+        "occurrences": 9,
+        "label": "O"
+      },
+      {
+        "token": "A-K-E-H-C-M-B-F",
+        "subwords": 15,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "www.bwea.com/edu/calcs.html",
+        "subwords": 14,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "1-alkyl-2-acetyl-sn-glycerol",
+        "subwords": 14,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://raphael.mit.edu/xfoil",
+        "subwords": 13,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "(123)I-meta-iodobenzylguanidine",
+        "subwords": 13,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "http://www.ntis.gov/ordering.htm",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "Sandy_Butterfield@NREL.Gov",
+        "subwords": 12,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "renin-angiotensin-aldosterone",
+        "subwords": 11,
+        "occurrences": 2,
+        "label": "B"
+      },
+      {
+        "token": "ash.sharma@nefco.fi",
+        "subwords": 11,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "http://www.offshorewindenergy.org",
+        "subwords": 11,
+        "occurrences": 1,
+        "label": "O"
+      },
+      {
+        "token": "Renin-angiotensin-aldosterone",
+        "subwords": 11,
+        "occurrences": 1,
+        "label": "B"
+      },
+      {
+        "token": "renin-angiotensin-aldosteron",
+        "subwords": 11,
+        "occurrences": 1,
+        "label": "B"
+      }
+    ]
+  }
+}

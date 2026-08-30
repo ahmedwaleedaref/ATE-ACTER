@@ -269,20 +269,10 @@ that column is the informative one.
 6,638 of 14,162 examples — 47% of the corpus by example count against 26% by
 token count. Most of those examples carry one or two tokens.
 
-### 4.4 max_length: 512 is probably safe, 256 may be sufficient
+### 4.4 max_length: superseded by the measurement in §5
 
-Longest sentence in the corpus is 281 whitespace tokens (corp). At a plausible
-subword inflation of ~1.8× that is ~506 positions — inside BERT's 512 limit,
-but by six positions on a ratio that has not yet been measured. **Provisional,
-not settled.**
-
-The more useful figures are the p99s: corp 98, htfl 78. At ~1.8× those are
-~176 and ~140 subwords. A `max_length` of **256 may truncate under 1% of
-sentences at roughly a quarter of the attention cost of 512**, since attention
-is quadratic in sequence length. Padding should be per-batch (dynamic), with
-`max_length` acting purely as a truncation threshold.
-
-Deciding this requires the wordpiece measurement in §5, not this table.
+The whitespace numbers above suggested a `max_length` question that the
+wordpiece measurement settles directly. See §5.
 
 ### 4.5 Inventory ratios
 
@@ -309,9 +299,109 @@ Khaled's open decision; the numbers above are the input to it.
 
 ---
 
-## 5. Open questions raised by s01
+## 5. s02 — wordpieces (four tokenizers)
 
-### 5.1 [OPEN] Do wind's 4,048 fragments contain terms?
+Wordpieces per sentence including special tokens, measured with
+`tok(tokens, is_split_into_words=True)` on the pre-split token list, no
+truncation. Inflation = subwords per dataset token, split by whether the token
+carries a positive label.
+
+| tokenizer | htfl p99 | corpus max | inside-span inflation |
+|---|---:|---:|---:|
+| bert-base-cased | 118 | 1,074 | 1.636 |
+| roberta-base | 112 | 399 | 1.445 |
+| deberta-v3-base | 106 | 1,061 | 1.242 |
+| xlm-roberta-base | 120 | 488 | 1.795 |
+
+### 5.1 max_length = 256. Settled.
+
+Sentences exceeding 256 wordpieces, out of 14,162:
+
+| tokenizer | >256 | >512 | htfl >256 |
+|---|---:|---:|---:|
+| bert-base-cased | 8 | 1 | 1 |
+| roberta-base | 5 | 0 | 0 |
+| deberta-v3-base | 6 | 1 | 0 |
+| xlm-roberta-base | 6 | 0 | 0 |
+
+htfl p99 is 106–120 across all four tokenizers, so 256 leaves more than
+double the headroom on the test domain. Under BERT exactly **one** htfl
+sentence exceeds it.
+
+**Decision:** `max_length = 256`, used purely as a truncation threshold, with
+dynamic per-batch padding. Attention is quadratic in sequence length, so this
+costs roughly a quarter of what 512 would.
+
+**The truncation ceiling from §1.4 is therefore ≈ 0** on the test domain. It
+still gets measured at type level once gold spans are available (§7 item 7),
+but it will not be a material term in the results table. That is a good
+outcome and worth stating explicitly rather than leaving implicit.
+
+### 5.2 The inflation estimate used earlier was wrong
+
+Planning assumed ~1.8× subword inflation. Measured overall inflation is
+**1.12–1.40**, and p50 barely moves: 22 whitespace tokens becomes 27 BERT
+wordpieces.
+
+The earlier concern that a 281-token sentence would consume ~506 of BERT's 512
+positions was overstated by 30–60%. Under BERT that sentence is 325
+wordpieces.
+
+Recorded because the corrected figure is what future length estimates in this
+project should use — and because the failure mode was assuming a ratio instead
+of measuring one.
+
+### 5.3 Terms fragment far more than the text around them
+
+The overall ratio hides the effect the split was designed to find. On htfl:
+
+| tokenizer | inside span (B/I) | outside (O) | ratio |
+|---|---:|---:|---:|
+| bert-base-cased | 2.043 | 1.215 | **1.68×** |
+| roberta-base | 1.722 | 1.141 | 1.51× |
+| deberta-v3-base | 1.382 | 1.102 | 1.25× |
+| xlm-roberta-base | 2.031 | 1.367 | 1.49× |
+
+Under BERT, a htfl gold-term token becomes **2.04 wordpieces on average**
+while ordinary text becomes 1.22 — terms fragment at 68% above the rate of
+their surrounding text, in the only domain where recall is scored.
+
+This is a direct consequence of vocabulary coverage: WordPiece's 30k pieces
+were learned on general English, and clinical terminology is not in them.
+
+**wind is the exception.** Its B/I inflation is 1.443 against O at 1.299, a
+gap of only 1.11× versus htfl's 1.68×. wind terms fragment barely more than
+wind text — consistent with them being short table-cell nouns rather than long
+technical compounds. Further evidence for §6.1.
+
+### 5.4 BERT vs DeBERTa-v3
+
+The largest gap in the table sits exactly where the task is hardest.
+DeBERTa-v3 fragments htfl terms at **1.382 against BERT's 2.043** — a third
+fewer pieces per term. Its vocabulary is 128k SentencePiece Unigram pieces
+against BERT's 30k WordPiece.
+
+Why this could matter: with first-subword labelling, the model classifies a
+term from its first fragment plus context. `hyper` as the opening piece of a
+fragmented medical compound carries less than the near-whole token DeBERTa
+would produce. Whether that converts to F1 is unknown without training.
+
+XLM-R is both the longest and the worst on htfl terms. Relevant to T5: Tran
+et al. (2024) worked under a heavier length budget than this project will.
+
+**Decision: train BERT this month.** It is the ATE reference point, it keeps
+results comparable, and switching now costs time the schedule does not have.
+
+**Logged as the first lever if htfl recall underperforms:** DeBERTa-v3 is a
+general-purpose encoder with a larger vocabulary, not a biomedical one. Using
+it introduces no leakage into the cross-domain claim, unlike BioBERT or
+PubMedBERT, which must not be used.
+
+---
+
+## 6. Open questions
+
+### 6.1 [OPEN] Do wind's 4,048 fragments contain terms?
 
 wind's ≤2-token "sentences" are table cells. Whether they can be dropped from
 training depends on how many gold terms live in them — a number not yet
@@ -331,7 +421,7 @@ not lower.
 separately there. **Do not filter before measuring:** it would silently change
 every wind number.
 
-### 5.2 [OPEN] Is wind the best test of the document-context hypothesis?
+### 6.2 [OPEN] Is wind the best test of the document-context hypothesis?
 
 A table cell has no sentence context. So if wind's terms concentrate in
 fragments, wind is where sentence-level input is weakest — and therefore where
@@ -341,9 +431,9 @@ That would make wind the project's sharpest evidence rather than its noisiest
 domain. It would also be a per-domain effect that pooled reporting hides,
 reinforcing §4.2.
 
-Depends on 5.1. Not actionable this week.
+Depends on 6.1. Not actionable this week.
 
-### 5.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
+### 6.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
 
 **Not established. Do not assume it.** Cross-sentence and document-level
 context for sequence labelling is a worked area in NLP, and ACTER-specific
@@ -353,17 +443,30 @@ What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
 that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
 
+### 6.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
+
+Corpus max under BERT is 1,074 wordpieces, from a wind sentence whose
+whitespace length is far below that. The four tokenizers disagree by 2.7× on
+it (BERT 1,074, DeBERTa 1,061, XLM-R 488, RoBERTa 399), which is the signature
+of a long unbroken character sequence — a URL, a numeric string, or a table
+row rather than text.
+
+One sentence out of 14,162, past a `max_length` of 256 that already truncates
+almost nothing. Not worth weight. Excluding it, the corpus max under BERT is
+325.
+
+Noted only so the figure in §5 is not mistaken for a property of the prose.
+
 ---
 
-## 6. Still to measure
+## 7. Still to measure
 
 | item | statistic | decides |
 |---|---|---|
-| §7 T2-1b | wordpieces per sentence, three tokenizers | `max_length`; encoder choice |
-| §7 T2-1c | inflation ratio, inside-span vs outside-span | whether domain terms dominate the budget |
-| §7 T2-1d | htfl gold term *types* with all occurrences past 128/256/512 | the truncation ceiling (§1.4) |
+| ~~§7 T2-1b~~ | ~~wordpieces per sentence~~ | **done — §5, max_length = 256** |
+| ~~§7 T2-1c~~ | ~~inflation ratio, inside vs outside span~~ | **done — §5.3** |
 | §7 T2-3 | term length distribution | T4 candidate n-gram cap |
 | §7 T2-4 | term frequency, hapax proportion | C-Value's ceiling; T4 reference-corpus decision |
 | §7 T2-5 | term-set overlap, train ↔ htfl | how much of any score is memorisation |
-| §7 T2-6 | positive-label proportion; **wind fragment subset (§5.1)** | training invariant; wind filtering |
-| §7 T2-7 | nested-term count, split 1-token vs ≥2-token | NOBI's expected effect size |
+| §7 T2-6 | positive-label proportion; **wind fragment subset (§6.1)** | training invariant; wind filtering |
+| §7 T2-7 | nested-term count, split 1-token vs ≥2-token; truncation ceiling at type level | NOBI's expected effect size |
