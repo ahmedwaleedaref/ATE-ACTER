@@ -1,0 +1,390 @@
+{
+  "generated_by": "src/stats/s06_overlap.py",
+  "note": "overlap denominated in htfl gold terms; terms-only keys, with a separate terms+NE comparison",
+  "terms_only": {
+    "n_htfl": 2339,
+    "type": {
+      "n": 10,
+      "by_length": {
+        "1": [
+          9,
+          1029
+        ],
+        "2": [
+          1,
+          754
+        ],
+        "3": [
+          0,
+          366
+        ],
+        "4+": [
+          0,
+          190
+        ]
+      }
+    },
+    "text": {
+      "n": 99,
+      "not_in_gold_n": 89
+    },
+    "head": {
+      "n_mw": 1310,
+      "n": 302,
+      "not_type_n": 301
+    },
+    "per_domain": {
+      "corp": {
+        "type_n": 2,
+        "text_n": 39
+      },
+      "equi": {
+        "type_n": 6,
+        "text_n": 58
+      },
+      "wind": {
+        "type_n": 2,
+        "text_n": 46
+      }
+    },
+    "occ_weighted": {
+      "total": 9243,
+      "in_type": 31
+    },
+    "top20": [
+      [
+        "patients",
+        598,
+        false,
+        true,
+        false
+      ],
+      [
+        "heart failure",
+        350,
+        false,
+        false,
+        true
+      ],
+      [
+        "hf",
+        293,
+        false,
+        false,
+        false
+      ],
+      [
+        "p",
+        220,
+        false,
+        true,
+        false
+      ],
+      [
+        "ci",
+        114,
+        false,
+        true,
+        false
+      ],
+      [
+        "mortality",
+        109,
+        false,
+        false,
+        false
+      ],
+      [
+        "outcomes",
+        100,
+        false,
+        false,
+        false
+      ],
+      [
+        "clinical",
+        98,
+        false,
+        false,
+        false
+      ],
+      [
+        "patient",
+        73,
+        false,
+        true,
+        false
+      ],
+      [
+        "hr",
+        71,
+        false,
+        false,
+        false
+      ],
+      [
+        "hfpef",
+        64,
+        false,
+        false,
+        false
+      ],
+      [
+        "chf",
+        60,
+        false,
+        false,
+        false
+      ],
+      [
+        "follow-up",
+        60,
+        false,
+        true,
+        false
+      ],
+      [
+        "baseline",
+        57,
+        false,
+        true,
+        false
+      ],
+      [
+        "significantly",
+        57,
+        false,
+        true,
+        false
+      ],
+      [
+        "death",
+        55,
+        false,
+        true,
+        false
+      ],
+      [
+        "cardiac",
+        54,
+        false,
+        false,
+        false
+      ],
+      [
+        "hospitalization",
+        53,
+        false,
+        true,
+        false
+      ],
+      [
+        "significant",
+        52,
+        false,
+        true,
+        false
+      ],
+      [
+        "therapy",
+        50,
+        false,
+        false,
+        false
+      ]
+    ]
+  },
+  "terms_nes": {
+    "n_htfl": 2556,
+    "type": {
+      "n": 32,
+      "by_length": {
+        "1": [
+          26,
+          1132
+        ],
+        "2": [
+          6,
+          787
+        ],
+        "3": [
+          0,
+          386
+        ],
+        "4+": [
+          0,
+          251
+        ]
+      }
+    },
+    "text": {
+      "n": 122,
+      "not_in_gold_n": 90
+    },
+    "head": {
+      "n_mw": 1424,
+      "n": 356,
+      "not_type_n": 350
+    },
+    "per_domain": {
+      "corp": {
+        "type_n": 13,
+        "text_n": 49
+      },
+      "equi": {
+        "type_n": 18,
+        "text_n": 72
+      },
+      "wind": {
+        "type_n": 13,
+        "text_n": 59
+      }
+    },
+    "occ_weighted": {
+      "total": 9264,
+      "in_type": 45
+    },
+    "top20": [
+      [
+        "patients",
+        598,
+        false,
+        true,
+        false
+      ],
+      [
+        "heart failure",
+        350,
+        false,
+        false,
+        true
+      ],
+      [
+        "hf",
+        293,
+        false,
+        false,
+        false
+      ],
+      [
+        "p",
+        220,
+        false,
+        true,
+        false
+      ],
+      [
+        "ci",
+        114,
+        false,
+        true,
+        false
+      ],
+      [
+        "mortality",
+        109,
+        false,
+        false,
+        false
+      ],
+      [
+        "outcomes",
+        100,
+        false,
+        false,
+        false
+      ],
+      [
+        "clinical",
+        98,
+        false,
+        false,
+        false
+      ],
+      [
+        "patient",
+        73,
+        false,
+        true,
+        false
+      ],
+      [
+        "hr",
+        71,
+        false,
+        false,
+        false
+      ],
+      [
+        "hfpef",
+        64,
+        false,
+        false,
+        false
+      ],
+      [
+        "chf",
+        60,
+        false,
+        false,
+        false
+      ],
+      [
+        "follow-up",
+        60,
+        false,
+        true,
+        false
+      ],
+      [
+        "baseline",
+        57,
+        false,
+        true,
+        false
+      ],
+      [
+        "significantly",
+        57,
+        false,
+        true,
+        false
+      ],
+      [
+        "death",
+        55,
+        false,
+        true,
+        false
+      ],
+      [
+        "cardiac",
+        54,
+        false,
+        false,
+        false
+      ],
+      [
+        "hospitalization",
+        53,
+        false,
+        true,
+        false
+      ],
+      [
+        "significant",
+        52,
+        false,
+        true,
+        false
+      ],
+      [
+        "therapy",
+        50,
+        false,
+        false,
+        false
+      ]
+    ]
+  }
+}

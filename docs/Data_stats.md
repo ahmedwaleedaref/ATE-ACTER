@@ -81,23 +81,6 @@ The model's job is to say *which* tokens form a term. It is never asked what
 those tokens say; that is already on disk in the exact form the gold list was
 built from.
 
-### 1.4 Truncation is a third recall ceiling
-
-`data_layout.md` §5 records two ceilings, from nested terms and from
-discontinuous-term fragments. Truncation adds a third.
-
-A gold term whose every occurrence falls past `max_length` can never be
-predicted. It is not a model failure and must not be reported as one. Unlike
-the other two, this ceiling is a property of the configuration rather than the
-annotation scheme, which makes it the only one that can be engineered away —
-and the only one that is invisible if not deliberately measured.
-
-Counted at the **type** level, not the occurrence level: a term with eight
-occurrences, one of them truncated, loses nothing, because the metric is F1
-over a deduplicated list.
-
----
-
 ## 2. The loader
 
 All seven T2 statistics read the corpus through `src/stats/loading.py`. A
@@ -331,11 +314,6 @@ sentence exceeds it.
 **Decision:** `max_length = 256`, used purely as a truncation threshold, with
 dynamic per-batch padding. Attention is quadratic in sequence length, so this
 costs roughly a quarter of what 512 would.
-
-**The truncation ceiling from §1.4 is therefore ≈ 0** on the test domain. It
-still gets measured at type level once gold spans are available (§7 item 7),
-but it will not be a material term in the results table. That is a good
-outcome and worth stating explicitly rather than leaving implicit.
 
 ### 5.2 The inflation estimate used earlier was wrong
 
@@ -605,19 +583,101 @@ confirms `data_layout.md` §1 and validates the counting code.
 
 ---
 
-## 8. Open questions
+## 8. s06 — term-set overlap, training domains vs htfl
 
-### 8.1 [CLOSED] Do wind's ≤2-token sentences contain terms?
+Terms-only keys (`without_named_entities`) on both sides. N = 2,339 htfl gold
+terms. Training side = corp + equi + wind. Token-sequence matching,
+lowercased.
+
+`Tasks.md` calls this the number that matters most: it bounds how much of any
+reported score could be memorisation rather than cross-domain generalisation.
+
+| measure | count | % of htfl terms |
+|---|--:|--:|
+| **type overlap** — htfl term is also a training gold entry | **10** | **0.4%** (N=2,339) |
+| occurrence-weighted type overlap | 31 / 9,243 occ | 0.3% |
+| **text overlap** — sequence occurs in training annotated text, any label | 99 | 4.2% (N=2,339) |
+| … seen in text but never a labelled term there | 89 | 3.8% (N=2,339) |
+| **head overlap** — final token matches a training term's final token | 302 | 23.1% (N=1,310 multi-word) |
+| … not already a type match | 301 | 23.0% (N=1,310) |
+
+Per training domain alone: corp 2 type / 39 text, equi 6 / 58, wind 2 / 46.
+
+### 8.1 The domains are lexically near-disjoint
+
+**10 of 2,339 htfl gold terms appear in the training gold lists.** All ten are
+generic: `bpm`, `chest`, `compliance`, `contracting`, `muscle`, `muscles`,
+`muscular`, `pad`, `rna`, `remote monitoring` — anatomy and ordinary English
+that happens to be annotated in dressage or wind energy. None is medical
+terminology.
+
+By length: 9 of the 10 are single-token. Type overlap at 3+ tokens is exactly
+zero.
+
+Text overlap is an order of magnitude higher in relative terms (4.2% vs 0.4%)
+and still negligible in absolute terms — the model saw 99 htfl term strings
+somewhere in training, 89 of them never as labelled examples.
+
+**Consequence: essentially no reported score can be lexical memorisation.**
+Every result on htfl is a genuine cross-domain generalisation result, with no
+caveat required. This is the question a sharp reader asks first, and the answer
+is that it is not a concern.
+
+### 8.2 Head overlap is the transfer channel that does exist
+
+**23.1% of htfl's multi-word terms share a final token with some training
+term**, and 23.0% are not covered by type overlap at all.
+
+That is the mechanism by which anything transfers: a model that learned
+`... failure` or `... system` occupies a term-final position generalises to
+compounds it has never seen. `heart failure` carries a head flag despite no
+type or text overlap.
+
+**Prediction, checkable against per-length recall later:** recall on
+multi-word htfl terms should exceed recall on single-word terms. Multi-word
+terms have head-position and syntactic cues that transfer; single words, 44%
+of the htfl key, have essentially no transfer channel at all. Failures should
+concentrate there.
+
+### 8.3 htfl's frequent terms are clinical register, not terminology
+
+None of htfl's 20 most frequent terms is a type overlap. What they are:
+`patients`, `p`, `ci`, `mortality`, `outcomes`, `clinical`, `hr`, `follow-up`,
+`baseline`, `significantly`, `significant`, `death`.
+
+Most is research-abstract register — statistical notation and boilerplate —
+rather than domain terminology. ACTER's scheme counts Common Terms and
+Out-of-Domain Terms as positive (`data_layout.md` §4), so these are gold.
+
+The small text overlap that exists is concentrated here: `patients`, `p`,
+`baseline`, `death`, `significant` appear in corp and equi because they are
+ordinary English. The abbreviations `hf`, `hfpef`, `chf` have no overlap of
+any kind, and the training domains contain almost nothing of that term type.
+
+### 8.4 Named entities inflate every measure
+
+terms+NE key on both sides, N = 2,556: type overlap 32 (1.3%), text overlap
+122 (4.8%), head overlap 356 of 1,424 (25.0%).
+
+Roughly triple the type overlap, as expected — organisation and place names
+recur across domains. Keys are never mixed across the two sides; doing so
+would produce a misleadingly high figure.
+
+---
+
+## 9. Open questions
+
+### 9.1 [CLOSED] Do wind's ≤2-token sentences contain terms?
 
 No. They hold 0.9% of wind's B count and 3,499 of the 4,048 are a single
 period. Resolved in §6.2; filtering decision recorded there.
 
-### 8.2 [CLOSED] Is wind the sharpest test of the document-context hypothesis?
+### 9.2 [CLOSED] Is wind the sharpest test of the document-context hypothesis?
 
 Premise was that wind's terms live in context-free table cells. They do not —
 see §6.2. wind's terms are in its prose, like every other domain.
 
-### 8.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
+### 9.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
 
 **Not established. Do not assume it.** Cross-sentence and document-level
 context for sequence labelling is a worked area in NLP, and ACTER-specific
@@ -627,7 +687,7 @@ What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
 that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
 
-### 8.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
+### 9.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
 
 Corpus max under BERT is 1,074 wordpieces, from a wind sentence whose
 whitespace length is far below that. The four tokenizers disagree by 2.7× on
@@ -643,7 +703,7 @@ Noted only so the figure in §5 is not mistaken for a property of the prose.
 
 ---
 
-## 9. Still to measure
+## 10. Still to measure
 
 | item | statistic | decides |
 |---|---|---|
@@ -651,7 +711,6 @@ Noted only so the figure in §5 is not mistaken for a property of the prose.
 | ~~§7 T2-1c~~ | ~~inflation ratio, inside vs outside span~~ | **done — §5.3** |
 | ~~§7 T2-3~~ | ~~term length distribution~~ | **done — §7.1, cap at 4** |
 | ~~§7 T2-4~~ | ~~term frequency, hapax proportion~~ | **done — §7.2, §7.3** |
-| §7 T2-5 | term-set overlap, train ↔ htfl | how much of any score is memorisation |
+| ~~§7 T2-5~~ | ~~term-set overlap, train ↔ htfl~~ | **done — §8, overlap is 0.4%** |
 | ~~§7 T2-6~~ | ~~positive-label proportion~~ | **done — §6** |
 | §7 T2-7 | nested-term count, split 1-token vs ≥2-token | NOBI's expected effect size — **deferred to week 3** |
-| §1.4 | truncation ceiling at type level | ≈0 per §5.1; fold into T3's round-trip, which needs `decode()` anyway |

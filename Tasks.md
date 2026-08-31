@@ -8,7 +8,7 @@ a day ends.
 | Task | Owner | Depends on | Status |
 |---|---|---|---|
 | T1 — Repo, data, layout analysis | Ahmed | — | **done** |
-| T2 — Data statistics | Ahmed | T1 | next |
+| T2 — Data statistics | Ahmed | T1 | **done** |
 | T3 — Evaluation harness | Ahmed | T1, interface contract | |
 | T4 — C-Value baseline | khaled Ahmed | interface contract | can start now |
 | T5 — Prior work and comparison table | Moamen Talaat | — | can start now |
@@ -72,7 +72,7 @@ Tag the repo: `git tag day-1`.
 
 ---
 
-## T2 — Data statistics · Ahmed · depends on T1
+## T2 — Data statistics · Ahmed · DONE
 
 Compute the statistics listed in `data_layout.md` §7, all over the **annotated
 portion only**.
@@ -90,6 +90,13 @@ is near 52k, not 314k; `data_stats.md` committed with the script.
 
 **Risk:** computing over unannotated files. The word-count table in
 `data_layout.md` §1 is the cross-check.
+
+**Done.** Statistics computed by `src/stats/s01`, `s02`, `s04`–`s06` (loader +
+sentence length, wordpieces, label distribution, term length, term frequency,
+train↔htfl overlap); outputs in `results/data_stats/`, write-up in
+`docs/Data_stats.md`. Wind annotated word count is 57,766 (inventory ratio
+0.18), not 314k. One §7 item, T2-7 (nested-term count), is **deferred to week 3**
+alongside the NOBI ceiling comparison — recorded in `Data_stats.md` §10.
 
 ---
 
