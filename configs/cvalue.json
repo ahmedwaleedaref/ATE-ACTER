@@ -1,0 +1,11 @@
+{
+  "target_domain": "htfl",
+  "reference_corpus": "target_only",
+  "min_n": 2,
+  "max_n": 4,
+  "min_frequency": 2,
+  "threshold": 1.0,
+  "stopwords_path": null,
+  "output_path": "results/term_lists/htfl_cvalue_terms.txt",
+  "run_info_path": "results/term_lists/htfl_cvalue_run_info.json"
+}
