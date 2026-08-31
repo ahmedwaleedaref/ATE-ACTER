@@ -3,11 +3,11 @@
 2·9 , p
 30-day readmission
 30-day readmission rate
+30-day readmission rate for patients
 4-year survival
 6-minute walk
 6-minute walk test
 6-minute walked distance
-6-month event rates
 6-month risk of death
 6-month survival
 6-week follow-up
@@ -15,12 +15,12 @@
 7-day follow-up visits
 72-hour cumulative urine volume
 abdominal problems
-ability of bnp
+ability of bnp to predict
 ability to inhibit
 abnormal ca
 abnormal hr variability
 absolute value
-according to the biological
+according to the biological phenotype
 acp recommends
 across hospital volume groups
 across quartiles
@@ -31,18 +31,22 @@ acute coronary
 acute coronary syndromes
 acute heart
 acute heart failure
+acute heart failure ( ahf
+acute heart failure ( hf
+acute heart failure and renal
 acute hf
 acute kidney injury
+acute myocardial
 acute myocardial infarction
+acute myocardial infarction ( ami
 acute right
 acute right heart failure
 acute rv
 acute rv failure
 acute β-ar stimulation
-adaptive or maladaptive cardiac
+adaptive or maladaptive cardiac remodelling
 adding ctnt and nt-probnp
 addition to standard
-adenine nucleotides contents
 adherence to prescribed
 adipose tissue
 adjunctive treatment
@@ -53,9 +57,8 @@ adjusted hr
 adjusted odds ratio
 adjustment for age
 admission to discharge
-admitted to hospital
 adult patients
-adult patients with heart
+adult patients with heart disease
 adult population
 adults with heart
 adults with heart failure
@@ -64,7 +67,7 @@ adults with newly diagnosed
 advanced copd
 advanced heart
 advanced heart failure
-advanced heart failure patients
+advanced heart failure ( hf
 advanced hf
 advances in treatment
 adverse cv events
@@ -72,7 +75,6 @@ adverse event
 adverse event rates
 adverse events
 adverse events occurred
-adverse neurological and cardiovascular
 adverse outcomes
 aerobic capacity
 aerobic exercise
@@ -86,51 +88,51 @@ age group
 age-matched and sex-matched
 aged 20 years
 aggressive medical treatment
+aggressive medical treatment for hf
 aim of this study
 aimed to assess
-aimed to investigate
+aimed to investigate the association
 air pollution
 albumin levels
-albumin levels during lvad
+albumin levels during lvad support
 aldosterone antagonist
 all-cause death
 all-cause hospitalization
 all-cause hospitalizations
-all-cause medical hospitalization
+all-cause medical hospitalization in hf
 all-cause mortality
-all-cause mortality ( hazard
-all-cause mortality and readmissions
+all-cause mortality ( hazard ratio
 all-cause readmission
 all-cause readmissions
 alleviate symptoms
-alone in treating patients
 altered expression
 although limited
 ambulatory heart failure trial
 ambulatory hf
 ambulatory patients
-ambulatory patients with heart
+ambulatory patients with heart failure
 ambulatory patients with hf
 american college
 american college of cardiology
 american college of physicians
 american heart association
+ami ) , and pneumonia
 among older
 among older patients
 among patients
-among patients with heart
+among patients with heart failure
 among patients with hfpef
 among study patients
 among the elderly
 anaerobic threshold
-analysis of patient management
+analysis of patient management interventions
 analysis revealed
 analysis showed
 analysis using
 analysis was performed
-anemia and congestive heart
+anemia and congestive heart failure
 anemia and iron deficiency
-anemia in patients
+anemia in patients with heart
 ang ii infusion
 angiotensin converting
 angiotensin converting enzyme
@@ -142,12 +144,14 @@ angiotensin receptor blockers
 angiotensin receptor neprilysin inhibitor
 angiotensin-converting enzyme
 angiotensin-converting enzyme inhibitors
+angiotensin-converting enzyme inhibitors / angiotensin
 animal models
 ankle-brachial index
-annular plane systolic excursion
 annular size
 annular size reduction
-annuloplasty for ischemic mitral
+annular size reduction by surgery
+annuloplasty for ischemic
+annuloplasty for ischemic mitral regurgitation
 ans mice
 antagonist therapy
 anterior leaflet opening due
@@ -156,23 +160,19 @@ antiarrhythmic drugs
 antibodies targeting
 antihyperglycemic agents
 antiplatelet agents
-aortic blood flow
 aortic constriction
-aortic constriction ( tac
 aortic valve
 aortic valve replacement
 applied early
-approaches to stop hypertension
 area under the curve
-area under the receiver
+area under the receiver operating
 arg16 / gln27
 aric hf model
 arterial elastance
-arterial elastance ( ea
+arterial elastance , and ventricular-arterial
 arterial pressure
 arterial tonometry
 artery disease
-artery disease ( cad
 article describes
 assess the association
 assess the impact
@@ -181,19 +181,17 @@ assess the safety
 assess whether
 assessed by echocardiography
 assist device
-assist device ( lvad
 assist device implantation
 assist devices
-assist devices ( lvads
 associated with a higher
 associated with a significantly
 associated with an increased
 associated with better outcomes
-associated with congestive heart
+associated with congestive heart failure
 associated with heart failure
 associated with hf
 associated with improved
-associated with improved functional
+associated with improved functional capacity
 associated with increased
 associated with lower
 associated with mortality
@@ -203,6 +201,9 @@ associated with poor
 associated with poor prognosis
 associated with reduced
 associated with risk
+association ( nyha
+association ( nyha ) class
+association ( nyha ) functional
 association between frailty
 association class
 association with functional capacity
@@ -211,16 +212,19 @@ atherosclerotic cad
 atrial area
 atrial fibrillation
 atrial fibrillation ( af
-atrial fibrillation and congestive
-atrial fibrillation for stroke
+atrial fibrillation and congestive heart
+atrial fibrillation for stroke prevention
 atrial pacing
 atrial pressure
+automatic defibrillator implantation with cardiac
 autonomic balance
 autonomic nervous system
 average age
 b treatment
 b-treated plus
+b-type natriuretic
 b-type natriuretic peptide
+b-type natriuretic peptide ( bnp
 baroreflex activation therapy
 barriers to exercise
 baseline and follow-up
@@ -231,9 +235,10 @@ baseline hrqol
 bb therapy
 beat-to-beat qt
 because functional ms
+because functional ms is dynamic
 beck depression inventory
 beneficial effect
-beneficial effect of exercise
+beneficial effect of exercise training
 beneficial effects
 beta blockers
 beta-blocker therapy
@@ -242,6 +247,7 @@ biomarker-guided clinical
 biomedical reasons for nonprescribing
 biomedical treatment
 biomedical treatment alone
+biomedical treatment alone in treating
 biomedical treatment plus chm
 biosynthetic enzymes
 biventricular pacing
@@ -252,18 +258,17 @@ blockers and β-blockers
 blood flow
 blood pressure
 blood transfusions
-bnp ) levels
 bnp and nt-probnp
 bnp group
 bnp levels
-bnp to predict inhospital
+bnp to predict inhospital mortality
 body composition
+body composition , and prognosis
 body mass
-body mass / min
 body mass index
 body weight
 bottleneck stent
-brain natriuretic peptide
+brain natriuretic peptide ( bnp
 breast cancer
 breast cancer patients
 bridge to transplantation
@@ -272,10 +277,12 @@ btt and dt
 bundle branch
 c-kit + cell
 c-kit + cells
+ca2 ( + ) current
 cad as a cause
 caloric restriction
-caloric restriction or aerobic
-cardiac and kidney index
+caloric restriction or aerobic exercise
+capacity , quality of life
+cardiac and kidney index score
 cardiac angiogenesis
 cardiac arrest
 cardiac autonomic balance
@@ -293,10 +300,10 @@ cardiac hypertrophy
 cardiac index
 cardiac injury
 cardiac insulin-resistance
-cardiac insulin-resistance and decreased
+cardiac insulin-resistance and decreased mitochondrial
 cardiac magnetic
 cardiac magnetic resonance
-cardiac magnetic resonance postcontrast
+cardiac magnetic resonance postcontrast t1
 cardiac magnetic resonance t1
 cardiac na
 cardiac nurses
@@ -306,6 +313,7 @@ cardiac rehabilitation
 cardiac remodeling
 cardiac resynchronization
 cardiac resynchronization therapy
+cardiac resynchronization therapy ( crt
 cardiac sympathetic
 cardiac sympathetic activity
 cardiac transplant
@@ -313,16 +321,14 @@ cardiac transplantation
 cardiac vagal
 cardiac-resynchronization therapy
 cardiogenic shock
-cardiomyopathy and male sex
 cardiomyopathy questionnaire
-cardiomyopathy questionnaire ( kccq
 cardiopulmonary exercise
 cardiopulmonary exercise test
 cardiopulmonary exercise testing
 cardiorespiratory fitness
 cardiovascular complications
 cardiovascular death
-cardiovascular death or hf
+cardiovascular death or hf hospitalization
 cardiovascular disease
 cardiovascular diseases
 cardiovascular event
@@ -331,17 +337,19 @@ cardiovascular events
 cardiovascular function
 cardiovascular health
 cardiovascular mortality
-cardiovascular mortality / hf
+cardiovascular mortality / hf hospitalization
 cardiovascular outcomes
 cardiovascular risk factors
 cardioverter-defibrillator deactivation
 cardioverter-defibrillator device
 care delivery
 care for patients
+care for patients with heart
 care management
 care management and telehealth
 care of patients
 carvedilol and metoprolol
+carvedilol and metoprolol on inappropriate
 carvedilol resulted
 carvedilol was associated
 case report
@@ -354,42 +362,49 @@ cause of death
 cause of systolic
 cause of systolic hf
 cd34+vegfr2 + cells
-centers for medicare
+centers for medicare and medicaid
 centrimag rvad
 cf lvad patients
-change in cystatin c
+change in cystatin c level
 changes in chromatin
 changes in fm
 channel mrna
 channel mrna splice variants
-characteristic curve ( auc
 characteristics and outcomes
+characteristics and outcomes of young
 chart review
 chf patients
 chf-inv rabbits
-children with end-stage heart
+children with end-stage heart failure
 chinese herbal medicine
 chromatin structure
 chromatin-associated proteins
-chronic advanced heart failure
+chronic advanced heart failure patients
 chronic disease
 chronic heart
 chronic heart failure
+chronic heart failure ( chf
+chronic heart failure ( hf
+chronic heart failure with systolic
 chronic hf
 chronic kidney disease
 chronic myocardial ischemia
+chronic myocardial ischemia and heart
 chronic obstructive pulmonary disease
 circulating nt-probnp
 circulating progenitor cells
 circulatory support
+city cardiomyopathy
+city cardiomyopathy questionnaire
+city cardiomyopathy questionnaire ( kccq
 class ii
 class ii or iii
 class iii
 class iii or iv
 class iii to class
-clear organic lesion
+classification of diseases , ninth
 clinic outpatients
-clinical , laboratory
+clinical , laboratory , echocardiographic
 clinical and radiological signs
 clinical application
 clinical benefit
@@ -413,6 +428,7 @@ clinical trials
 clinical variables
 clinically significant
 cm / s
+cm2 , and a mean
 cms metrics
 co correlated
 co-primary outcome
@@ -425,14 +441,14 @@ cohort study
 collagen deposition
 collateral growth
 collected from hf patients
-combination of annular size
+combination of annular size reduction
 combined end point
 common cause
 common form
 common in patients
 commonly used
 compared with ch
-compared with hdl
+compared with hdl ( healthy
 compared with metoprolol
 compared with patients
 compared with placebo
@@ -442,9 +458,8 @@ compliance with treatment
 complicating ami
 complications occurred
 complications were observed
-composite ( vs. hospital
+composite ( vs. hospital compare
 composite quality
-composition , and prognosis
 conclusion , patients
 concurrent hf
 confidence in estimates
@@ -456,6 +471,8 @@ confidence intervals
 confidence level ( mdc95
 congestive heart
 congestive heart failure
+congestive heart failure ( chf
+congestive heart failure or coronary
 consecutive case series
 consecutive patients
 consensus report
@@ -464,7 +481,7 @@ contextual factors
 contextual reasons
 continuous relationship
 contractile function
-contractile reserve in patients
+contractile reserve
 contrast agent
 contribution of nursing
 control animals
@@ -480,6 +497,7 @@ coronary artery
 coronary artery bypass
 coronary artery bypass grafting
 coronary artery disease
+coronary artery disease ( cad
 coronary disease
 coronary heart
 coronary heart disease
@@ -513,7 +531,6 @@ current status
 curve ( auc
 cv events
 cystatin c
-cystatin c level
 dash / srd
 dash diet
 dash diet scores
@@ -530,18 +547,19 @@ death and all-cause
 death and all-cause hospitalization
 death from any cause
 death in patients
-death or first hf
+death or first hf hospitalization
 death or hf
 death or hf hospitalization
 death or hospitalization
+death or hospitalization for heart
 death or urgent
 death or urgent readmission
 decompensated hf
-decongestion and preserve renal
-decrease in cd34+vegfr2
+decongestion and preserve renal function
+decrease in cd34+vegfr2 + cells
 decrease mortality
 decreased mortality
-defibrillator implantation with cardiac
+defibrillator implantation with cardiac resynchronization
 deficit index
 degenerative mitral
 degenerative mr
@@ -554,8 +572,10 @@ design was used
 destination therapy
 determine whether
 detrimental alterations
+develop even in a patient
 developed countries
 developed heart failure
+developed heart failure with preserved
 developed hf
 development and disease
 development of cardiac
@@ -563,7 +583,6 @@ development of cardiac hypertrophy
 development of heart failure
 development of ie
 development of ies
-develops after ring annuloplasty
 device implantation
 diabetes mellitus
 diagnosis , medical
@@ -575,20 +594,18 @@ diagnostic procedures
 dialysis patients
 dialysis patients demonstrated
 dialysis-dependent patients
-dialysis-dependent patients with heart
+dialysis-dependent patients with heart failure
 diastolic dysfunction
 diastolic filling
 diastolic function
-diastolic function , arterial
+diastolic function , arterial elastance
 diastolic mitral
-diastolic mitral annular velocity
-diastolic mitral flow velocity
 diastolic mitral valve tethering
 diet group
 diet score
 diet score ( p
 diet scores
-dietary approaches to stop
+dietary approaches to stop hypertension
 dietary recommendations
 difference among
 differences were found
@@ -602,26 +619,24 @@ disease ( hr
 disease in patients
 disease management
 disease management programs
+disease management programs in heart
 disease progression
 diseased cardiomyocytes
 diseases , ninth revision
+displaced papillary muscles with left
 distance covered
 diuretic therapy
 diuretic use
-dl , n
 dna fragmentation
 documented in medical records
-dopamine or low-dose nesiritide
 dopamine or nesiritide
 doppler echocardiography
 dose uptitration
-doxorubicin-induced heart failure
-due to atrial fibrillation
-due to myocardial infarction
+doxorubicin-induced heart failure in rats
 due to partial
-due to posteriorly displaced
+due to posteriorly displaced papillary
 duration and extent
-dynamic and proportional
+dynamic and proportional to lv
 dyssynchronous heart failure
 dyssynchronous hf
 e / e
@@ -631,45 +646,49 @@ e / emean
 early diastolic
 early diastolic mitral
 early diastolic mitral annular
-early diastolic mitral flow
-early physician follow-up
+early diastolic mitral annular velocity
+early diastolic mitral flow velocity
+early physician follow-up after discharge
 early rhythm control therapy
 early transmitral
-early treatment of atrial
+early treatment of atrial fibrillation
 echocardiographic measures
-echocardiographic measures , n-terminal
+echocardiographic measures , n-terminal pro-brain
 echocardiographic predictors
 echocardiographic score
 ecmo group
 ecmo+vad group
-economic analysis of patient
+economic analysis of patient management
 ed cases
 ed patients
 ed visit
 ed visits
 edge-to-edge anastomosis
 effect of crt
+effect of exercise
 effect of exercise training
-effect on 72-hour cumulative
-effective arterial elastance
+effect of lvef on long-term
+effect on 72-hour cumulative urine
+effective arterial elastance ( ea
 effective practice
 effective rate
 effective treatment
 effectiveness and safety
+effectiveness and safety of spironolactone
 effects of b
 efficacy and safety
-efficacy of eplerenone
-efficacy of mineralocorticoid receptor
+efficacy of eplerenone in patients
+efficacy of mineralocorticoid receptor antagonists
 egfr group
-egfr in the vad
+egfr in the vad group
 ejection fraction
 ejection fraction ( ef
 ejection fraction ( hfpef
-ejection fraction ( hfref
 ejection fraction ( lvef
+ejection fraction : a randomized
 ejection fraction ≤35
 ejection fractions
-elastance , and ventricular-arterial
+elastance , and ventricular-arterial coupling
 electrical activation
 electromechanical delay
 electronic databases
@@ -689,7 +708,7 @@ end points
 end stage
 end stage heart failure
 end-diastolic pressure
-end-diastolic pressure / wall
+end-diastolic pressure / wall stress
 end-diastolic volume
 end-diastolic volume index
 end-stage heart
@@ -701,23 +720,25 @@ end-systolic volume
 endothelial function
 endpoint of inappropriate
 energy metabolism
-enhance decongestion and preserve
-enrolled in the heart
+enhance decongestion and preserve renal
+enrolled in the heart failure
 enzyme inhibitor
 enzyme inhibitors
 enzyme inhibitors / angiotensin
+enzyme inhibitors / angiotensin receptor
 eo-cfus were associated
-epithelial to mesenchymal transition
+epithelial to mesenchymal transition markers
 eplerenone in patients
+eplerenone in patients at high
 erythropoiesis-stimulating agents
 estimated glomerular filtration rate
 et al
 evaluate the cost-effectiveness
 evaluated whether
-even in a patient
 even though
 event rate
 event rates
+event rates in the um
 events ( defined
 events in patients
 evidence based practice
@@ -726,8 +747,8 @@ examined the impact
 excluded patients
 exercise + diet
 exercise adherence
+exercise and cardiac and kidney
 exercise capacity
-exercise capacity , quality
 exercise group
 exercise group ( p
 exercise intolerance
@@ -746,7 +767,7 @@ exercise with testosterone
 exercise-induced pasp
 exercise-induced pasp increase
 exhibited a higher
-expenditure on health per
+expenditure on health per capita
 experimental procedures
 explored whether
 expressed in the heart
@@ -759,49 +780,49 @@ extracellular matrix
 extracorporeal membrane oxygenation
 factor analysis
 factors associated
-factors for the development
 failing fontan
 failing heart
 failing hearts
-failure : a controlled
-failure : a systematic
-failure and reduced ejection
-failure and renal dysfunction
-failure disease management programs
-failure due to myocardial
-failure in patients treated
+failure ( chf
+failure ( hf
+failure ( hf ) patients
+failure ( hf ) using
+failure : a controlled trial
+failure : a systematic review
+failure and reduced
+failure and reduced ejection fraction
+failure due to myocardial infarction
+failure in patients
 failure is a major
-failure or coronary heart
+failure is a major public
+failure or coronary heart disease
 failure patients
-failure survey in israel
 failure with preserved
-failure with preserved ejection
+failure with preserved ejection fraction
 failure with reduced
-failure with reduced ejection
-failure with systolic dysfunction
+failure with reduced ejection fraction
 familiar physician
 fat mass
 favorable outcome
 ffm decreased
-fibrillation and congestive heart
-fibrillation for stroke prevention
+fibrillation and congestive heart failure
+fibrillation for stroke prevention trial
 filling pressure
 filling pressures
 findings suggest
 first 2 trials
-first hf hospitalization
+first hf hospitalization ( hazard
 first month
 first month after discharge
 five patients
 flow velocity
-flow velocity to peak
+flow velocity to peak early
 flow-mediated dilatation
 fluid overload
 fm increased
-follow-up of 2.5 years
 follow-up period
 follow-up visits
-following variables were significantly
+following variables were significantly associated
 fontan adults
 fontan circulation
 fontan failure
@@ -810,18 +831,18 @@ form the foundation
 forms of nt-probnp
 four groups
 four of five patients
-fraction : a randomized
+fraction ( hfpef
 fractional shortening
-frailty and risk
+frailty and risk for heart
 free wall
-frequency of 7-day follow-up
-frequently develops after ring
+frequency of 7-day follow-up visits
+frequently develops after ring annuloplasty
 fully magnetically levitated
-function , arterial elastance
 function , body composition
 function in chronic
 function in hfpef
 function in patients
+function in patients with acute
 function is impaired
 function was assessed
 functional capacity
@@ -834,14 +855,15 @@ functional enrichment analysis
 functional mitral stenosis
 functional ms
 functional ms can potentially
-functional ms could develop
-functional ms is dynamic
+functional ms could develop even
 functional status
-future high and low
+future high and low performers
 g / dl
+g / dl , n
 g / s
 g-protein-coupled receptor kinase-2
 g-protein-coupled receptors
+gait therapy with the lokomat®
 gastrointestinal bleeding
 gene expression
 gene expression profile
@@ -850,8 +872,8 @@ general population
 gill index
 given the lack
 global attenuation
-global left ventricular longitudinal
-global longitudinal strain
+global left ventricular longitudinal systolic
+global longitudinal strain of left
 global proteomics
 global proteomics changes
 glomerular filtration rate
@@ -861,7 +883,7 @@ greater risk
 grip strength
 group ( hazard ratio
 group ( p
-group and the ecmo+vad
+group and the ecmo+vad group
 group compared
 group ii
 group iii
@@ -889,51 +911,51 @@ health care
 health care system
 health insurance
 health outcomes
-health per capita
 health service
 health status
 health-related quality of life
 healthy control
 healthy individuals
 heart association
-heart association ( nyha
 heart association class
-heart association class ii
-heart association class iii
 heart disease
 heart failure
-heart failure ( ahf
 heart failure ( chf
 heart failure ( hf
+heart failure : a controlled
+heart failure : a systematic
 heart failure among
 heart failure and arrhythmias
 heart failure and reduced
-heart failure and renal
+heart failure and reduced ejection
+heart failure and renal dysfunction
 heart failure cost-effectiveness model
-heart failure disease management
-heart failure due
+heart failure disease management programs
+heart failure due to myocardial
 heart failure hospitalization
 heart failure in patients
-heart failure in rats
+heart failure in patients treated
 heart failure index version
+heart failure is a major
 heart failure is associated
-heart failure or coronary
+heart failure or coronary heart
 heart failure or death
 heart failure patients
-heart failure questionnaire
 heart failure samples
-heart failure survey
+heart failure survey in israel
 heart failure treatment
 heart failure trial
 heart failure via
 heart failure with preserved
+heart failure with preserved ejection
 heart failure with reduced
-heart failure with systolic
+heart failure with reduced ejection
+heart failure with systolic dysfunction
 heart failure-related
 heart magnetic resonance imaging
 heart rate
 heart rate ( hr
-heart rate and aortic
+heart rate and aortic blood
 heart rate reduction
 heart rate variability
 heart team
@@ -941,29 +963,27 @@ heart transplant
 heart transplantation
 heartmate ii
 heartmate ii lvad
+heartmate ii lvad and centrimag
 heavy chain
 help patients
 hemodynamic status
 hemoglobin levels
-hf ) , acute
-hf ) patients
-hf ) using
+hf ) , acute myocardial
 hf , cxl-1020
 hf , cxl-1020 reduced
 hf , respectively
 hf 4 years
 hf after mi
 hf clinic
-hf clinic outpatients
 hf epidemiology
 hf hospital admissions
 hf hospitalization
 hf hospitalization ( hazard
+hf hospitalization ( hazard ratio
 hf hospitalization ( hr
 hf in la
 hf model
 hf mortality
-hf of unclear etiology
 hf pathogenesis
 hf patients
 hf patients with reduced
@@ -977,22 +997,21 @@ hf symptom
 hf symptoms
 hf was associated
 hf with preserved
-hf with preserved ejection
+hf with preserved ejection fraction
 hf with reduced
 hf with reduced ef
-hf with reduced ejection
+hf with reduced ejection fraction
 hf-action randomized
 hfpef patients
 hfref and hfpef
 hfvt(+) group
-high and low performers
 high bnp
 high mortality
 high risk
 high risk for hyperkalemia
 high sst2
-high sst2 / high-dose
-high sst2 treated
+high sst2 / high-dose bb
+high sst2 treated with low-dose
 high-cost medicare
 high-density lipoprotein
 high-dose bb
@@ -1010,7 +1029,7 @@ higher serum levels
 highly effective
 history of myocardial infarction
 history of successful
-history of successful valve
+history of successful valve plasty
 hm ii
 hnorm group
 hospital admission
@@ -1023,14 +1042,13 @@ hospitalization ( hazard ratio
 hospitalization for acute
 hospitalization for heart failure
 hospitalization for hf
-hospitalization in hf clinic
+hospitalization in hf clinic outpatients
 hospitalization or death
 hospitalization rates
 hospitalizations in patients
-hospitalized for heart failure
 hospitalized for hf
-hospitalized heart failure
 hospitalized older adults
+hospitalized older adults with heart
 hospitalized patients
 however , clinical
 however , limited
@@ -1044,7 +1062,6 @@ human hf
 human resistin
 hyperkalemia or wrf
 hypertensive heart
-hypertensive heart disease
 hypertensive hfpef
 icd patients
 icd shocks
@@ -1054,11 +1071,9 @@ identify patients
 idiopathic dilated cardiomyopathy
 ii infusion
 ii lvad
-ii lvad and centrimag
 ii or iii
-imaging on chelation choices
-impact of carvedilol
-impact of heart magnetic
+impact of carvedilol and metoprolol
+impact of heart magnetic resonance
 impact of qrs morphology
 impaired cardiac
 implantable cardiac
@@ -1068,7 +1083,7 @@ implantable cardioverter defibrillators
 implantable cardioverter-defibrillator
 implantable cardioverter-defibrillator deactivation
 implantable cardioverter-defibrillator deactivation discussions
-implantation with cardiac resynchronization
+implantation with cardiac resynchronization therapy
 implanted monitoring devices
 implementation strategies
 important component
@@ -1078,17 +1093,17 @@ improve cardiac
 improve outcomes
 improve symptoms
 improved clinical
-improved functional capacity
 improved survival
 improvement in egfr
 improvement of cardiac
 improves cardiac
 improves exercise capacity
+improves exercise capacity , quality
 improves outcomes
 inappropriate atp
 inappropriate implantable cardioverter-defibrillator therapy
 inappropriate therapy
-inappropriate therapy due
+inappropriate therapy due to atrial
 incidence and predictors
 incident hf
 includes age , race
@@ -1110,7 +1125,7 @@ increased peak vo2
 increased risk
 increased risk for adverse
 increased risk of death
-increased risk of heart
+increased risk of heart failure
 increased significantly
 increased sympathetic
 independent predictor
@@ -1119,53 +1134,49 @@ independent predictors
 independent prognostic
 independently associated
 independently associated with increased
-index , and heart
+index , and heart failure
 index admission
 index was associated
 indicative for surgery
 indicative of cardiac
-infarction , congestive heart
-infarction , heart failure
-infarction , or heart
+infarction , congestive heart failure
+infarction , or heart failure
 infarction heart
 infarction heart failure
 inflammatory biomarkers
 inflammatory markers
 ingenuity pathway analysis
-inhibitors / angiotensin receptor
+inhibitors / angiotensin receptor blockers
 inhospital mortality
 inotropic effect
 inpatient admissions
 insulin resistance
-insulin-resistance and decreased mitochondrial
 integrated discrimination improvement
-intensive transitions of care
+intensive transitions of care program
 internal consistency
 international classification of diseases
 interquartile range
+interventions in heart
 interventions in heart failure
+interventions in heart failure cost-effectiveness
 intravenous iron
 intubation rates declined
 invasive hemodynamic
-investigate the association
-investigating outcomes of exercise
+investigating outcomes of exercise training
 iron deficiency
-irrespective of β2-adrenergic receptor
+irrespective of β2-adrenergic receptor haplotype
 irs1 and irs2
 irs1 and irs2 proteins
-ischemia and heart failure
 ischemic cardiomyopathy
-ischemic cardiomyopathy and male
+ischemic cardiomyopathy and male sex
 ischemic events
 ischemic heart
 ischemic heart failure
-ischemic mitral regurgitation
 isolated cardiomyocytes
 isolated heart
 isolated heartmate ii
 isolated hr reduction
 iv hf
-ivabradine ( β
 ivabradine group
 ivc occlusion
 jehovah 's witness
@@ -1175,18 +1186,17 @@ kccq overall
 kccq overall summary
 key health outcomes
 kg ( p
-kg / day
 kg / m
 kg / min
 kg [ sd
-kg body mass
+kg body mass / min
 kg vs
-kidney index score
 kidney infection
 l / min
+l / min / m
+l ; 95 % ci
 l-type ca2
 l-type channel
-laboratory , echocardiographic
 laboratory report
 laboratory report model
 lad model
@@ -1196,6 +1206,7 @@ latin america
 lcx and lad models
 leading cause
 leading cause of mortality
+leaflet opening due to posteriorly
 lean body mass
 lean mass
 lean zsf1
@@ -1208,10 +1219,11 @@ left ventricular
 left ventricular ( lv
 left ventricular assist
 left ventricular assist device
+left ventricular assist device implantation
 left ventricular assist devices
 left ventricular assist system
 left ventricular diastolic
-left ventricular diastolic end
+left ventricular diastolic end diameter
 left ventricular diastolic function
 left ventricular dilatation
 left ventricular dysfunction
@@ -1221,7 +1233,7 @@ left ventricular ejection fractions
 left ventricular ejection time
 left ventricular filling
 left ventricular filling pressure
-left ventricular longitudinal systolic
+left ventricular longitudinal systolic strain
 left ventricular systolic
 left-to-right interatrial
 left-to-right interatrial shunting
@@ -1231,11 +1243,8 @@ less common
 less likely
 less severe
 less than 130 msec
-levels during lvad support
 levels in patients
-life , emotional
 life expectancy
-life in patients
 life-sustaining treatment
 likely to develop
 limited data
@@ -1244,23 +1253,23 @@ linked administrative
 little is known
 liver disease
 living with heart failure
+living with heart failure questionnaire
 logistic regression
-lokomat® system
 long time
 long-term mortality
 long-term mortality as patients
 long-term outcomes
 long-term survival
-longitudinal strain of left
+longitudinal strain of left ventricle
 longitudinal study
 low left ventricular ejection
 low pasp
 low sst2
-low sst2 / low-dose
+low sst2 / low-dose bb
 low testosterone status
 low-dose bb
 low-dose dopamine
-low-dose dopamine or low-dose
+low-dose dopamine or low-dose nesiritide
 low-dose nesiritide
 low-volume ed cases exhibited
 lower among patients
@@ -1272,7 +1281,7 @@ lower mortality
 lower rate
 lower rates
 lower risk
-lower total expenditure
+lower total expenditure on health
 lower von willebrand factor
 lp-pla2 ( p
 lung weight
@@ -1287,15 +1296,16 @@ lv ejection fraction
 lv end-diastolic
 lv end-diastolic dimension
 lv end-diastolic pressure
+lv end-diastolic pressure / wall
 lv end-diastolic volume
 lv end-systolic volume
 lv filling
 lv hypertrophy
-lv is dilated
+lv is dilated by another
 lv reverse remodeling
 lv strain
 lv systolic
-lv with an end-diastolic
+lv with an end-diastolic volume
 lvad implantation
 lvad surgery
 lvad use
@@ -1306,32 +1316,35 @@ lvh and rwt
 lyso-paf-at ( p
 magnetic resonance
 magnetic resonance imaging
-magnetic resonance postcontrast t1
+magnetic resonance imaging on chelation
+magnetic resonance postcontrast t1 time
 magnetically levitated
 main outcome
 main outcome measure
 main outcomes and measures
 maintenance of sinus rhythm
-major adverse neurological
+major adverse neurological and cardiovascular
 major cause
 major complications
 major public health problem
 major role
 majority of patients
-maladaptive cardiac remodelling
 maladaptive remodelling
 male mice
 male patients
 male patients with chf
-male patients with chronic
+male patients with chronic heart
 mammalian enabled ( mena
-management interventions in heart
+management interventions in heart failure
 management of heart failure
 management of patients
+management of patients with heart
+management of patients with ras
 management programs
-management programs in heart
+management programs in heart failure
 management strategies
 mass index
+mass index , and heart
 matched controls
 materials and methods
 mean age
@@ -1340,46 +1353,45 @@ mean ejection fraction
 mean follow-up
 mean pressure gradient
 mean score
-measure of right ventricular
+measure of right ventricular contractile
 measurement of hr variability
 measurement of natriuretic peptides
-measures , n-terminal pro-brain
+measures , n-terminal pro-brain natriuretic
 measures of hr
 mechanical cardiac support
 mechanism is a combination
 median age
 median bnp
 median follow-up
+median follow-up of 2.5 years
 median rate ratio
-medical hospitalization in hf
+medical hospitalization in hf clinic
 medical management
 medical outcomes study short-form
 medical records
-medical support provided
+medical support provided during office
 medical therapy
 medical treatment
-medical treatment for heart
+medical treatment for heart failure
 medical treatment for hf
-medicare 's post-acute care
-medicare and medicaid
+medicare 's post-acute care transfer
 medicare and medicaid services
 medicare data
 medicare fee-for-service beneficiaries
-mediterranean and dash diet
+mediterranean and dash diet scores
 mediterranean diet
 medline , embase
 membrane oxygenation
 membrane oxygenation ( ecmo
 mena overexpression
-mesenchymal transition markers
 metabolic enzymes
 metabolic exercise and cardiac
 metabolic risk
 methods and results
-metoprolol on inappropriate
 metric choice
 mg / dl
 mg / kg
+mg / kg / day
 mg / l
 mg daily
 mg hr
@@ -1388,16 +1400,15 @@ mi animals
 mice showed
 mild heart failure
 mild mr
-mild or moderate
 mild to moderate anemia
+min ( 95 % ci
 min / 1.73 m
 min / kg
 min / kg increase
-min / m
 min per 1.73 m
 mineralocorticoid receptor
 mineralocorticoid receptor antagonists
-minnesota living with heart
+minnesota living with heart failure
 mitochondrial dysfunction
 mitochondrial function
 mitochondrial oxidative
@@ -1407,41 +1418,50 @@ mitochondrial-targeted peptide
 mitral annulus
 mitral annulus velocity
 mitral filling flow
+mitral flow velocity to peak
 mitral regurgitation
 mitral stenosis
 mitral valve
 mitral valve opening
 mitral valve plasty
+mitral valve plasty for degenerative
+mitral valve tethering , restricting
 mixed-methods study
 ml / kg
-ml / kg body
+ml / kg / min
+ml / kg body mass
 ml / m2
 ml / min
+ml / min / kg
 ml / min per
+ml ; 95 % ci
 ml ; p
 mm hg
 mm hg ( fig
 mm hg / ml
 mmol / l
 model can be used
-model for chronic myocardial
+model for chronic myocardial ischemia
 model of chronic
-model of hypertensive heart
+model of hypertensive heart disease
 models were developed
 models were used
+models were used to assess
 moderate the beneficial effect
-moderate to severe heart
+moderate to severe heart failure
 molecular mechanism
 molecular pathways
 months of follow-up
 months of treatment
 morbidity and mortality
+mortality ( hazard
 mortality ( hazard ratio
-mortality / hf hospitalization
 mortality / hospitalization
 mortality among
 mortality and morbidity
+mortality as patients with mild
 mortality in patients
+mortality in patients with heart
 mortality in women
 mortality rates
 mortality risk
@@ -1449,12 +1469,13 @@ mortality using
 mouse heart
 mouse hf model
 mouse model
+mr , if the lv
 mr and ms
 mrna levels
 mrna splicing
-ms , respectively
-ms , the hazard
-ms could develop even
+ms , respectively ; p
+ms , the hazard ratio
+ms is dynamic and proportional
 mt group
 multicenter automatic defibrillator implantation
 multicenter study
@@ -1466,7 +1487,6 @@ multivariate analysis showed
 multivariate cox
 multivariate logistic regression analysis
 multivariate models
-muscles with left ventricular
 muscular strength
 mva of 1.2 cm2
 mva of 1.7 cm2
@@ -1475,12 +1495,12 @@ myocardial dd
 myocardial extracellular matrix
 myocardial function
 myocardial infarction
-myocardial infarction ( ami
 myocardial infarction ( mi
-myocardial infarction , congestive
-myocardial infarction , heart
+myocardial infarction , congestive heart
+myocardial infarction , heart failure
+myocardial infarction , or heart
 myocardial ischemia
-myocardial ischemia and heart
+myocardial ischemia and heart failure
 myocardial pde2
 myocardial perfusion
 myocardial t1
@@ -1490,15 +1510,16 @@ n - and c-terminally
 n-terminal pro-b-type
 n-terminal pro-b-type natriuretic
 n-terminal pro-b-type natriuretic peptide
+n-terminal pro-brain
+n-terminal pro-brain natriuretic
 n-terminal pro-brain natriuretic peptide
 na + channel
-na + channel mrna
+na + channel mrna splice
 na + current
 narrow qrs complex
 national trends
 natriuretic peptide
 natriuretic peptide ( bnp
-natriuretic peptide ( nt-probnp
 natriuretic peptide levels
 natriuretic peptides
 natriuretic peptides ( nps
@@ -1510,7 +1531,9 @@ new targets
 new therapeutic
 new users
 new york
+new york heart
 new york heart association
+new york heart association class
 newly diagnosed
 newly diagnosed heart failure
 ng / ml
@@ -1518,7 +1541,7 @@ nicorandil was effective
 nitric oxide
 nitroxyl ( hno
 non-fatal stroke
-non-ischemic and ischemic heart
+non-ischemic and ischemic heart failure
 nonterminal epitopes
 nontrastuzumab users
 nordic walking
@@ -1529,14 +1552,12 @@ north america
 novel therapeutic
 np levels
 nt-probnp levels
-number of hf risk
+number of hf risk factors
 number of patients
 number of studies
 nursing care
 nursing-sensitive outcome
-nyha ) class
 nyha ) class iii
-nyha ) functional
 nyha ) functional class
 nyha class
 nyha class iii
@@ -1556,12 +1577,13 @@ odds ratio
 odds ratios
 office hours
 older adults
-older adults with heart
+older adults with heart failure
 older age
 older patients
 ongoing gdmt
 onset heart failure
-opening due to posteriorly
+opening due to posteriorly displaced
+operating characteristic curve ( auc
 optimal combined treatment
 optimal therapy
 outcome in patients
@@ -1574,9 +1596,8 @@ outcomes for patients
 outcomes in heart failure
 outcomes in hf
 outcomes in patients
+outcomes in patients with heart
 outcomes included
-outcomes of exercise training
-outcomes of young
 outcomes trial
 outpatient settings
 outpatients with heart failure
@@ -1585,6 +1606,7 @@ overall summary
 oxidative stress
 oxygen consumption
 oxygen flow
+p < .001 ) remained
 p < 0·01
 p = 0·05
 p for trend
@@ -1592,7 +1614,7 @@ p value
 p values
 paf levels
 paf-ah ( p
-papillary muscles with left
+papillary muscles with left ventricular
 parasympathetic activity
 partially reversed
 partially reversed by metoprolol
@@ -1606,17 +1628,18 @@ pathophysiology of hf
 pathway analysis
 patient compliance
 patient died
-patient management interventions
+patient management interventions in heart
 patient outcomes
 patient population
 patient preferences
 patient safety
 patient was admitted
+patient was admitted to hospital
 patient with heart failure
 patients ( aged
-patients ( left ventricular
+patients ( left ventricular ejection
 patients ( n
-patients , 6-month event
+patients , 6-month event rates
 patients , respectively
 patients admitted
 patients at high risk
@@ -1628,8 +1651,8 @@ patients enrolled
 patients exhibited
 patients having hfpef
 patients hospitalized
-patients hospitalized for heart
-patients in the ecmo
+patients hospitalized for heart failure
+patients in the ecmo group
 patients in the vad
 patients presenting
 patients receiving
@@ -1640,7 +1663,7 @@ patients requiring isolated
 patients treated
 patients treated with bisphosphonates
 patients undergoing
-patients undergoing left ventricular
+patients undergoing left ventricular assist
 patients undergoing mt
 patients underwent
 patients were included
@@ -1648,11 +1671,12 @@ patients who had undergone
 patients who underwent
 patients who underwent catheterization
 patients with acute
-patients with acute heart
+patients with acute heart failure
 patients with advanced
 patients with advanced chronic
-patients with advanced heart
+patients with advanced heart failure
 patients with an implantable
+patients with an implantable cardioverter-defibrillator
 patients with and without
 patients with atrial fibrillation
 patients with baseline
@@ -1660,9 +1684,10 @@ patients with cad
 patients with chf
 patients with chronic
 patients with chronic heart
-patients with congestive heart
+patients with chronic heart failure
+patients with congestive heart failure
 patients with coronary
-patients with dcm
+patients with dcm and heart
 patients with diabetes
 patients with heart
 patients with heart disease
@@ -1676,8 +1701,10 @@ patients with left ventricular
 patients with low
 patients with low sst2
 patients with mild
-patients with moderate
-patients with new york
+patients with mild or moderate
+patients with mild to moderate
+patients with moderate to severe
+patients with new york heart
 patients with non-lbbb
 patients with pad
 patients with precapillary ph
@@ -1688,18 +1715,21 @@ patients with ras
 patients with recent onset
 patients with reduced
 patients with severe
-patients with severe heart
-patients with severe pulmonary
+patients with severe heart failure
+patients with severe pulmonary hypertension
 patients with stable
 patients with systolic
 patients with systolic dysfunction
-patients with systolic heart
+patients with systolic heart failure
 patients with systolic hf
-patients with ventricular assist
+patients with ventricular assist devices
 patients without
 pde2 expression
 peak early
+peak early diastolic
 peak early diastolic mitral
+peak early diastolic mitral annular
+peak early diastolic mitral flow
 peak o2 per kilogram
 peak oxygen
 peak oxygen consumption
@@ -1708,6 +1738,8 @@ peak quadriceps force
 peak vo2
 peak vo2 ( p
 pediatric heart failure
+peptide ( bnp
+peptide ( bnp ) levels
 per capita
 per patient
 per week
@@ -1725,24 +1757,20 @@ peripheral vascular disease
 peritoneal dialysis
 persistent af
 pg / ml
-ph with heart failure
 pharmacological treatment
-phosphocreatine and adenine nucleotides
+phosphocreatine and adenine nucleotides contents
 physical activity
 physical examination
 physician adherence
 physician continuity
-physician follow-up after discharge
 physician volume
 physician volume is associated
 pilot study
 pka subunits
-placebo , 0.11 mg
-placebo , 8296 ml
 placebo group
 plasma membrane
 plasma samples
-plasty for degenerative mr
+plasty for degenerative
 play a role
 play an important role
 point of care
@@ -1757,6 +1785,7 @@ post-lvad ai
 post-myocardial infarction
 post-myocardial infarction heart
 postcontrast t1
+postcontrast t1 time is associated
 posterior wall
 posteriorly displaced papillary muscles
 postoperative normalization of albumin
@@ -1766,11 +1795,10 @@ potassium > 5.5 mmol
 potential benefit
 potential usefulness
 practice-level variation
-precapillary ph with heart
-predict inhospital mortality
+precapillary ph with heart failure
 predict the 6-month risk
 predicting adverse cv events
-prediction of lv reverse
+prediction of lv reverse remodeling
 prediction rule
 predictive cutoff value
 predictive value
@@ -1780,18 +1808,20 @@ predicts clinical
 preoperative hypoalbuminemia
 preoperative renal dysfunction
 present study
-preserve renal function
-preserved and reduced ejection
+preserve renal function in patients
+preserved and reduced ejection fraction
 preserved ef
 preserved ejection
 preserved ejection fraction
+preserved ejection fraction ( hfpef
 preserved left
 preserved left ventricular
+preserved left ventricular ( lv
 preserved left ventricular ejection
+preserved left ventricular ejection fraction
 preserved lvef
-pressure / wall stress
 pressure-overload-induced heart failure
-prevention and treatment
+prevention and treatment of hf
 primary efficacy
 primary end point
 primary endpoint
@@ -1802,6 +1832,7 @@ primary study end point
 prior hf
 pro-b-type natriuretic
 pro-b-type natriuretic peptide
+pro-b-type natriuretic peptide ( nt-probnp
 processes of care
 progenitor cells
 prognosis in advanced
@@ -1813,6 +1844,7 @@ prognostic information
 prognostic relevance
 prognostic value
 program of exercise
+programs in heart
 programs in heart failure
 progression of heart
 progression to heart failure
@@ -1829,7 +1861,6 @@ protein kinase
 protein levels
 proteins alter chromatin structure
 provide insight
-provided during office hours
 proximal lad
 proximal left anterior descending
 psoriasis patients
@@ -1859,8 +1890,11 @@ quality improvement initiative
 quality measures
 quality of care
 quality of life
+quality of life , emotional
+quality of life in patients
 quality-of-life score
 race influences
+race was associated with increased
 rad q65p
 rad q66p
 rad variant
@@ -1877,20 +1911,20 @@ randomized trials
 randomly assigned
 randomly selected
 ras - and β-blocker
+ras - and β-blocker dose
+ras - and β-blocker uptitrations
 rate ( hr
-rate and aortic blood
+rate and aortic blood flow
 rate control
 rate for patients
 rate-control strategies
-rates and risk factors
-rates in the um
+rates and risk factors associated
 rates of patients
-ratio of peak early
+ratio of peak early diastolic
 rats were randomized
 reach an advanced
 readmission metrics
 readmission rate
-readmission rate for patients
 readmission rates
 reasons for nonprescribing
 reasons for not prescribing
@@ -1903,7 +1937,6 @@ recent studies
 recent trials
 recent years
 recently discharged
-receptor 1 ( s1pr1
 receptor antagonist
 receptor antagonists
 receptor blocker
@@ -1911,19 +1944,22 @@ receptor blockers
 reclassification of risk
 redo sternotomy
 reduce all-cause mortality
+reduce all-cause mortality and readmissions
 reduce morbidity and mortality
 reduce the risk
-reduced and preserved ejection
+reduced and preserved ejection fraction
 reduced cardiac
 reduced compared
 reduced ef
 reduced ejection
 reduced ejection fraction
+reduced ejection fraction ( hfref
 reduced hospitalizations
 reduced left ventricular
 reduced lv
 reduced mortality
 reduced sympathetic
+reduction by surgery and diastolic
 reduction in mortality
 reduction in the primary
 reduction of sympathetic
@@ -1941,7 +1977,6 @@ relationship between sex
 relationships between right ventricular
 relative decrease
 relative risk
-reliability of the timed
 remained elevated
 remained independently associated
 remained significant
@@ -1957,15 +1992,14 @@ renal dnx
 renal dysfunction
 renal function
 renal function in children
-renal function in patients
 renin-angiotensin system
 renin-angiotensin-aldosterone system
 research design
 research is needed
+reserve in patients with severe
 resistance training
 resistin levels
-resonance imaging on chelation
-resonance postcontrast t1 time
+resonance imaging on chelation choices
 resource use
 resource use , costs
 respectively ( p
@@ -1974,20 +2008,19 @@ respectively ; p
 response caused
 response to exercise
 resting hr
-restricting the anterior leaflet
-restriction or aerobic exercise
+restricting the anterior leaflet opening
+restriction or aerobic exercise training
 results show
 results suggest
 results were similar
 resynchronization therapy
-resynchronization therapy ( crt
-resynchronization-defibrillation for ambulatory heart
+resynchronization therapy with a defibrillator
+resynchronization-defibrillation for ambulatory heart failure
 retrospective cohort
 retrospective cohort study
 revealed reduced
 reverse remodeling
 reversed by medical treatment
-review and network meta-analysis
 review provides
 rheumatic fever
 rheumatoid arthritis
@@ -2006,17 +2039,18 @@ right ventricular contractile
 right ventricular contractile reserve
 ring annuloplasty
 ring annuloplasty for ischemic
+ring annuloplasty for ischemic mitral
 risk among
 risk associated
 risk factor
 risk factor for cardiovascular
 risk factors
-risk factors associated
+risk factors for the development
 risk for heart failure
 risk for hhf
-risk for hospitalized heart
+risk for hospitalized heart failure
 risk for stroke
-risk for subsequent heart
+risk for subsequent heart failure
 risk model
 risk of death
 risk of developing
@@ -2028,20 +2062,21 @@ risk of inappropriate therapy
 risk of long-term mortality
 risk of thromboembolic events
 risk stratification
-risk stratification of cardiac
+risk stratification of cardiac patients
 risk-adjusted mortality
 robot-assisted gait therapy
 role in hf
 rotterdam study
 rs , rs synchrony
 rs synchrony
+rs synchrony , and cs
 rs synchrony and cs
 rv dysfunction
 rv failure
 rv function
 safety and efficacy
+safety and efficacy of eplerenone
 safety monitoring
-safety of spironolactone
 salt loading
 salt loading and uninephrectomy
 sarcomeric microstructure
@@ -2061,7 +2096,7 @@ seen in medium
 self-care confidence
 self-care maintenance
 self-care management
-self-care of heart failure
+self-care of heart failure index
 ser77 and ser83
 serum potassium
 serum resistin levels
@@ -2075,7 +2110,6 @@ severe hf
 severe hyperkalemia
 severe hypertension
 severe lv
-severe pulmonary hypertension
 severe systolic
 severely reduced lvef
 sham levels
@@ -2091,7 +2125,7 @@ significant decrease
 significant difference
 significant differences
 significant effect
-significant effect on 72-hour
+significant effect on 72-hour cumulative
 significant improvement
 significant improvements
 significant interaction
@@ -2115,7 +2149,6 @@ sinus rhythm
 sitagliptin versus
 sixty-one patients
 size reduction
-size reduction by surgery
 skeletal muscle
 skeletal muscle mass
 social support
@@ -2123,14 +2156,14 @@ social support and barriers
 sought to evaluate
 sought to investigate
 south dakota
-sphingosine-1-phosphate receptor
+sphingosine-1-phosphate receptor 1 ( s1pr1
 spironolactone use
 spontaneous vt
 sr ca ( 2+)-pump
+sst2 / high-dose
 sst2 / high-dose bb
-sst2 / low-dose bb
 sst2 concentrations
-sst2 treated with low-dose
+sst2 treated with low-dose bb
 st2 was modestly associated
 stable heart failure
 stable hf
@@ -2142,12 +2175,9 @@ standard error of measurement
 statistically significant
 ste analysis
 step forward
-strain of left ventricle
 strain rate
-stratification of cardiac patients
 stress doppler echocardiography
 stroke , myocardial infarction
-stroke prevention trial
 stroke volume
 strongly associated
 structure and function
@@ -2178,15 +2208,15 @@ subgroups of patients
 subjected to cardiac
 subjects were followed
 subjects with rv dysfunction
-subsequent heart failure
 subunit expression
 successful valve plasty
+successful valve plasty for degenerative
 sudden cardiac
 sudden cardiac death
 sudden death
 summary scores
-support provided during office
-surgery and diastolic mitral
+support provided during office hours
+surgery and diastolic mitral valve
 surgical indications
 surgical intervention
 survival compared
@@ -2199,11 +2229,10 @@ sympathetic activity
 sympathetic tone
 sympathovagal balance
 symptoms and signs
-symptoms in patients
+symptoms in patients with heart
 symptoms of heart failure
-synchrony , and cs
 systematic review
-systematic review and network
+systematic review and network meta-analysis
 systemic vascular resistance
 systolic and diastolic
 systolic blood pressure
@@ -2211,26 +2240,28 @@ systolic dysfunction
 systolic function
 systolic heart
 systolic heart failure
+systolic heart failure ( hf
 systolic hf
-systolic hf of unclear
+systolic hf of unclear etiology
 systolic pressure
 systolic pressure ( pasp
 t1 changes
 t1 mapping
 t1 time
-t1 time is associated
 t1-mapping values
 tapse / pasp
 tapse vs. pasp relationship
 target dose
 terminal heart failure
 terminal phase
-test in patients
+test in patients with advanced
 test whether
 test-retest reliability
+test-retest reliability of the timed
 tested the hypothesis
 tested whether
 testosterone supplementation
+tethering , restricting the anterior
 therapeutic approaches
 therapeutic implications
 therapeutic interventions
@@ -2240,23 +2271,23 @@ therapeutic targets
 therapy ( crt
 therapy ( hr
 therapy compared with metoprolol
-therapy due to atrial
+therapy due to atrial fibrillation
 therapy in chronic
 therapy in heart failure
 therapy in patients
 therapy on cardiac function
-therapy with a defibrillator
-therapy with ivabradine
-therapy with the lokomat®
+therapy with ivabradine ( β
+therapy with the lokomat® system
 three groups
 thromboembolic events
 tidal respiration
+time , he had severe
 time of admission
-time to death
+time to death or first
 time to esrd
 time-dependent analysis
 timed up & go
-timing of implantable cardioverter-defibrillator
+timing of implantable cardioverter-defibrillator deactivation
 tissue doppler
 titin hypophosphorylation
 titin hypophosphorylation importantly
@@ -2265,31 +2296,31 @@ tnf antagonist
 tnf antagonists
 tools for economic analysis
 total adiponectin
-total expenditure on health
+total expenditure on health per
 total sample
 training for heart failure
 transcription factor
 transcription factor hand2
 transcription factors
 transforming growth
-transitions of care program
 transmitral flow
 transplant recipients
 transplantation eligibility status
 transverse aortic constriction
+transverse aortic constriction ( tac
 trastuzumab users
 trastuzumab-related chf
 treated with eplerenone
-treated with low-dose bb
 treating patients
 treating patients with dcm
-treatment alone in treating
+treatment alone in treating patients
+treatment for heart
 treatment for heart failure
 treatment for hf
 treatment group
 treatment of anemia
-treatment of atrial fibrillation
-treatment of chronic heart
+treatment of anemia in patients
+treatment of chronic heart failure
 treatment of heart failure
 treatment of hf
 treatment strategies
@@ -2297,9 +2328,10 @@ treatment with carvedilol
 treatment with crt-d
 treatment with ivabradine
 trend toward
-trends in hf
+trends in hf after mi
+trial investigating outcomes of exercise
 trial of heart failure
-tricuspid annular plane systolic
+tricuspid annular plane systolic excursion
 troponin t
 tta / tgtetmena
 tta / tgtetmena mice
@@ -2310,10 +2342,10 @@ two reviewers
 twofold increase
 type 2 diabetes
 ultrastructural changes
-um / va
+um / va / va-rt
 unclear etiology
 uncontrolled hypertension
-undergoing left ventricular assist
+undergoing left ventricular assist device
 underlying myocardial dd
 unfamiliar physician
 unfavorable outcome
@@ -2331,6 +2363,7 @@ use of implantable cardioverter
 used cox
 used data
 used to assess
+used to assess the relationship
 used to evaluate
 used to identify
 users of saxagliptin
@@ -2341,39 +2374,45 @@ usual care
 usual care plus
 va / va-rt cohorts
 vad group
+vad group and the ecmo+vad
 vagal tone
 value of mdc
 valve plasty
 valve plasty for degenerative
+valve plasty for degenerative mr
 valve replacement
-valve tethering , restricting
-variables were significantly associated
 variation in future
 various measures
 vascular effects
 vascular endothelial growth factor
 vascular resistance
 vasopressin receptor antagonist
-velocity ( e
-velocity to peak early
+velocity ( e / e
+velocity to peak early diastolic
 venous pressure
 ventricle in heart failure
+ventricular ( lv
+ventricular ( lv ) ejection
 ventricular action
 ventricular assist
 ventricular assist device
-ventricular assist device implantation
+ventricular assist device ( lvad
 ventricular assist devices
+ventricular assist devices ( lvads
 ventricular cardiomyocytes
+ventricular contractile
+ventricular contractile reserve
+ventricular contractile reserve in patients
 ventricular diastolic
-ventricular diastolic end diameter
 ventricular diastolic function
+ventricular diastolic function , arterial
 ventricular dysfunction
 ventricular ejection
 ventricular ejection fraction
+ventricular ejection fraction ( lvef
 ventricular end-diastolic
 ventricular filling
 ventricular function
-ventricular longitudinal systolic strain
 ventricular systolic
 ventricular tachycardia
 ventricular-arterial coupling
@@ -2388,8 +2427,9 @@ volume groups
 volume index
 volume overload
 vs placebo
+vs placebo , 0.11 mg
+vs placebo , 8296 ml
 vs δ
-vs. hospital compare
 walk distance
 walk test
 wall cs
@@ -2407,7 +2447,7 @@ wild-type rad
 within 1 year
 within-day test-retest reliability
 without affecting
-without any clear organic
+without any clear organic lesion
 without diabetes
 without exercise
 without major
@@ -2431,10 +2471,13 @@ years of age
 years old
 york heart
 york heart association
+york heart association ( nyha
 york heart association class
+york heart association class ii
+york heart association class iii
 young adults
-young adults with heart
-young and very young
+young adults with heart failure
+young and very young adults
 young athletes
 younger patients
 youngest patients
@@ -2446,9 +2489,6 @@ zsf1 rats
 β-adrenoceptor blockade
 β-ar responsiveness
 β-ar stimulation
-β-blocker dose
-β-blocker uptitrations
-β2-adrenergic receptor haplotype
-μg / kg
+μg / kg / min
 ≥160 ms
 ≥70 years

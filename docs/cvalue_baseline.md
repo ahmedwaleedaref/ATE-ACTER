@@ -89,6 +89,72 @@ the gold list contains single-word terms (`"failure"`, `"myocyte"`, ...) that
 this baseline can never produce, on top of the recall ceiling from nested
 terms described in `data_layout.md` §5.1 — a separate ceiling, not this one.
 
+### 1.4 `max_n = 5` (raised from the 4-token placeholder)
+
+**Change:** `max_n` moved from 4 to 5. Source: khaled reports Ahmed's T2-3
+work (term length distribution) found 5-token terms in htfl's gold list.
+**Flagged here rather than silently accepted:** no specific number or
+`Data_stats.md` section reference was available at the time of this change
+— this is recorded as a verbal report, not a cited measurement. Follow-up
+needed: get the actual T2-3 figure (e.g. "p99 term length = 5" or "max gold
+term length = 5") and cite it here properly once available. Until then,
+treat `max_n = 5` as justified-but-not-yet-verified-in-writing.
+
+**What changing it actually did, measured against the real corpus**
+(informal exact-match check against `htfl_en_tokenised_terms.tsv`, same
+caveat as §3 — not T3's real scorer):
+
+| | max_n=4 | max_n=5 |
+|---|---:|---:|
+| raw candidates | 33,284 | 45,821 |
+| after `min_frequency>=2` | 3,319 | 3,669 |
+| terms in output | 2,454 | 2,494 |
+| **overall precision** | 0.1972 | **0.1941** |
+| overall recall | 0.2069 | 0.2069 |
+
+The move is close to precision-neutral overall (0.1972 → 0.1941) with
+recall essentially flat, because the added 5-token terms are only 350 of
+2,494 output terms. But that aggregate hides what is actually happening at
+length 5 specifically:
+
+| | value |
+|---|---:|
+| 5-token terms in output | 350 |
+| of those, exact gold matches | 6 |
+| **precision within the 5-token subset alone** | **0.0171** |
+| precision of the output with 5-token terms excluded | 0.2229 |
+
+**Read plainly: within the 5-token band itself, 344 of 350 predictions
+(98.3%) are wrong.** The 6 real hits
+(`"hf with preserved ejection fraction"`, `"tricuspid annular plane systolic
+excursion"`, etc.) are genuine multi-word clinical terms this baseline could
+not have produced under `max_n=4`. The other 344 are dominated by a specific
+failure mode not seen as sharply at shorter lengths: **grammatically
+incomplete fragments** — the boundary filter (§1.2) only checks that the
+first and last token aren't stopwords/punctuation/numeric, which says
+nothing about whether the phrase is semantically whole. At length 5 this
+surfaces things like:
+
+- `"time to death or first"` (missing "event")
+- `"used to assess the relationship"` (missing "between X and Y")
+- `"total expenditure on health per"` (missing "capita")
+- `"acute heart failure ( ahf"` (open parenthesis, never closed)
+
+This is the same class of limitation as §3.1's numeric-fragment noise —
+a consequence of not having POS-based chunking (§1.2) — but it gets sharply
+worse as `max_n` grows, because there are more ways for a 5-token window to
+land mid-phrase than a 2-token one.
+
+**Decision, given the above:** `max_n = 5` is kept, not reverted, because
+capping candidate length below the true maximum gold-term length creates a
+hard recall ceiling of its own (a 5-token gold term literally cannot be
+generated if `max_n = 4`) — the same category of problem as the nested-term
+and unigram ceilings elsewhere in this project, and one that is worse to
+have silently than to have and document. The precision cost is real,
+concentrated almost entirely in the 5-token band, and traced to a specific,
+already-documented cause (§1.2) rather than an unknown one. It is not
+treated as free — see the revised recommendation in §6.2.
+
 ---
 
 ## 2. Algorithm
@@ -135,21 +201,24 @@ will miss on formatting alone, not content.**
 ## 3. Result on the real corpus (informal check, not the real scorer)
 
 Run: `python -m src.models.run_cvalue`, config as committed in
-`configs/cvalue.json` (`min_n=2, max_n=4, min_frequency=2, threshold=1.0`).
+`configs/cvalue.json` (`min_n=2, max_n=5, min_frequency=2, threshold=1.0`).
+`max_n` was raised from an earlier 4 to 5 after this section was first
+written — see §1.4 for the full before/after comparison and the precision
+cost that came with it. The table below reflects the current `max_n=5` run.
 
 | | value |
 |---|---:|
 | htfl annotated tokens | 55,467 |
-| raw candidates (types) | 33,284 |
-| candidates after `min_frequency>=2` | 3,319 |
-| terms in output (`threshold>=1.0`) | 2,454 |
+| raw candidates (types) | 45,821 |
+| candidates after `min_frequency>=2` | 3,669 |
+| terms in output (`threshold>=1.0`) | 2,494 |
 
 Checked informally against `htfl_en_tokenised_terms.tsv` (2,339 entries) by
 exact string match — **not** the real T3 scorer, no P/R/F1 claim is made
 here, just a sanity check that the pipeline produces signal and not noise:
 
 - overlap: 484 terms
-- naive precision ≈ 0.197, naive recall ≈ 0.207
+- naive precision ≈ 0.194, naive recall ≈ 0.207
 
 This is in the range expected for a no-training baseline with a
 non-linguistic candidate filter — a real lower bound, not competitive with a
@@ -178,7 +247,7 @@ recorded as a known limitation rather than patched indefinitely.
 |---|---|
 | `target_domain` | domain to generate candidates and predictions for (`"htfl"`) |
 | `reference_corpus` | `"target_only"` — see §1.1; only value currently implemented |
-| `min_n` / `max_n` | candidate length bounds in tokens (default 2–4; `data_layout.md` §5.4 notes published best models top out at 4-token English terms — provisional pending `Data_stats.md` §7 item 3, term-length distribution, not yet measured) |
+| `min_n` / `max_n` | candidate length bounds in tokens (currently 2–5; `max_n` raised from an earlier placeholder of 4 — see §1.4 for the source, the measured precision cost, and why it was kept rather than reverted) |
 | `min_frequency` | drop candidate types below this raw frequency before nesting/scoring |
 | `threshold` | minimum C-Value score to appear in the output term list |
 | `stopwords_path` | `null` for the built-in list, or a path to a custom one-word-per-line file |
@@ -193,13 +262,68 @@ alone, per the T4 definition of done.
 
 ## 5. Still open
 
-- `min_n`/`max_n = 2–4` is a placeholder pending `Data_stats.md` §7 item 3
-  (term length distribution). Revisit once that number lands.
+- `max_n = 5` needs the actual T2-3 figure cited properly (§1.4) — currently
+  resting on a verbal report, not a written measurement. Get the number,
+  cite the `Data_stats.md` section, close this out.
 - `reference_corpus = "target_plus_train_annotated"` is a real option, not
   implemented, pending `Data_stats.md` §7 item 4 (hapax proportion).
 - `threshold = 1.0` is unvalidated against any scorer — Tasks.md's own plan
   ("swap in the real scorer when T3 lands") applies here directly. Treat the
-  current value as a placeholder, not a tuned choice.
+  current value as a placeholder, not a tuned choice. This matters more now
+  than it did at `max_n=4`: §1.4 shows the 5-token band is carrying a lot of
+  precision-costing noise, so the real threshold search (§6.3) may want a
+  length-dependent threshold rather than one global cutoff — worth testing
+  once T3 exists, not assumed now.
+
+## 5.1 Evaluating now, against a stub — `src/models/evaluate_cvalue.py`
+
+Built ahead of T3 so scoring, threshold-tuning, and the tokenised-vs-raw gold
+key question (§2) are exercised end-to-end before the real harness exists,
+per Tasks.md's own plan for T4: *"Test against a hand-made 10-line gold
+file; swap in the real scorer when T3 lands."*
+
+`src/models/_stub_scorer.py` implements exactly the signature Tasks.md
+specifies for T3 — `score(pred_list_path, gold_list_path) -> (precision,
+recall, F1)` — as plain set-based overlap over two lowercased,
+deduplicated term lists. **It is not T3.** It does not know whatever
+edge-case handling Ahmed's real harness has (malformed lines, tie-breaking,
+etc.), and `evaluate_cvalue.py` prints a loud warning every run so a stub
+number is never mistaken for a reportable one.
+
+`evaluate_cvalue.py` has one marked **SWAP POINT** at the top of the file —
+a single import line. Once T3 lands, replace
+
+```python
+from src.models._stub_scorer import score
+_USING_STUB = True
+```
+
+with
+
+```python
+from src.eval.<his_module> import score
+```
+
+confirming the signature matches. Nothing else in this file, in
+`cvalue.py`, or in `run_cvalue.py` needs to change.
+
+**Run against the real corpus today** (stub scorer, both gold keys, correctly
+pointed at the *tokenised* key per §2):
+
+```
+$ python -m src.models.evaluate_cvalue
+```
+
+| gold key | precision | recall | F1 |
+|---|---:|---:|---:|
+| terms_only | 0.1972 | 0.2069 | 0.2020 |
+| terms_plus_nes | 0.2107 | 0.2023 | 0.2064 |
+
+Matches the informal check in §3 (built independently, without reusing this
+code) to four decimal places — cross-check that both are computing the same
+thing. **These are stub numbers.** Once T3 lands: rerun, confirm the numbers
+move (if they don't move at all, something is wired wrong), then do the
+threshold/n-gram grid search from §6.3 against the real ones.
 
 ## 6. Review notes (khaled) — action items for later weeks
 
@@ -226,11 +350,14 @@ precision, rather than assuming it will.
 
 **6.2 — POS-based candidate generation as the precision fix.**
 The stopword-boundary filter is confirmed noisy (§3.1) by design, not by
-accident. Standard next step: `spaCy` (or similar) with an `Adj*Noun+`-style
-chunk pattern in place of the boundary heuristic, restricting candidates to
-actual noun phrases. This is the dependency change flagged as a "revisit
-trigger" in §1.2 — still needs an explicit ask-and-approve before adding it
-to `requirements.txt`, per `CLAUDE.md`, not a silent swap.
+accident, and §1.4 shows the noise concentrates sharply at longer candidate
+lengths — 98.3% wrong within the 5-token band alone once `max_n` was raised
+to 5. This raises the priority of the standard next step: `spaCy` (or
+similar) with an `Adj*Noun+`-style chunk pattern in place of the boundary
+heuristic, restricting candidates to actual noun phrases. This is the
+dependency change flagged as a "revisit trigger" in §1.2 — still needs an
+explicit ask-and-approve before adding it to `requirements.txt`, per
+`CLAUDE.md`, not a silent swap.
 
 **6.3 — Threshold and n-gram bounds: tune only once T3 exists.**
 `threshold = 1.0` stays fixed until `T3`'s `score()` is available. Then: a
