@@ -492,19 +492,132 @@ length 1.22. Dressage terms are overwhelmingly single words.
 
 ---
 
-## 7. Open questions
+## 7. s05 — term length and frequency (gold unique lists)
 
-### 7.1 [CLOSED] Do wind's ≤2-token sentences contain terms?
+Tokenised gold lists only. A non-tokenised `*_terms.tsv` variant exists in
+every domain and is ignored: only the tokenised list matches the corpus token
+stream that `decode()` will join from.
+
+**Both format assumptions in `data_layout.md` §4 confirmed:** 0 entries
+contain an uppercase character, 0 duplicates after lowercasing, in all eight
+files. Dedup-at-lowercase is safe.
+
+### 7.1 Term length — ≥95% of terms are ≤4 tokens
+
+Length in whitespace tokens, cumulative percentage at ≤4:
+
+| domain | key | N | 1 token | cum ≤4 | max |
+|---|---|--:|--:|--:|--:|
+| corp | terms | 926 | 42.0% | 98.4% | 7 |
+| corp | terms+NE | 1,172 | 42.8% | 95.2% | 13 |
+| equi | terms | 1,146 | 55.7% | 99.7% | 5 |
+| equi | terms+NE | 1,561 | 55.9% | 99.0% | 7 |
+| wind | terms | 1,092 | 29.1% | 98.9% | 7 |
+| wind | terms+NE | 1,529 | 36.8% | 98.0% | 10 |
+| htfl | terms | 2,339 | 44.0% | 97.3% | 8 |
+| htfl | terms+NE | 2,556 | 44.3% | 96.1% | 13 |
+
+**For T4:** candidate generation capped at 4 tokens loses 0.3–2.7% of gold
+terms on the terms-only keys. Going beyond 5 is not worth the precision cost.
+
+**Bears on §5.4.** Tran et al. (2024) report that the best models under both
+BIO and NOBI predicted terms only up to 4 tokens (English). On these keys that
+ceiling costs at most 2.7% of gold types, so it is not a material limit for
+this project's setup.
+
+Domains differ in compositionality: equi is 55.7% single-word terms, wind only
+29.1%. The longest entries are almost entirely organisation names on the
+terms+NE keys.
+
+### 7.2 Annotation is not exhaustive — a third to a half of occurrences are untagged
+
+Three counts, deliberately distinguished:
+
+- **(a)** decoded gold-BIO span occurrences
+- **(b)** the term's token sequence in the annotated token stream, any label
+- **(c)** same over the whole corpus (`texts_tokenised/` + `unannotated_texts/`)
+
+| domain | (a) total | (b) total | **(b)/(a)** | (c) total |
+|---|--:|--:|--:|--:|
+| corp | 4,116 | 6,632 | **1.61** | 19,072 |
+| equi | 8,546 | 12,606 | **1.48** | 21,619 |
+| wind | 4,982 | 9,304 | **1.87** | 31,306 |
+| htfl | 9,243 | 13,890 | **1.50** | 13,890 |
+
+Individual cases are stark. In wind, `wind` is tagged 57 times and appears
+642; `power` 63 against 399; `rotor` 99 against 284. In corp,
+`anti-corruption` is tagged 44 times and appears 146. In htfl,
+`heart failure` is tagged 350 times and appears 530.
+
+**Two mechanisms, with different implications:**
+
+*Nesting.* `wind` occurs inside `wind turbine`, `wind speed`, `wind energy`.
+BIO marks only the longest span, so the inner occurrence carries no
+independent label. This is §5.1's recall ceiling measured from the other
+direction, and it explains most of wind's 1.87 — wind's terms are the most
+compositional in the corpus (§7.1).
+
+*Genuinely unannotated occurrences,* where a term appears standalone and was
+not marked.
+
+These numbers do not separate the two. The distinction matters: nesting is a
+representational limit to report, non-exhaustive annotation is training noise.
+
+**Consequence for training.** The model will see `wind` labelled `B` in one
+sentence and `O` in another, distinguished only by whether the occurrence sits
+inside a longer term. That is contradictory supervision unless the model
+learns the longest-match rule. **Training loss will not approach zero, and
+that is not a bug.**
+
+### 7.3 Hapax proportion — the ceiling on any frequency-based method
+
+| domain | hapax % under (a) | under (b) | under (c) |
+|---|--:|--:|--:|
+| corp | 44.5% | 44.7% | 30.1% |
+| equi | 41.8% | 38.8% | 32.3% |
+| wind | 43.9% | 43.0% | 30.4% |
+| htfl | 47.7% | 46.0% | 46.0% |
+
+**For T4's open decision** (which corpus supplies frequency counts): using the
+unannotated reference material moves hapax from ~44% to ~30% in corp and wind,
+and wind's max frequency from 212 to 4,560. That is a substantial improvement
+in frequency estimates and a real argument for using it.
+
+But **~30% of gold terms still occur exactly once even across 314k words.**
+C-Value cannot rank a hapax by definition, and the metric is F1 over a
+deduplicated list, which weights a hapax the same as a 598-occurrence term.
+The statistical baseline is therefore capped near 70% recall before any code
+is written.
+
+htfl's (c) equals its (b) exactly, since htfl has no unannotated text — this
+confirms `data_layout.md` §1 and validates the counting code.
+
+### 7.4 htfl is harder than the training domains on every axis measured
+
+- **Twice the term inventory:** 2,339 gold terms against ~1,100 per training
+  domain.
+- **Highest hapax rate:** 47.7%, with no unannotated text to improve the
+  estimate.
+- **Highest term density:** 26% positive tokens (§6.3).
+- **Different term profile:** its most frequent entries include `p`, `ci`,
+  `hr`, `hf` — statistical notation and abbreviations from clinical abstracts.
+  The training domains contain essentially none of this term type.
+
+---
+
+## 8. Open questions
+
+### 8.1 [CLOSED] Do wind's ≤2-token sentences contain terms?
 
 No. They hold 0.9% of wind's B count and 3,499 of the 4,048 are a single
 period. Resolved in §6.2; filtering decision recorded there.
 
-### 7.2 [CLOSED] Is wind the sharpest test of the document-context hypothesis?
+### 8.2 [CLOSED] Is wind the sharpest test of the document-context hypothesis?
 
 Premise was that wind's terms live in context-free table cells. They do not —
 see §6.2. wind's terms are in its prose, like every other domain.
 
-### 7.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
+### 8.3 [OPEN] Is cross-sentence context actually unexplored for ATE?
 
 **Not established. Do not assume it.** Cross-sentence and document-level
 context for sequence labelling is a worked area in NLP, and ACTER-specific
@@ -514,7 +627,7 @@ What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
 that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
 
-### 7.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
+### 8.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
 
 Corpus max under BERT is 1,074 wordpieces, from a wind sentence whose
 whitespace length is far below that. The four tokenizers disagree by 2.7× on
@@ -530,14 +643,15 @@ Noted only so the figure in §5 is not mistaken for a property of the prose.
 
 ---
 
-## 8. Still to measure
+## 9. Still to measure
 
 | item | statistic | decides |
 |---|---|---|
 | ~~§7 T2-1b~~ | ~~wordpieces per sentence~~ | **done — §5, max_length = 256** |
 | ~~§7 T2-1c~~ | ~~inflation ratio, inside vs outside span~~ | **done — §5.3** |
-| §7 T2-3 | term length distribution | T4 candidate n-gram cap |
-| §7 T2-4 | term frequency, hapax proportion | C-Value's ceiling; T4 reference-corpus decision |
+| ~~§7 T2-3~~ | ~~term length distribution~~ | **done — §7.1, cap at 4** |
+| ~~§7 T2-4~~ | ~~term frequency, hapax proportion~~ | **done — §7.2, §7.3** |
 | §7 T2-5 | term-set overlap, train ↔ htfl | how much of any score is memorisation |
 | ~~§7 T2-6~~ | ~~positive-label proportion~~ | **done — §6** |
-| §7 T2-7 | nested-term count, split 1-token vs ≥2-token; truncation ceiling at type level | NOBI's expected effect size |
+| §7 T2-7 | nested-term count, split 1-token vs ≥2-token | NOBI's expected effect size — **deferred to week 3** |
+| §1.4 | truncation ceiling at type level | ≈0 per §5.1; fold into T3's round-trip, which needs `decode()` anyway |

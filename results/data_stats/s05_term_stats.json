@@ -1,0 +1,904 @@
+{
+  "generated_by": "src/stats/s05_term_stats.py",
+  "note": "tokenised gold lists only; the non-tokenised variant exists in every domain and is ignored",
+  "part_a_term_length": {
+    "corp": {
+      "terms": {
+        "n_entries": 926,
+        "length_dist": [
+          [
+            "1",
+            389,
+            42.008639308855294
+          ],
+          [
+            "2",
+            376,
+            40.60475161987041
+          ],
+          [
+            "3",
+            115,
+            12.419006479481641
+          ],
+          [
+            "4",
+            31,
+            3.347732181425486
+          ],
+          [
+            "5",
+            9,
+            0.9719222462203023
+          ],
+          [
+            "6",
+            4,
+            0.4319654427645788
+          ],
+          [
+            "7",
+            2,
+            0.2159827213822894
+          ],
+          [
+            "8+",
+            0,
+            0.0
+          ]
+        ],
+        "cum_pct_le_4": 98.38012958963283,
+        "p50": 2,
+        "p95": 3,
+        "p99": 5,
+        "max": 7,
+        "longest_10": [
+          "advisory committee on the conduct of members",
+          "closed , with no further action taken",
+          "confiscation of the proceeds of crime",
+          "expenditure budget line ( s )",
+          "laundering of the proceeds of crime",
+          "primacy of the rule of law",
+          "aut dedere aut judicare rule",
+          "breach of a statutory duty",
+          "code of good administrative behaviour",
+          "criminal expertise and liaison unit"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      },
+      "terms_nes": {
+        "n_entries": 1172,
+        "length_dist": [
+          [
+            "1",
+            502,
+            42.83276450511946
+          ],
+          [
+            "2",
+            418,
+            35.665529010238906
+          ],
+          [
+            "3",
+            143,
+            12.20136518771331
+          ],
+          [
+            "4",
+            53,
+            4.522184300341297
+          ],
+          [
+            "5",
+            31,
+            2.645051194539249
+          ],
+          [
+            "6",
+            11,
+            0.9385665529010239
+          ],
+          [
+            "7",
+            6,
+            0.5119453924914675
+          ],
+          [
+            "8+",
+            8,
+            0.6825938566552902
+          ]
+        ],
+        "cum_pct_le_4": 95.22184300341297,
+        "p50": 2,
+        "p95": 4,
+        "p99": 7,
+        "max": 13,
+        "longest_10": [
+          "ad hoc committee for the negotiations of a united nations convention against corruption",
+          "oecd 's convention on combating bribery of foreign officials in international business transactions",
+          "oecd convention on combating bribery of foreign public officials in international business transactions",
+          "convention on the protection of the european communities ' financial interests",
+          "network of expertise on economic , financial and fiscal crime",
+          "evaluation of the activities of the european anti-fraud office",
+          "federal government department of the budget and management control",
+          "treaty on the functioning of the european union",
+          "advisory committee on the conduct of members",
+          "bureau of official ethics and good practice"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      }
+    },
+    "equi": {
+      "terms": {
+        "n_entries": 1146,
+        "length_dist": [
+          [
+            "1",
+            638,
+            55.67190226876091
+          ],
+          [
+            "2",
+            417,
+            36.38743455497382
+          ],
+          [
+            "3",
+            70,
+            6.108202443280978
+          ],
+          [
+            "4",
+            17,
+            1.4834205933682374
+          ],
+          [
+            "5",
+            4,
+            0.34904013961605584
+          ],
+          [
+            "6",
+            0,
+            0.0
+          ],
+          [
+            "7",
+            0,
+            0.0
+          ],
+          [
+            "8+",
+            0,
+            0.0
+          ]
+        ],
+        "cum_pct_le_4": 99.65095986038395,
+        "p50": 1,
+        "p95": 3,
+        "p99": 4,
+        "max": 5,
+        "longest_10": [
+          "change rein across the diagonal",
+          "grand prix freestyle to music",
+          "half turn on the haunches",
+          "quarter turn on the haunches",
+          "acceptance of the bit",
+          "airs above the ground",
+          "change through the diagonal",
+          "coiling of the loins",
+          "fall to the outside",
+          "flying changes in sequence"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      },
+      "terms_nes": {
+        "n_entries": 1561,
+        "length_dist": [
+          [
+            "1",
+            873,
+            55.92568866111467
+          ],
+          [
+            "2",
+            534,
+            34.208840486867395
+          ],
+          [
+            "3",
+            102,
+            6.534272901985906
+          ],
+          [
+            "4",
+            36,
+            2.3062139654067906
+          ],
+          [
+            "5",
+            12,
+            0.7687379884689302
+          ],
+          [
+            "6",
+            3,
+            0.19218449711723254
+          ],
+          [
+            "7",
+            1,
+            0.06406149903907751
+          ],
+          [
+            "8+",
+            0,
+            0.0
+          ]
+        ],
+        "cum_pct_le_4": 98.97501601537476,
+        "p50": 1,
+        "p95": 3,
+        "p99": 5,
+        "max": 7,
+        "longest_10": [
+          "people for the ethical treatment of animals",
+          "humane society of the united states",
+          "mexican haute école of riders domecq",
+          "royal andalusian school of equestrian art",
+          "annual pony club national championships",
+          "change rein across the diagonal",
+          "escola portuguesa de arte equestre",
+          "françois robichon de la guérinière",
+          "grand prix freestyle to music",
+          "half turn on the haunches"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      }
+    },
+    "wind": {
+      "terms": {
+        "n_entries": 1092,
+        "length_dist": [
+          [
+            "1",
+            318,
+            29.12087912087912
+          ],
+          [
+            "2",
+            525,
+            48.07692307692308
+          ],
+          [
+            "3",
+            198,
+            18.13186813186813
+          ],
+          [
+            "4",
+            39,
+            3.5714285714285716
+          ],
+          [
+            "5",
+            11,
+            1.0073260073260073
+          ],
+          [
+            "6",
+            0,
+            0.0
+          ],
+          [
+            "7",
+            1,
+            0.09157509157509157
+          ],
+          [
+            "8+",
+            0,
+            0.0
+          ]
+        ],
+        "cum_pct_le_4": 98.9010989010989,
+        "p50": 2,
+        "p95": 3,
+        "p99": 5,
+        "max": 7,
+        "longest_10": [
+          "enfield-andreau type of horizontal axis wind turbine",
+          "cut - out wind speed",
+          "direct drive synchronous annular generator",
+          "distribution of angle of attack",
+          "free stream velocity of wind",
+          "horizontal-axis wind turbine blade design",
+          "planetary / spur gear system",
+          "prandtl 's tip correction factor",
+          "rate of decrease of momentum",
+          "tip-controlled horizontal axis wind turbines"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      },
+      "terms_nes": {
+        "n_entries": 1529,
+        "length_dist": [
+          [
+            "1",
+            562,
+            36.756049705689996
+          ],
+          [
+            "2",
+            631,
+            41.26880313930673
+          ],
+          [
+            "3",
+            243,
+            15.892740353172007
+          ],
+          [
+            "4",
+            63,
+            4.120340091563113
+          ],
+          [
+            "5",
+            16,
+            1.0464355788096795
+          ],
+          [
+            "6",
+            3,
+            0.1962066710268149
+          ],
+          [
+            "7",
+            6,
+            0.3924133420536298
+          ],
+          [
+            "8+",
+            5,
+            0.3270111183780249
+          ]
+        ],
+        "cum_pct_le_4": 98.03793328973185,
+        "p50": 2,
+        "p95": 4,
+        "p99": 5,
+        "max": 10,
+        "longest_10": [
+          "baltic coast environmental research and planning institute of klaipeda university",
+          "department of defense , executive services and communications directorate",
+          "joint implementation project design document form for small-scale projects",
+          "national program of increasing efficiency of energy consumption",
+          "state commission for control on prices and energy",
+          "enfield-andreau type of horizontal axis wind turbine",
+          "graduate school of natural and applied sciences",
+          "journal of wind engineering and industrial aerodynamics",
+          "office of energy efficiency & renewable energy",
+          "vattenfall europe berlin ag & co. kg"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      }
+    },
+    "htfl": {
+      "terms": {
+        "n_entries": 2339,
+        "length_dist": [
+          [
+            "1",
+            1029,
+            43.99315946985892
+          ],
+          [
+            "2",
+            754,
+            32.23599828986747
+          ],
+          [
+            "3",
+            366,
+            15.647712697734075
+          ],
+          [
+            "4",
+            128,
+            5.472424112868747
+          ],
+          [
+            "5",
+            32,
+            1.3681060282171869
+          ],
+          [
+            "6",
+            22,
+            0.9405728943993159
+          ],
+          [
+            "7",
+            6,
+            0.25651988029072254
+          ],
+          [
+            "8+",
+            2,
+            0.08550662676357418
+          ]
+        ],
+        "cum_pct_le_4": 97.3492945703292,
+        "p50": 2,
+        "p95": 4,
+        "p99": 6,
+        "max": 8,
+        "longest_10": [
+          "heart failure with preserved left ventricular ejection fraction",
+          "l-type voltage-gated ca ( 2 + ) channels",
+          "area under the receiver operating characteristic curve",
+          "fully magnetically levitated left ventricular assist system",
+          "heart failure with a reduced ejection fraction",
+          "hypertensive heart failure with preserved ejection fraction",
+          "raf-mek1 / 2-erk1 / 2 scaffold proteins",
+          "raf-mek1 / 2-erk1 / 2 signalling pathway",
+          "ca ( 2 + ) handling",
+          "ca ( 2 + ) sensitivity"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      },
+      "terms_nes": {
+        "n_entries": 2556,
+        "length_dist": [
+          [
+            "1",
+            1132,
+            44.28794992175274
+          ],
+          [
+            "2",
+            787,
+            30.790297339593113
+          ],
+          [
+            "3",
+            386,
+            15.101721439749609
+          ],
+          [
+            "4",
+            152,
+            5.94679186228482
+          ],
+          [
+            "5",
+            42,
+            1.6431924882629108
+          ],
+          [
+            "6",
+            34,
+            1.3302034428794993
+          ],
+          [
+            "7",
+            9,
+            0.352112676056338
+          ],
+          [
+            "8+",
+            14,
+            0.5477308294209703
+          ]
+        ],
+        "cum_pct_le_4": 96.12676056338029,
+        "p50": 2,
+        "p95": 4,
+        "p99": 6,
+        "max": 13,
+        "longest_10": [
+          "tools for economic analysis of patient management interventions in heart failure cost-effectiveness model",
+          "candesartan in heart failure assessment of reduction in mortality and morbidity",
+          "heart failure - a controlled trial investigating outcomes in exercise training",
+          "heart failure : a controlled trial investigating outcomes of exercise training",
+          "eplerenone post myocardial infarction heart failure efficacy and survival study",
+          "national cardiovascular disease registry practice innovation and clinical excellence registry",
+          "systolic heart failure treatment with the if inhibitor ivabradine trial",
+          "early treatment of atrial fibrillation for stroke prevention trial",
+          "cochrane effective practice and organisation of care taxonomy",
+          "grading of recommendations assessment , development and evaluation"
+        ],
+        "n_with_uppercase": 0,
+        "n_dup_after_lower": 0
+      }
+    }
+  },
+  "part_b_term_frequency": {
+    "corp": {
+      "n_terms": 926,
+      "i_without_preceding_b": 0,
+      "total_a": 4116,
+      "total_b": 6632,
+      "total_c": 19072,
+      "b_over_a": 1.6112730806608357,
+      "a": {
+        "hapax": 412,
+        "hapax_pct": 44.49244060475162,
+        "p50": 1,
+        "p90": 10,
+        "p99": 42,
+        "max": 300
+      },
+      "b": {
+        "hapax": 414,
+        "hapax_pct": 44.70842332613391,
+        "p50": 2,
+        "p90": 15,
+        "p99": 98,
+        "max": 485
+      },
+      "c": {
+        "hapax": 279,
+        "hapax_pct": 30.129589632829372,
+        "p50": 3,
+        "p90": 45,
+        "p99": 292,
+        "max": 873
+      },
+      "top10_by_a": [
+        [
+          "corruption",
+          300,
+          485,
+          873
+        ],
+        [
+          "fraud",
+          81,
+          98,
+          315
+        ],
+        [
+          "financial interests",
+          63,
+          66,
+          204
+        ],
+        [
+          "rules",
+          57,
+          77,
+          204
+        ],
+        [
+          "decision",
+          55,
+          98,
+          185
+        ],
+        [
+          "companies",
+          46,
+          46,
+          77
+        ],
+        [
+          "legal person",
+          46,
+          46,
+          61
+        ],
+        [
+          "anti-corruption",
+          44,
+          146,
+          241
+        ],
+        [
+          "political",
+          42,
+          64,
+          278
+        ],
+        [
+          "regulation",
+          42,
+          43,
+          152
+        ]
+      ]
+    },
+    "equi": {
+      "n_terms": 1146,
+      "i_without_preceding_b": 0,
+      "total_a": 8546,
+      "total_b": 12606,
+      "total_c": 21619,
+      "b_over_a": 1.475076058974959,
+      "a": {
+        "hapax": 479,
+        "hapax_pct": 41.79755671902269,
+        "p50": 2,
+        "p90": 15,
+        "p99": 79,
+        "max": 1040
+      },
+      "b": {
+        "hapax": 445,
+        "hapax_pct": 38.83071553228621,
+        "p50": 2,
+        "p90": 19,
+        "p99": 147,
+        "max": 1250
+      },
+      "c": {
+        "hapax": 370,
+        "hapax_pct": 32.28621291448517,
+        "p50": 3,
+        "p90": 32,
+        "p99": 261,
+        "max": 2429
+      },
+      "top10_by_a": [
+        [
+          "horse",
+          1040,
+          1080,
+          1870
+        ],
+        [
+          "rider",
+          284,
+          293,
+          527
+        ],
+        [
+          "horses",
+          173,
+          184,
+          252
+        ],
+        [
+          "walk",
+          130,
+          182,
+          271
+        ],
+        [
+          "trot",
+          123,
+          204,
+          327
+        ],
+        [
+          "ride",
+          116,
+          120,
+          194
+        ],
+        [
+          "riding",
+          116,
+          173,
+          261
+        ],
+        [
+          "training",
+          108,
+          162,
+          295
+        ],
+        [
+          "balance",
+          107,
+          112,
+          177
+        ],
+        [
+          "riders",
+          89,
+          97,
+          152
+        ]
+      ]
+    },
+    "wind": {
+      "n_terms": 1092,
+      "i_without_preceding_b": 2,
+      "total_a": 4982,
+      "total_b": 9304,
+      "total_c": 31306,
+      "b_over_a": 1.867523083099157,
+      "a": {
+        "hapax": 479,
+        "hapax_pct": 43.86446886446886,
+        "p50": 1,
+        "p90": 10,
+        "p99": 46,
+        "max": 212
+      },
+      "b": {
+        "hapax": 470,
+        "hapax_pct": 43.040293040293044,
+        "p50": 2,
+        "p90": 18,
+        "p99": 112,
+        "max": 642
+      },
+      "c": {
+        "hapax": 332,
+        "hapax_pct": 30.4029304029304,
+        "p50": 3,
+        "p90": 46,
+        "p99": 396,
+        "max": 4560
+      },
+      "top10_by_a": [
+        [
+          "blade",
+          212,
+          521,
+          969
+        ],
+        [
+          "blades",
+          114,
+          143,
+          350
+        ],
+        [
+          "rotor",
+          99,
+          284,
+          735
+        ],
+        [
+          "airfoil",
+          96,
+          100,
+          174
+        ],
+        [
+          "tip-speed ratio",
+          65,
+          65,
+          67
+        ],
+        [
+          "power",
+          63,
+          399,
+          1383
+        ],
+        [
+          "wind turbine",
+          60,
+          129,
+          1073
+        ],
+        [
+          "wind turbines",
+          60,
+          112,
+          541
+        ],
+        [
+          "power coefficient",
+          57,
+          70,
+          83
+        ],
+        [
+          "wind",
+          57,
+          642,
+          4560
+        ]
+      ]
+    },
+    "htfl": {
+      "n_terms": 2339,
+      "i_without_preceding_b": 1,
+      "total_a": 9243,
+      "total_b": 13890,
+      "total_c": 13890,
+      "b_over_a": 1.5027588445309965,
+      "a": {
+        "hapax": 1115,
+        "hapax_pct": 47.6699444206926,
+        "p50": 1,
+        "p90": 7,
+        "p99": 40,
+        "max": 598
+      },
+      "b": {
+        "hapax": 1076,
+        "hapax_pct": 46.002565198802905,
+        "p50": 2,
+        "p90": 10,
+        "p99": 70,
+        "max": 647
+      },
+      "c": {
+        "hapax": 1076,
+        "hapax_pct": 46.002565198802905,
+        "p50": 2,
+        "p90": 10,
+        "p99": 70,
+        "max": 647
+      },
+      "top10_by_a": [
+        [
+          "patients",
+          598,
+          598,
+          598
+        ],
+        [
+          "heart failure",
+          350,
+          530,
+          530
+        ],
+        [
+          "hf",
+          293,
+          346,
+          346
+        ],
+        [
+          "p",
+          220,
+          229,
+          229
+        ],
+        [
+          "ci",
+          114,
+          114,
+          114
+        ],
+        [
+          "mortality",
+          109,
+          127,
+          127
+        ],
+        [
+          "outcomes",
+          100,
+          108,
+          108
+        ],
+        [
+          "clinical",
+          98,
+          101,
+          101
+        ],
+        [
+          "patient",
+          73,
+          73,
+          73
+        ],
+        [
+          "hr",
+          71,
+          89,
+          89
+        ]
+      ]
+    }
+  }
+}
