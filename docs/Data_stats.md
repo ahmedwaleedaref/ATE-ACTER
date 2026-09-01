@@ -289,12 +289,18 @@ Wordpieces per sentence including special tokens, measured with
 truncation. Inflation = subwords per dataset token, split by whether the token
 carries a positive label.
 
-| tokenizer | htfl p99 | corpus max | inside-span inflation |
+| tokenizer | htfl p99 | corpus max | inside-span inflation (pooled, all domains) |
 |---|---:|---:|---:|
 | bert-base-cased | 118 | 1,074 | 1.636 |
 | roberta-base | 112 | 399 | 1.445 |
 | deberta-v3-base | 106 | 1,061 | 1.242 |
 | xlm-roberta-base | 120 | 488 | 1.795 |
+
+The inflation column is **pooled across all four domains**. The htfl-only
+figures in §5.3 are substantially higher — 2.043 for BERT against 1.636 here —
+because htfl fragments hardest. **§5.3 holds the numbers to cite;** this column
+is context only. The two must never be quoted as if they were the same
+measurement.
 
 ### 5.1 max_length = 256. Settled.
 
@@ -398,11 +404,28 @@ weighting. The value of these numbers is as a **fixed reference constant**.
 The week-2 dataloader will tokenize, apply first-subword labelling, and set
 continuation subwords to `-100`. Exactly one position per dataset token is
 scored, so the positive rate computed over the batched tensors (ignoring
-`-100`) must reproduce the table above **exactly**. htfl must come out at
-0.2604.
+`-100`) must reproduce the table above **exactly**.
 
 If it does not, label alignment is broken — and nothing crashes when that
-happens. Assert against these four numbers once the dataloader exists.
+happens.
+
+**The table above is pre-filter.** It counts every sentence in every domain,
+including the wind sentences that §6.2 decides to drop at training time.
+Asserting wind's pre-filter 0.1455 against a filtered dataloader will fire a
+false alarm on the very first run — and an assertion that cries wolf gets
+commented out, which loses the detector entirely.
+
+**The invariant, stated against the numbers the dataloader will actually
+produce:**
+
+| domain | assert | source |
+|---|--:|---|
+| htfl | **0.2604** | §6 table — no filter applies to htfl |
+| wind | **0.1562** | §6.2 prose bucket — post-filter |
+| corp | **0.1262** | §6 table — no filter applied |
+| equi | **0.1822** | §6 table — no filter applied |
+
+The pooled figure shifts under filtering and is not asserted against.
 
 ### 6.2 wind's ≤2-token sentences are filterable
 
@@ -460,10 +483,14 @@ question.
 here so it can be checked against actual per-domain results rather than
 discovered afterwards.
 
+**This gap is wider under the adopted split — see §8.5.** With equi moved to
+validation, the training prior is set by corp and wind alone, neither of which
+is as term-dense as equi.
+
 Consequence for T3: a decode threshold tuned on training-domain data inherits
 the wrong prior. Either use argmax and report this shift as a known
-limitation, or tune on a held-out training domain and state the value used.
-Tuning on htfl is fitting the test set.
+limitation, or tune on the validation domain and state the value used. Tuning
+on htfl is fitting the test set.
 
 `equi` is the opposite extreme — 14.9% B against 3.3% I, mean occurrence
 length 1.22. Dressage terms are overwhelmingly single words.
@@ -592,6 +619,14 @@ lowercased.
 `Tasks.md` calls this the number that matters most: it bounds how much of any
 reported score could be memorisation rather than cross-domain generalisation.
 
+**Caveat on scope.** These figures were computed with corp + equi + wind on the
+training side. The adopted split (§8.5) trains on **corp + wind only**, with
+equi as the validation domain. Equi contributed 6 of the 10 type overlaps and
+58 of the 99 text overlaps, so the true figures under the adopted split are
+**lower** — likely around 0.2% type overlap. Deliberately not recomputed: the
+conclusion (memorisation is effectively impossible) holds *a fortiori* under a
+smaller overlap. **Do not quote 0.4% as a split-matched number.**
+
 | measure | count | % of htfl terms |
 |---|--:|--:|
 | **type overlap** — htfl term is also a training gold entry | **10** | **0.4%** (N=2,339) |
@@ -613,6 +648,13 @@ terminology.
 
 By length: 9 of the 10 are single-token. Type overlap at 3+ tokens is exactly
 zero.
+
+**Several of the ten are polysemes, not shared terms.** In corp, *compliance*
+is regulatory; in htfl it is ventricular compliance or patient adherence.
+*Pad* in wind energy is a physical component; in cardiology, PAD is peripheral
+artery disease. The string matches, the concept does not — so the measured
+overlap **overstates** the real overlap, and the disjointness conclusion is
+stronger than the number suggests.
 
 Text overlap is an order of magnitude higher in relative terms (4.2% vs 0.4%)
 and still negligible in absolute terms — the model saw 99 htfl term strings
@@ -639,6 +681,20 @@ terms have head-position and syntactic cues that transfer; single words, 44%
 of the htfl key, have essentially no transfer channel at all. Failures should
 concentrate there.
 
+**This prediction runs against the field — logged as contrarian.** The standard
+finding in ATE is the opposite: recall degrades as term length grows. TermEval
+2020's winning system extracted no terms beyond three tokens, and Tran et al.
+(2024) report the same length ceiling under both BIO and NOBI.
+
+Two mechanisms push the other way here. htfl's single-word terms include the
+most frequent entries in the whole key (`patients`, `p`, `ci` — §8.3), and
+frequency is the one property that reliably helps every system. Head-position
+transfer has to beat that.
+
+**If per-length recall comes back matching the field rather than this
+prediction, that is the expected outcome and not a failure.** If it matches the
+prediction, head-position transfer is a mechanism worth reporting.
+
 ### 8.3 htfl's frequent terms are clinical register, not terminology
 
 None of htfl's 20 most frequent terms is a type overlap. What they are:
@@ -662,6 +718,39 @@ terms+NE key on both sides, N = 2,556: type overlap 32 (1.3%), text overlap
 Roughly triple the type overlap, as expected — organisation and place names
 recur across domains. Keys are never mixed across the two sides; doing so
 would produce a misleadingly high figure.
+
+### 8.5 Adopted split — and its two consequences
+
+**Train `corp` + `wind` · validate `equi` · test `htfl`.**
+
+This is the standard ACTER cross-domain setting established by Lang et al.
+(2021) and followed by Tran et al. (2022, 2024), who state they use it
+specifically to allow direct comparison with prior benchmark approaches.
+Adopted here for the same reason: an in-domain random split would make this
+project's numbers incomparable to the entire modern line of work on this
+dataset.
+
+The statistics above were computed before this decision and are not recomputed.
+The two consequences that change how they are read are recorded here.
+
+**Consequence 1 — the prior shift in §6.3 widens.** Equi had the highest
+positive rate of the three candidate training domains, at 0.182. Training on
+corp (0.1262) and wind (0.1562 post-filter) leaves a training prior near
+**0.14** against htfl's **0.2604**. The predicted recall suppression should
+therefore be stated more strongly than §6.3 does on its own.
+
+**Consequence 2 — the wind filter becomes load-bearing.** Wind is now roughly
+half the training data by tokens rather than a third, and 61% of its sentences
+are the fragments §6.2 drops. That filtering decision now materially shapes the
+training distribution rather than trimming a corner of it.
+
+**Known limitation, inherited not introduced.** Equi is the least
+representative validation domain for this test set: 55.7% single-word terms
+against htfl's 44% (§7.1), mean occurrence length 1.22 against 1.50 (§6.3), and
+by §4.1 the only single-peaked length distribution in the corpus. Early
+stopping on equi optimises for a term profile unlike htfl's. This comes with
+the standard split, not from any choice made here. **T5: check whether Lang et
+al. or Tran et al. discuss it.** If nobody has, it is worth a paragraph.
 
 ---
 
@@ -687,19 +776,43 @@ What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
 that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
 
-### 9.4 [OPEN, low priority] One wind sentence tokenizes to 1,074 pieces
+### 9.4 [RESOLVED BY DESIGN] How do the comparison papers compute their F1?
 
-Corpus max under BERT is 1,074 wordpieces, from a wind sentence whose
-whitespace length is far below that. The four tokenizers disagree by 2.7× on
-it (BERT 1,074, DeBERTa 1,061, XLM-R 488, RoBERTa 399), which is the signature
-of a long unbroken character sequence — a URL, a numeric string, or a table
-row rather than text.
+The ACTER authors warn that scores computed from a candidate-term list versus
+from sequential labels can lead to very different conclusions. Tran et al.
+(2024) do sequence labelling, as this project does. If they report span-level
+F1 rather than F1 over a deduplicated unique list, their numbers and a
+list-only pipeline would measure different things and could not share a table.
 
-One sentence out of 14,162, past a `max_length` of 256 that already truncates
-almost nothing. Not worth weight. Excluding it, the corpus max under BERT is
-325.
+**Decision: T3 builds both metrics**, so the question no longer blocks anything.
 
-Noted only so the figure in §5 is not mistaken for a property of the prose.
+- **Unique-list F1** — the **headline**. TermEval 2020's protocol, and the unit
+  every comparison number is in.
+- **Exact-span F1** — decoded spans scored positionally against gold spans,
+  micro-averaged, both boundaries required to match exactly. Secondary and
+  diagnostic. Named `exact_span` in the config: "span-level F1" is ambiguous,
+  because it is also used for token-level F1, which scores each token
+  independently and gives partial credit for partial overlap.
+
+The headline is fixed now, before either number exists.
+
+**The two are not the same measurement at different granularity.** Exact-span
+F1 is occurrence-weighted, unique-list F1 is type-weighted — `heart failure` is
+350 units of span F1 and one list entry, and at 47.7% hapax (§7.3) these
+diverge. And the ceilings (`data_layout.md` §5.3) exist **only in the list
+metric**; in span space the round-trip is exactly 1.0, which makes it a real
+assertion rather than a measurement.
+
+Useful consequence: span F1 measures tagger quality uncontaminated by the
+annotation scheme, list F1 measures tagger quality plus what the scheme costs,
+and **the gap is a diagnostic**. Span high with list low means frequent terms
+found and rare types missed — the expected shape at 47.7% hapax. The two close
+together would mean uniform performance across the frequency distribution,
+which would be surprising.
+
+**Still for T5:** record which unit and which key (ANN / NES) each published
+number was measured in. Mixing units silently in the comparison table would
+make it wrong.
 
 ---
 
