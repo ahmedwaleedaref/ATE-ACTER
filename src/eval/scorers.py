@@ -1,3 +1,5 @@
+from surface import generating_uniqe_list_for_corp_domian
+
 def load_gold_list_into_set(path : str):
     gold_set : set[str] = set()
     with open(path , "r") as file:
@@ -52,4 +54,4 @@ def score_list(predicted_unique : set[str] , gold_list : set[str] ):
 # key silently scored as false positive + false negative, no crash. data_layout.md §4, §6.
 GOLD_PATH = "/home/ahmed-walled/Projects/ATE-ACTER/ate-acter/data/raw/ACTER/en/corp/annotated/annotations/unique_annotation_lists/corp_en_tokenised_terms_nes.tsv"
 
-print(score_list(load_gold_list_into_set(GOLD_PATH) , load_gold_list_into_set(GOLD_PATH)))
+print(score_list(generating_uniqe_list_for_corp_domian() , load_gold_list_into_set(GOLD_PATH)))
