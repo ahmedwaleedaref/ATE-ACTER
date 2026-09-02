@@ -3,7 +3,7 @@
     "target_domain": "htfl",
     "reference_corpus": "target_only",
     "min_n": 2,
-    "max_n": 5,
+    "max_n": 4,
     "min_frequency": 2,
     "threshold": 1.0,
     "stopwords_path": null,
@@ -15,8 +15,8 @@
   "n_documents": 190,
   "n_sentences": 2432,
   "n_tokens": 55467,
-  "n_candidates_raw": 45821,
-  "n_candidates_after_min_frequency": 3669,
-  "n_terms_output": 2494,
+  "n_candidates_raw": 33284,
+  "n_candidates_after_min_frequency": 3319,
+  "n_terms_output": 2454,
   "output_path": "/home/amr/Desktop/MLA training/ATE-ACTER/results/term_lists/htfl_cvalue_terms.txt"
 }
