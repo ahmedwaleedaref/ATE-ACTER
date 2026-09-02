@@ -1,5 +1,3 @@
-from surface import generating_uniqe_list_for_corp_domian
-
 def load_gold_list_into_set(path : str):
     gold_set : set[str] = set()
     with open(path , "r") as file:
@@ -43,15 +41,5 @@ def score_list(predicted_unique : set[str] , gold_list : set[str] ):
     if Precision + Recall == 0.0 :
         return Precision , Recall , 0.0
 
-    f1_score = 2 * (Recall*Precision) / (Recall+Precision) 
-    return Precision , Recall , f1_score 
-
-
-# TOKENISED key only. The non-tokenised variant sits beside it with a near-identical
-# name and splits hyphens and internal punctuation differently ("public prosecutor's
-# office" vs "public prosecutor 's office"). decode() joins original dataset tokens
-# with spaces, so it can only ever match the tokenised form. Wrong file = ~1% of the
-# key silently scored as false positive + false negative, no crash. data_layout.md §4, §6.
-GOLD_PATH = "/home/ahmed-walled/Projects/ATE-ACTER/ate-acter/data/raw/ACTER/en/corp/annotated/annotations/unique_annotation_lists/corp_en_tokenised_terms_nes.tsv"
-
-print(score_list(generating_uniqe_list_for_corp_domian() , load_gold_list_into_set(GOLD_PATH)))
+    f1_score = 2 * (Recall*Precision) / (Recall+Precision)
+    return Precision , Recall , f1_score

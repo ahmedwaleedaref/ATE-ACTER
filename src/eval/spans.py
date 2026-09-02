@@ -1,12 +1,3 @@
-import sys
-from pathlib import Path
-
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from src.stats.loading import Document , load_domain  # noqa: E402
-
 def decode(tokens: list[str], labels: list[str], scheme: str) -> list[tuple[int, int]]:
     """
     Decode an IOB label sequence for ONE sentence into term spans.
@@ -79,24 +70,3 @@ def encode(tokens: list[str], spans: list[tuple[int, int]], scheme: str ) :
             else : 
                 labels[i] = "I"
     return labels
-
-def test_decode():
-    """
-    this function will laod every domain , then for eac domain we will each document 
-    by loader we will get each token , label list for each sentance in document . 
-    
-    """
-    number_of_mismathces = 0 
-    Domains : list[str] = ["corp", "equi", "wind","htfl"]
-    for domain in Domains : 
-        Documents : list[Document] = load_domain(domain)
-        for doc in Documents : 
-            #each doc has list of sentences
-            for sentence in doc.sentences : 
-                token = sentence[0]
-                label = sentence[1]
-                if( encode(token , decode(token,label,"bio"),"bio") != label ) : 
-                    number_of_mismathces += 1
-    return number_of_mismathces
-
-print(test_decode())

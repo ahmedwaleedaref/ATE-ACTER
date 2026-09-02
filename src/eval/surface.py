@@ -1,12 +1,5 @@
-import sys
-from pathlib import Path
-
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from src.stats.loading import Document , load_domain  # noqa: E402
-from spans import decode
+from src.eval.spans import decode
+from src.stats.loading import Document, load_domain
 
 def spans_to_unique_list(sentences: list[tuple[list[str], list[tuple[int, int]]]]):
     """
@@ -43,26 +36,26 @@ def spans_to_unique_list(sentences: list[tuple[list[str], list[tuple[int, int]]]
 
     return unique_list, n_spans, len(unique_list)
 
-def generating_uniqe_list_for_corp_domian():
+def generate_unique_list(domain: str):
     """
     """
-    
+
     sentences : list[tuple[list[str], list[tuple[int, int]]]] = []
-    
-    Domains : list[str] = ["corp"]
-    
-    for domain in Domains : 
+
+    Domains : list[str] = [domain]
+
+    for domain in Domains :
         Documents : list[Document] = load_domain(domain)
-        for doc in Documents : 
+        for doc in Documents :
             #each doc has list of sentences
-            for sentence in doc.sentences : 
+            for sentence in doc.sentences :
                 token = sentence[0]
                 label = sentence[1]
                 span = decode(token,label,"bio")
                 element = (token , span)
                 sentences.append(element)
     unique_list , n_spans, uniq_lenght = spans_to_unique_list(sentences)
-    return unique_list
-                
-                
-    
+    return unique_list, n_spans, uniq_lenght
+
+
+
