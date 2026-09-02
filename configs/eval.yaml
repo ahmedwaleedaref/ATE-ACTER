@@ -1,0 +1,12 @@
+headline_metric: unique_list_f1   # TermEval 2020 protocol; every published
+                                  # number this project compares against is
+                                  # in this unit
+secondary_metric: exact_span_f1   # BOTH boundaries must match exactly.
+                                  # NOT token-level F1 — no partial credit.
+                                  # Micro-averaged over all spans.
+scheme: bio
+labels: without_named_entities
+keys: [ann, nes]                  # one output list, scored against both
+dangling_i_policy: drop           # matches seqeval mode='strict', scheme=IOB2
+seqeval_mode: strict
+seqeval_scheme: IOB2
