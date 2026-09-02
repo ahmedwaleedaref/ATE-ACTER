@@ -1,11 +1,9 @@
-from surface import generate_flatten_spans
-
 def load_gold_list_into_set(path : str):
     gold_set : set[str] = set()
     with open(path , "r") as file:
         for line in file : 
             line_list = line.split("\t")
-            gold_set.add(line_list[0])
+            gold_set.add(line_list[0].strip())
     return gold_set
 
 def score_list(predicted_unique : set[str] , gold_list : set[str] ):
@@ -80,12 +78,3 @@ def score_exact_spans(pred: set[Span], gold: set[Span]):
     
     f1_score = 2 * (Recall*Precision) / (Recall+Precision)
     return Precision , Recall , f1_score
-    
-
-set1 = generate_flatten_spans("corp")
-set2 = generate_flatten_spans("corp")
-print(score_exact_spans(set1 , set2))
-
-spans = generate_flatten_spans("corp")
-assert len(spans) == 4180
-assert len(spans) == len(set(spans)), "duplicate span keys"

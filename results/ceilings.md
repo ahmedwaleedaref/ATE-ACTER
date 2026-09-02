@@ -1,3 +1,12 @@
+# List-metric ceilings (max_recall / max_precision)
+
+- headline metric: unique_list_f1
+- secondary metric: exact_span_f1
+- scheme: bio
+- labels: without_named_entities
+- keys scored (one predicted list, both keys): ann, nes
+- dangling-I policy: drop (seqeval mode='strict', scheme='IOB2')
+
 | domain | key | precision | recall | f1 | n_spans | n_unique |
 |---|---|---|---|---|---|---|
 | corp | ANN | 0.9668 | 0.9438 | 0.9552 | 4180 | 904 |

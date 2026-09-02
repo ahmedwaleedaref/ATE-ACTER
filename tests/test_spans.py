@@ -6,6 +6,7 @@ effect (a four-domain corpus pass) on every import.
 
 from __future__ import annotations
 
+from src.eval.scorers import score_exact_spans
 from src.eval.spans import decode, encode
 from src.stats.loading import Document, load_domain
 
@@ -14,6 +15,11 @@ from src.stats.loading import Document, load_domain
 # decode() drops them, so the re-encoded sequence differs at exactly these three
 # positions. Measured over all four English domains, 222,281 tokens.
 EXPECTED_MISMATCHES = 3
+
+# len(spans_a) per domain from decode() over gold labels, measured once and
+# pinned here so a change in decode()'s output is caught even if the round-trip
+# below still happens to agree with itself.
+_EXPECTED_SPAN_COUNTS = {"corp": 4180, "equi": 8662, "wind": 5053, "htfl": 9636}
 
 
 def test_decode():
@@ -61,3 +67,33 @@ def test_decode_structural_invariants():
                     sum(e - s for s, e in spans)
                     == labels.count("B") + labels.count("I") - dangling
                 )
+
+
+def test_span_roundtrip_exact():
+    """Span-space round-trip: decode -> encode -> decode must reproduce the
+    exact same span set, for all four domains.
+
+    This differs from test_decode()'s label round-trip, which finds exactly
+    EXPECTED_MISMATCHES mismatches from dangling "I" labels. Those artifacts
+    never become spans in the first place (decode() drops them), so in span
+    space there is no representational loss at all: any deviation here is a
+    bug in encode()/decode(), not a property of the data. Assert exact
+    equality, not pytest.approx.
+    """
+    for domain, expected_n in _EXPECTED_SPAN_COUNTS.items():
+        set_a: set[tuple[str, int, int, int]] = set()
+        set_b: set[tuple[str, int, int, int]] = set()
+
+        for doc in load_domain(domain):
+            for sent_idx, (tokens, labels) in enumerate(doc.sentences):
+                spans_a = decode(tokens, labels, "bio")
+                labels_b = encode(tokens, spans_a, "bio")
+                spans_b = decode(tokens, labels_b, "bio")
+
+                for start, end in spans_a:
+                    set_a.add((doc.file_id, sent_idx, start, end))
+                for start, end in spans_b:
+                    set_b.add((doc.file_id, sent_idx, start, end))
+
+        assert len(set_a) == expected_n
+        assert score_exact_spans(set_b, set_a) == (1.0, 1.0, 1.0)

@@ -75,6 +75,21 @@ def generate_flatten_spans(domain: str):
                     flatten_spans.append(element)
                 
     assert len(flatten_spans) == len(set(flatten_spans)), "duplicate span keys — file_id or sent_idx collision"
-    
-    return set(flatten_spans)   
 
+    return set(flatten_spans)
+
+
+def write_term_list(terms: set[str], path: str) -> None:
+    """
+    Write a term list in contract format (Tasks.md, interface contract): one
+    term per line, lowercased, deduplicated, UTF-8, sorted, no header, no index
+    column, trailing newline.
+
+    ``terms`` is already a set, so dedup is structural; sorting makes the
+    output deterministic byte-for-byte across runs.
+    """
+    assert all(term == term.lower() for term in terms), "all terms must already be lowercase"
+
+    with open(path, "w", encoding="utf-8") as file:
+        for term in sorted(terms):
+            file.write(term + "\n")
