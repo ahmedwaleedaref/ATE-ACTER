@@ -57,5 +57,24 @@ def generate_unique_list(domain: str):
     unique_list , n_spans, uniq_lenght = spans_to_unique_list(sentences)
     return unique_list, n_spans, uniq_lenght
 
-
+Span = tuple[str, int, int, int] 
+def generate_flatten_spans(domain: str):
+    flatten_spans : list[Span] = []
+    
+    Domains : list[str] = [domain]
+    for domain in Domains :
+        Documents : list[Document] = load_domain(domain)
+        for doc in Documents :
+            #each doc has list of sentences
+            for index,sentence in enumerate(doc.sentences) :
+                tokens = sentence[0]
+                labels = sentence[1]
+                spans = decode(tokens,labels,"bio")
+                for span in spans : 
+                    element = (doc.file_id , index , span[0] , span[1]  )
+                    flatten_spans.append(element)
+                
+    assert len(flatten_spans) == len(set(flatten_spans)), "duplicate span keys — file_id or sent_idx collision"
+    
+    return set(flatten_spans)   
 
