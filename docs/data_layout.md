@@ -187,6 +187,36 @@ Reason: with IO, "diabetic patient" is `I I` whether it is one two-word term or
 two separate one-word terms. That distinction is real in this dataset and IO
 discards it.
 
+### The scheme is strict IOB2 — measured [T3]
+
+Every term starts with `B`. Measured over all four English domains
+(`without_named_entities`, 222,281 tokens): **zero** `I` labels follow an `O`.
+The IOB1 convention — where a term not preceded by another term begins with `I`,
+and `B` appears only to separate adjacent terms — is ruled out.
+
+Three sentence-initial `I` labels exist, all terms split across a spurious
+sentence boundary:
+
+| file | fragment | full term |
+|---|---|---|
+| `wind_en_01` | `theory` | `BEM theory` |
+| `wind_en_01` | `coefficient` | `rotor power coefficient` |
+| `htfl_en_171` | `Arg83Gly` | `p . Arg83Gly` |
+
+Segmentation artifacts, not evidence of IOB1. The wind cases follow from the
+bimodal segmentation problem in §2; the htfl case is clinical notation
+(`p.Arg83Gly`) where the period triggers a split.
+
+**Policy, locked:** a dangling `I` — sentence-initial, or following `O` — opens
+no span and is dropped. This matches `seqeval` under `mode='strict',
+scheme=IOB2`, which the exact-span scorer is cross-checked against. Gold almost
+never exercises the branch; **model output is unconstrained, so the policy is
+load-bearing there.**
+
+Consequence for T3: the label-level round trip `encode(decode(gold)) == gold`
+differs on exactly these three tokens. That is a permanent assertion with a
+pinned expected value, not a bug.
+
 ### Encoding
 
 Non-ASCII characters survive into the token stream (e.g. `…` U+2026). The README
@@ -210,6 +240,23 @@ non-tokenised variant of each key. **Use the tokenised variant only.** The
 non-tokenised list splits differently on hyphens and internal punctuation, so
 it cannot be matched against decoded spans. Pin the exact filename in the
 interface contract; do not describe it.
+
+**[CONFIRMED — T3]** The two variants differ in entry count as well as content —
+corp terms+NE is **1,173 non-tokenised against 1,172 tokenised**, with 12 entries
+unique to one and 11 to the other:
+
+| non-tokenised | tokenised |
+|---|---|
+| `public prosecutor's office` | `public prosecutor 's office` |
+| `non- governmental organisations` | `non - governmental organisations` |
+| `expenditure budget line(s)` | `expenditure budget line ( s )` |
+
+`decode()` joins dataset tokens with spaces, so it can only ever produce the
+tokenised form. Scoring against the other costs a false positive and a false
+negative on the same term, raises no error, and lands disproportionately on
+multi-word terms. **Assert the expected entry count on load** — that is the
+tripwire that catches a wrong path, since an identity test passes at 1.0 against
+either file.
 
 Entry counts, all four domains [T2]:
 
@@ -360,6 +407,8 @@ That separates two failure modes cleanly:
 Both ceilings go in the results table. Reported list F1 is meaningless without
 them.
 
+**Measured in §5.5.**
+
 ### 5.4 NOBI — a published attempt at the recall ceiling
 
 **[CONFIRMED]** The recall ceiling in 5.1 is a known problem with published work
@@ -401,6 +450,50 @@ result, and it is the kind of decomposition this project is designed to produce.
 
 ---
 
+### 5.5 The ceilings, measured [T3]
+
+Gold BIO decoded to a unique term list and scored against the gold unique key.
+No model. Labels `without_named_entities`, tokenised keys, all four domains.
+Reproduced digit-for-digit by an independent implementation.
+
+| domain | spans | types | ANN max_P | ANN max_R | NES max_P | NES max_R |
+|---|--:|--:|--:|--:|--:|--:|
+| corp | 4,180 | 904 | 0.9668 | 0.9438 | 0.9668 | 0.7457 |
+| equi | 8,662 | 1,204 | 0.9294 | 0.9764 | 0.9294 | 0.7168 |
+| wind | 5,053 | 1,072 | 0.9468 | 0.9295 | 0.9468 | 0.6638 |
+| htfl | 9,636 | 2,452 | **0.8887** | **0.9316** | 0.8911 | 0.8549 |
+
+**htfl `max_recall` 0.9316 on the ANN key is the cap on every number this project
+reports.** Output in `results/ceilings.md`.
+
+Three readings:
+
+**The NES recall column is not a scheme ceiling.** Labels are
+`without_named_entities`, so the named entities in the NES key were never
+markable. Roughly 20 points of the ANN→NES recall drop is that, not BIO. Reported
+alone, wind's 0.6638 would read as "BIO costs a third of recall," which is false.
+**A ceiling without its key is unreadable.**
+
+**htfl has the lowest `max_precision` (0.8887) and is the only domain where it
+differs between keys.** Precision's denominator is the decoded list, which does
+not change with the key, so a handful of decoded htfl terms are absent from ANN
+but present in NES. This is §5.2 — discontinuous-term fragments — concentrated in
+the clinical domain, and consistent with §5.2b's finding that htfl carries the
+largest gold key.
+
+**equi has a shape no other domain has:** `max_recall` 0.9764 with `max_precision`
+0.9294. Almost everything in its key is reachable and almost nothing decoded is
+spurious. Further evidence for the §8.5 concern that equi is an unrepresentative
+validation domain for this test set — worth a paragraph in T5 if the literature
+has not said it.
+
+**Span/type ratios are 3.9–4.7**, not the ~2 predicted from the hapax rate during
+planning. Hapax is measured over gold key *types*; the span count is
+*occurrences* over annotated text. Different denominators — do not reason from
+one to the other.
+
+---
+
 ## 6. Decisions locked
 
 | Decision | Value |
@@ -419,6 +512,9 @@ result, and it is the kind of decomposition this project is designed to produce.
 | Encoder | `bert-base-cased` for week 2 [T2] |
 | Subword labelling | label on **first** subword; continuations `-100`; `word_ids()` for the mapping [T2] |
 | Decode output | join the **original dataset tokens** of a span; wordpieces never reach the output [T2] |
+| Span convention | `(file_id, sent_idx, start, end)`, `end` **exclusive** — `tokens[start:end]` is the term [T3] |
+| Dangling `I` | dropped, opening no span; matches seqeval `mode='strict', scheme=IOB2` [T3] |
+| Headline metric | unique-list F1; exact-span F1 is diagnostic [T3] |
 | wind filtering | drop wind sentences of ≤2 dataset tokens at training time [T2] |
 
 **On the split.** Train `corp` + `wind`, validate `equi`, test `htfl` is the
@@ -441,7 +537,8 @@ baseline, and going beyond it is the contribution.
 Task planning lives in `TASKS.md`. Listed here are the questions about the data
 itself that are still unanswered, tagged with the task that resolves each.
 
-**Resolved by T2** — numbers and reasoning in `results/data_stats.md`:
+**Resolved by T2 and T3** — numbers and reasoning in `results/data_stats.md`
+and `results/ceilings.md`:
 
 - ~~Tokens per sentence distribution~~ → section 2; `max_length` set in section 8
 - ~~Line/token consistency vs `texts_tokenised`~~ → section 3, 241/241 identical
@@ -453,6 +550,10 @@ itself that are still unanswered, tagged with the task that resolves each.
   recall.**
 - ~~Term-set overlap, training vs heart failure~~ → section 9
 - ~~Proportion of tokens carrying a positive label~~ → section 9
+- ~~`max_recall` and `max_precision` ceilings~~ **[T3]** → section 5.5, all four
+  domains against both keys. htfl ANN `max_recall` **0.9316** is the project cap.
+- ~~Is the sequential annotation IOB1 or IOB2?~~ **[T3]** → section 3, strict
+  IOB2, zero `I`-after-`O` in 222,281 tokens
 
 **Still open:**
 
@@ -463,9 +564,8 @@ itself that are still unanswered, tagged with the task that resolves each.
   size. Note this is not the same as "substring of another gold term": a term
   nested in one place and standalone in another is fully reachable, and
   character-substring matching gives false hits (`art` in `heart failure`).
-- **[T3]** `max_recall` and `max_precision` ceilings (section 5.3) — these need
-  the harness's `decode()`, and running them through it validates the conversion
-  code at the same time. Section 5.2b is the closest existing measurement.
+  **This is what decomposes htfl's measured `max_recall` gap** (0.9316 ANN,
+  section 5.5) into its nested-term and discontinuous-fragment components.
 - **[T5]** Tran et al. (2024) English heart-failure F1 on both keys, and their
   BIO-vs-NOBI recall delta
 - **[T5, no longer blocking]** How the comparison papers compute their F1 —

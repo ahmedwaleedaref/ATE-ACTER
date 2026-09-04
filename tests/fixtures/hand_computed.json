@@ -1,0 +1,44 @@
+{
+  "_comment": "Hand-computed fixture. Tokens/gold labels adapted from corp_en_01_seq_terms.tsv (blank line = sentence boundary); sentence 2's life label changed from O to I to include a two-token span. Labels are valid IOB2 but do not match the corpus file. The predicted labels are deliberately wrong. All 'expected' values below were derived by hand from the metric definitions, not by running decode()/encode()/score_list()/score_exact_spans() -- do not regenerate this file from the code.",
+  "file_id": "hand_computed",
+  "sentences": [
+    {
+      "tokens": ["Corruption", "?"],
+      "gold": ["B", "O"],
+      "pred": ["O", "B"]
+    },
+    {
+      "tokens": ["Not", "in", "our", "company"],
+      "gold": ["O", "O", "O", "B"],
+      "pred": ["B", "I", "O", "O"]
+    },
+    {
+      "tokens": ["Preventing", "corruption", "in", "corporate", "life"],
+      "gold": ["O", "B", "O", "B", "I"],
+      "pred": ["B", "B", "O", "B", "I"]
+    },
+    {
+      "tokens": ["Preface"],
+      "gold": ["O"],
+      "pred": ["O"]
+    }
+  ],
+  "expected": {
+    "gold_spans": [[0, 0, 1], [1, 3, 4], [2, 1, 2], [2, 3, 5]],
+    "pred_spans": [[0, 1, 2], [1, 0, 2], [2, 0, 1], [2, 1, 2], [2, 3, 5]],
+    "exact_span": {
+      "precision": 0.4,
+      "recall": 0.5,
+      "f1": 0.4444444444444444
+    },
+    "gold_terms": ["corruption", "company", "corporate life"],
+    "gold_n_spans": 4,
+    "pred_terms": ["?", "not in", "preventing", "corruption", "corporate life"],
+    "pred_n_spans": 5,
+    "unique_list": {
+      "precision": 0.4,
+      "recall": 0.6666666666666666,
+      "f1": 0.5
+    }
+  }
+}

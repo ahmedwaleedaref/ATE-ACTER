@@ -9,9 +9,9 @@ a day ends.
 |---|---|---|---|
 | T1 — Repo, data, layout analysis | Ahmed | — | **done** |
 | T2 — Data statistics | Ahmed | T1 | **done** |
-| T3 — Evaluation harness | Ahmed | T1, interface contract | next |
-| T4 — C-Value baseline | khaled Ahmed | interface contract | can start now |
-| T5 — Prior work and comparison table | Moamen Talaat | — | can start now |
+| T3 — Evaluation harness | Ahmed | T1, interface contract | **done** |
+| T4 — C-Value baseline | khaled Ahmed | interface contract | **done**; 3 decisions unrecorded |
+| T5 — Prior work and comparison table | Moamen Talaat | — | **done** |
 
 T4 and T5 do **not** wait for T3. See the interface contract below — that is what
 makes them parallel.
@@ -41,6 +41,13 @@ Consequences:
 - The neural model in week 2 emits the same format, so it needs no scorer changes.
 - Gold standard files are already in a compatible shape (one term per line,
   lowercased) — the label column is stripped on load.
+
+**[T3] The loader strips trailing whitespace.** Gold TSVs have a second column,
+so the newline lands there and `split("\t")[0]` is clean; a contract-format file
+has one column, so without the strip the newline welds to the last term of every
+line and the file scores near zero with no error. The strip lives in the loader,
+never in the writer — a writer that emits a padding tab to compensate is not
+producing contract format, and T4's output would not round-trip.
 
 **Note:** the term list is the contract for *cross-task* exchange. T3 also
 computes an exact-span metric internally (see below), which never crosses a task
@@ -214,6 +221,55 @@ Building both metrics also de-risks T5: whichever unit the comparison papers
 report in, the number exists. The open question in `Data_stats.md` §9.4 drops
 from blocking to "which column sits next to theirs."
 
+### Done
+
+`src/eval/`: `spans.py` (`encode`, `decode`), `surface.py`
+(`spans_to_unique_list`, `generate_unique_list`, `write_term_list`),
+`scorers.py` (`score_list`, `score_exact_spans`, `load_gold_list_into_set`,
+`generate_flatten_spans`), `run_eval.py` (`compute_ceilings`),
+`score_baseline.py`; `configs/eval.yaml`. **30 tests in `tests/`.**
+
+Against the definition of done — all six met:
+
+- Identity test — exactly 1.0, gold written through the contract writer and read
+  back through the gold loader, so the two normalisation paths are compared
+- Span round-trip — exactly 1.0, all four domains, set sizes pinned
+  (corp 4,180 / equi 8,662 / wind 5,053 / htfl 9,636)
+- List round-trip — `max_recall` / `max_precision` in `results/ceilings.md` and
+  `data_layout.md` §5.5
+- Hand-computed fixture — passes for both metrics
+- `score_list` runs against either key by path argument
+- `configs/eval.yaml` records the headline metric and `exact_span` semantics
+
+**Two tests beyond the spec:**
+
+- **Label round-trip.** `encode(decode(gold)) == gold` as exact sequence
+  equality, asserting exactly **3** mismatches (`data_layout.md` §3). Stronger
+  than the span round-trip, which is a set comparison and passes under a pair of
+  symmetric bugs; equality also names the failing token instead of returning
+  0.998.
+- **seqeval agreement.** Independent cross-check of `score_exact_spans` on a
+  perturbed prediction, agreeing to 6 dp under `mode='strict', scheme=IOB2`. The
+  perturbation excludes overlapping spans by construction — BIO cannot represent
+  them — so overlap behaviour is untested and no reader should infer otherwise.
+
+**On the fixture.** Adapted from `corp_en_01_seq_terms.tsv`, not verbatim: one
+label was changed (`life` `O` → `I`) to include a two-token span. Labels are
+valid IOB2 but do not match the corpus file. Expected values were derived by hand
+from the metric definitions. Same prediction gives **recall 0.5 by span and 0.667
+by type** — the two-metric divergence this task is built on, at a scale that can
+be checked by counting.
+
+Every other test compares the code against itself or against a number the code
+produced; a bug shared by `encode` and `decode` passes all of them. The fixture
+is the only external oracle, which is why it was not delegated.
+
+**Findings recorded in `data_layout.md`:** strict IOB2 with the dangling-`I`
+policy (§3), the tokenised/non-tokenised key trap with measured counts (§4), and
+the ceilings for all four domains (§5.5).
+
+Tag the repo: `git tag day-3`.
+
 ---
 
 ## T4 — C-Value baseline · khaled Ahmed · depends on contract only
@@ -241,6 +297,43 @@ and §7.3.
 
 **Definition of done:** produces a valid term list for heart failure; the
 frequency-corpus decision is recorded; runs from a config file.
+
+### Scored, provisionally
+
+htfl unique-list F1 **0.2003** (ANN key) / **0.2048** (NES key), via
+`src/eval/score_baseline.py`. 2,494 predicted terms against 2,339 gold (ANN).
+Input passed contract validation — no tabs, no uppercase, no duplicates.
+
+For orientation only: **no TermEval participant used C-Value**, so there is no
+direct published comparison. The nearest comparable system is e-Terminology's TSR
+(statistical, frequency threshold ≥2), which scored F1 20.1 incl NE / 21.4 excl
+NE on the same test set. So 0.20 is an ordinary place for a no-training
+statistical baseline to land. Not comparable digit-for-digit — those numbers are
+on ACTER 1.2's non-tokenised flat lists against a different gold (2,361 unique
+terms + 224 NEs, against our 2,339 / 2,556).
+
+**Three decisions to record before this number is usable:**
+
+1. **Frequency corpus.** Annotated portion only, or including the unannotated
+   texts as reference material? Both legitimate, not comparable to each other.
+   Already in the definition of done above.
+2. **Tokeniser.** 247 of 2,494 predicted terms (~10%) contain an apostrophe or
+   hyphen with no surrounding space. ACTER's tokenised key writes
+   `public prosecutor 's office`. If candidate generation used its own tokeniser,
+   those terms cannot match regardless of ranking quality, and the failure is
+   silent — a false positive and a false negative on the same term. Some will be
+   genuine (`30-day`); the split is unknown.
+3. **Threshold.** 2,494 predicted against 2,339 gold is close enough to suggest
+   the cutoff was set to produce a plausible *count*. If it was tuned against
+   htfl in any way the baseline is contaminated — htfl is the held-out test set.
+   A threshold from the training domains, or a fixed C-Value score, is fine but
+   must be stated.
+
+Relevant to interpretation: TermEval found recall lowest for hapax terms across
+every system, and e-Terminology reached **0%** hapax recall because of its
+frequency cut-off. At 47.7% hapax in htfl (`Data_stats.md` §7.3), a
+frequency-based method is structurally capped well below the ceiling. That is a
+property of C-Value, not a defect in the implementation.
 
 ---
 
@@ -283,6 +376,53 @@ nobody has, it is worth a paragraph.
 
 **Definition of done:** comparison table committed with all numbers sourced to a
 specific table in a specific paper, each labelled with its metric unit and key.
+
+### Starting point for item 1
+
+TermEval 2020 English track, heart-failure test set, percentages
+(Rigouts Terryn et al. 2020, Table 4). **Verify against the paper before use —
+do not take these on trust from this file:**
+
+| Rank | Team | Method | P | R | F1 incl NE | F1 excl NE |
+|---|---|---|--:|--:|--:|--:|
+| 1 | TALN-LS2N | BERT binary classification | 34.8 | 70.9 | 46.7 | 45.0 |
+| 2 | RACAI | TextRank + TFIDF + embeddings | 42.4 | 40.3 | 41.3 | 39.3 |
+| 3 | NYU | Termolator, chunking + TFIDF | 43.5 | 23.6 | 30.6 | 31.5 |
+| 4 | e-Terminology | TSR filtering, statistical | 34.4 | 14.2 | 20.1 | 21.4 |
+| 5 | NLPLab UQAM | BiLSTM + GloVe | 21.4 | 15.6 | 18.1 | 17.8 |
+
+Two things this settles:
+
+- **The unit.** These are unique-list scores. ACTER 1.2 shipped annotations only
+  as flat lists of unique terms, so no participant could have reported a
+  span-level number. Our headline metric is in the same unit. §9.4's question is
+  answered for this paper; Tran et al. (2024) still needs checking.
+- **The supervision asymmetry, confirmed from the source.** Sequential span
+  annotations arrived in v1.5. Same test set, same metric, more supervision
+  available to us — state it, do not gloss it.
+
+Also useful for the writeup: English hapax terms were 43% of the gold with NEs
+included, and recall was lowest for hapax terms across every system. Consistent
+with our 47.7% (`Data_stats.md` §7.3) and with the span-vs-list divergence T3
+predicts.
+
+Our own ceilings (`data_layout.md` §5.5) belong in this table as a row — a
+reader comparing an F1 against published work needs to know the cap.
+
+---
+
+## Week 1 status
+
+| Task | Status |
+|---|---|
+| T1 — Repo, data, layout | done |
+| T2 — Data statistics | done; nested-term count deferred to week 3 |
+| T3 — Evaluation harness | **done**, 30 tests |
+| T4 — C-Value baseline | **done**; F1 ≈ 0.20; 3 decisions unrecorded |
+| T5 — Prior work | **done**; TermEval table sourced |
+
+**Nothing blocks week 2.** The T4 decisions are khaled's to record and do not
+gate model training; the harness is what week 2 depends on and it is closed.
 
 ---
 
