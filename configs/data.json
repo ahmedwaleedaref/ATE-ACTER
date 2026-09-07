@@ -1,7 +1,9 @@
 {
   "data_root": "data/raw/ACTER",
   "language": "en",
-  "train_domains": ["corp", "equi", "wind"],
+  "all_domains": ["corp", "equi", "wind", "htfl"],
+  "train_domains": ["corp", "wind"],
+  "dev_domain": "equi",
   "test_domain": "htfl",
   "sequential_scheme": "iob_annotations",
   "ne_variant": "without_named_entities"

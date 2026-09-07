@@ -1,0 +1,31 @@
+{
+  "_purpose": "What one run does. configs/data.json says where the corpus is and how it is split; that file is stable all month and is read by week-1 code. This one varies per run and is copied into results/ with every experiment.",
+
+  "model_name": "bert-base-cased",
+  "hf_cache_dir": ".hf/hub",
+  "max_length": 256,
+  "truncation": true,
+
+  "effective_train_batch_size": 16,
+  "per_device_train_batch_size": 8,
+  "gradient_accumulation_steps": 2,
+  "_batch_note": "16 is the hyperparameter. 4 GB of VRAM is binding, so it is reached as 8 x 2 accumulation steps. T9's grid is stated in EFFECTIVE batch size; per-device size is a memory knob and must never be read as the hyperparameter. per_device * gradient_accumulation_steps == effective is asserted on load.",
+  "eval_batch_size": 32,
+
+  "learning_rate": 3e-5,
+  "num_epochs": 5,
+  "weight_decay": 0.01,
+  "lr_schedule": "linear",
+  "warmup_ratio": 0.1,
+  "seed": 13,
+
+  "length_grouped_batching": true,
+  "_length_grouped_note": "Batches are formed from length-sorted megabatches so padding, and therefore peak activation memory, is bounded by the batch's own longest sentence rather than the corpus maximum. Order within an epoch still varies with the seed.",
+
+  "short_sentence_filter": {
+    "max_tokens": 2,
+    "domains": ["wind"],
+    "splits": ["train"]
+  },
+  "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl."
+}

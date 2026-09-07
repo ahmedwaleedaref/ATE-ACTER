@@ -427,6 +427,32 @@ produce:**
 
 The pooled figure shifts under filtering and is not asserted against.
 
+**Measured against the real dataloader [T6] — three of four reproduce exactly,
+and the fourth cannot.** The table above counts in *dataset-token* space. The
+dataloader counts in *model-position* space, and the two denominators differ
+wherever a dataset token tokenizes to **zero** wordpieces. Under
+`bert-base-cased` that happens 41 times, all in `wind_en_01`: the Private Use
+Area characters U+F8EF and U+F8FA, left by PDF extraction. All 41 are gold `O`.
+corp, equi and htfl have none.
+
+| domain | asserted above | measured over positions | denominator |
+|---|--:|--:|---|
+| corp | 0.1262 | 0.1262 | 50,845 = 50,845 |
+| equi | 0.1822 | 0.1822 | 58,203 = 58,203 |
+| htfl | 0.2604 | 0.2604 | 55,467 = 55,467 |
+| wind (post-filter) | 0.1562 | **0.1563** | 53,450 of 53,491 |
+
+A token with no model position loses its label silently — nothing crashes, and
+the model can never predict it. **This is why T6's gate is per-example exact
+sequence equality rather than an assertion on these four rates:** a rate
+absorbs the loss in the fourth decimal, while the equality check fails loudly
+if any lost token had carried a `B` or an `I`. None do here, which is the only
+reason wind's rate moves by 0.0001 rather than by something visible.
+
+The count is a property of the tokenizer, not of ACTER — a byte-level BPE keeps
+those characters — so it is reported per run in `results/t6_alignment.md` and
+never pinned. Expect it to change at T10.
+
 ### 6.2 wind's ≤2-token sentences are filterable
 
 Short (≤2 dataset tokens) versus prose (≥3), per domain:

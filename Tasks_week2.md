@@ -78,7 +78,7 @@ Report both raw and ceiling-normalised or the gap will be misread.
 
 ---
 
-## T6 — Dataloader + alignment gate
+## T6 — Dataloader + alignment gate · Ahmed · DONE
 
 **Input:** `load_domain(domain, cfg) -> list[Document]`, with
 `Document.sentences` as parallel `(tokens, labels)`.
@@ -121,6 +121,37 @@ filter flag verified off for equi and htfl.
 **Risk:** this is the one bug the harness cannot catch. Misalignment happens
 upstream of `decode`, nothing crashes, and the model trains to a plausible
 score against shifted labels.
+
+**Done.** `src/data/align.py` (hand-written: `align_labels`,
+`recover_token_labels`, `positive_rate`, plus `LABEL2ID`/`ID2LABEL`) and
+`src/data/dataset.py` (tokenisation, filter, `ATEDataset`, collator,
+length-grouped batching). Report in `results/t6_alignment.md`; split moved into
+`configs/data.json`, run settings into `configs/train.json`. 38 tests pass.
+
+**The gate changed shape.** Instead of asserting the four positive rates, it
+asserts per-example exact sequence equality — `recover_token_labels(word_ids,
+align_labels(word_ids, gold), …) == gold` — over all 14,162 sentences,
+truncation disabled. It catches misalignment, a lost token and a length
+mismatch, and names the failing sentence and token instead of reporting a
+domain-level number that is slightly off. The rates are now reported, and the
+reason is the finding below.
+
+**Finding: 41 dataset tokens tokenize to zero wordpieces.** All in
+`wind_en_01`, the Private Use Area characters U+F8EF and U+F8FA left by PDF
+extraction, all gold `O`; corp, equi and htfl have none. They get no model
+position, so their labels land nowhere and wind's rate is measured over 53,450
+positions rather than 53,491 dataset tokens: **0.1563, not §6.1's 0.1562**. An
+exact-equality assertion on the four rates would have failed on the first run
+for a reason that is not a bug. corp 0.1262, equi 0.1822 and htfl 0.2604
+reproduce exactly. Recorded in `Data_stats.md` §6.1; the count is a property of
+the tokenizer, not of ACTER, so it will change at T10.
+
+**Truncation costs nothing on dev or test.** 8 sentences exceed 256 subwords
+corpus-wide (corp 2, wind 5, htfl 1 — matching `data_layout.md` §8.2), losing
+346 tokens and 48 positive labels, **all of them in the training domains**.
+equi loses nothing; htfl loses 2 tokens, both `O`. Truncated tokens are
+predicted `O` by policy, which can only cost recall — and on the reported
+metrics that cost is zero.
 
 ---
 

@@ -59,10 +59,23 @@ class DataConfig:
     test_domain: str
     sequential_scheme: str          # e.g. "iob_annotations"
     ne_variant: str                 # e.g. "without_named_entities"
+    # Added for week 2, both optional so every existing call site is unchanged.
+    dev_domain: str = ""            # validation domain under the adopted split
+    all_domains: tuple[str, ...] = ()
 
     @property
     def domains(self) -> tuple[str, ...]:
-        """Train domains then the test domain, in a fixed order."""
+        """Every domain the corpus statistics iterate over.
+
+        ``all_domains`` when the config names it: which domains exist is a fact
+        about the corpus, independent of which of them the split trains on. Once
+        ``train_domains`` became ("corp", "wind") -- equi moved to validation --
+        deriving this from the split would have silently dropped equi from every
+        T2 statistic. Falls back to train + test for configs written before the
+        field existed, which is what this loader's own tests construct.
+        """
+        if self.all_domains:
+            return self.all_domains
         return (*self.train_domains, self.test_domain)
 
 
@@ -86,10 +99,12 @@ def load_config(config_path=None) -> DataConfig:
     return DataConfig(
         data_root=data_root,#usually will be ate-acter/data/raw/ACTER
         language=raw["language"], #english
-        train_domains=tuple(raw["train_domains"]), #["corp", "equi", "wind"]
+        train_domains=tuple(raw["train_domains"]), #["corp", "wind"] under the adopted split
         test_domain=raw["test_domain"], #"htfl",
         sequential_scheme=raw["sequential_scheme"], #"iob_annotations"
         ne_variant=raw["ne_variant"], #"without_named_entities"
+        dev_domain=raw.get("dev_domain", ""), #"equi" under the adopted split
+        all_domains=tuple(raw.get("all_domains", ())), #all four English domains
     )
 
 
