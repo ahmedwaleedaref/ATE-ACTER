@@ -60,9 +60,13 @@ class TrainConfig:
     learning_rate: float
     num_epochs: int
     weight_decay: float
+    max_grad_norm: float
     lr_schedule: str
     warmup_ratio: float
     seed: int
+    device: str
+    log_every_steps: int
+    save_checkpoint: bool
     length_grouped_batching: bool
     filter_max_tokens: int
     filter_domains: tuple[str, ...]
@@ -111,9 +115,13 @@ def load_train_config(path=None) -> TrainConfig:
         learning_rate=float(raw["learning_rate"]),
         num_epochs=raw["num_epochs"],
         weight_decay=float(raw["weight_decay"]),
+        max_grad_norm=float(raw["max_grad_norm"]),
         lr_schedule=raw["lr_schedule"],
         warmup_ratio=float(raw["warmup_ratio"]),
         seed=raw["seed"],
+        device=raw["device"],
+        log_every_steps=raw["log_every_steps"],
+        save_checkpoint=raw["save_checkpoint"],
         length_grouped_batching=raw["length_grouped_batching"],
         filter_max_tokens=filt["max_tokens"],
         filter_domains=tuple(filt["domains"]),
@@ -318,8 +326,8 @@ class Collator:
         #B is number of example in batch if you access the first example you will find 1 vector with size L number of subword positions in the longest sequence in this batch the 768 does not get here yet .
         batch = self.collator(features)
         #lets put indices back one index per example those indices are necssary bcs we need to go back to (file_id, sent_idx)
-        return batch
         batch["example_index"] = torch.tensor(indices, dtype=torch.long)
+        return batch
 
 
 class LengthGroupedBatchSampler(Sampler):

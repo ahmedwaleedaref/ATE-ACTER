@@ -15,9 +15,16 @@
   "learning_rate": 3e-5,
   "num_epochs": 5,
   "weight_decay": 0.01,
+  "max_grad_norm": 1.0,
+  "_clip_note": "torch.nn.utils.clip_grad_norm_ on the accumulated gradient, once per optimizer step, before optimizer.step(). 1.0 is the HF Trainer default, so it matches the published BERT fine-tuning recipes T5 compares against. Fixed for T7-T12: it is a constant of the setup, not a tuned hyperparameter. If it ever varies it becomes an experimental axis and needs its own row in the results.",
   "lr_schedule": "linear",
   "warmup_ratio": 0.1,
-  "seed": 13,
+  "seed": 42,
+
+  "device": "auto",
+  "log_every_steps": 50,
+  "save_checkpoint": false,
+  "_run_note": "device auto -> cuda when available, else cpu; never hardcoded, because T10 may run on Colab and a code edit between runs stops results being comparable. log_every_steps counts OPTIMIZER steps. Checkpoints go to /runs/<run_id>/ which is gitignored; the JSON log goes to results/runs/<run_id>.json which is tracked.",
 
   "length_grouped_batching": true,
   "_length_grouped_note": "Batches are formed from length-sorted megabatches so padding, and therefore peak activation memory, is bounded by the batch's own longest sentence rather than the corpus maximum. Order within an epoch still varies with the seed.",

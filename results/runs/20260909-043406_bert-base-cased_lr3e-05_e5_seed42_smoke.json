@@ -1,0 +1,143 @@
+{
+  "run_id": "20260909-043406_bert-base-cased_lr3e-05_e5_seed42_smoke",
+  "started": "2026-09-09T04:34:09+00:00",
+  "git": {
+    "commit": "e9e0355ab1d984c551870d5a898609e7fb85a70c",
+    "dirty": true
+  },
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "seed": 42,
+  "config": {
+    "_purpose": "What one run does. configs/data.json says where the corpus is and how it is split; that file is stable all month and is read by week-1 code. This one varies per run and is copied into results/ with every experiment.",
+    "model_name": "bert-base-cased",
+    "hf_cache_dir": ".hf/hub",
+    "max_length": 256,
+    "truncation": true,
+    "effective_train_batch_size": 16,
+    "per_device_train_batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "_batch_note": "16 is the hyperparameter. 4 GB of VRAM is binding, so it is reached as 8 x 2 accumulation steps. T9's grid is stated in EFFECTIVE batch size; per-device size is a memory knob and must never be read as the hyperparameter. per_device * gradient_accumulation_steps == effective is asserted on load.",
+    "eval_batch_size": 32,
+    "learning_rate": 3e-05,
+    "num_epochs": 5,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "_clip_note": "torch.nn.utils.clip_grad_norm_ on the accumulated gradient, once per optimizer step, before optimizer.step(). 1.0 is the HF Trainer default, so it matches the published BERT fine-tuning recipes T5 compares against. Fixed for T7-T12: it is a constant of the setup, not a tuned hyperparameter. If it ever varies it becomes an experimental axis and needs its own row in the results.",
+    "lr_schedule": "linear",
+    "warmup_ratio": 0.1,
+    "seed": 42,
+    "device": "auto",
+    "log_every_steps": 50,
+    "save_checkpoint": false,
+    "_run_note": "device auto -> cuda when available, else cpu; never hardcoded, because T10 may run on Colab and a code edit between runs stops results being comparable. log_every_steps counts OPTIMIZER steps. Checkpoints go to /runs/<run_id>/ which is gitignored; the JSON log goes to results/runs/<run_id>.json which is tracked.",
+    "length_grouped_batching": true,
+    "_length_grouped_note": "Batches are formed from length-sorted megabatches so padding, and therefore peak activation memory, is bounded by the batch's own longest sentence rather than the corpus maximum. Order within an epoch still varies with the seed.",
+    "short_sentence_filter": {
+      "max_tokens": 2,
+      "domains": [
+        "wind"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl."
+  },
+  "data": {
+    "train_domains": [
+      "corp",
+      "wind"
+    ],
+    "dev_domain": "equi",
+    "test_domain": "htfl",
+    "n_train": 64,
+    "n_dev": 3090,
+    "n_test": 2432,
+    "micro_batches_per_epoch": 8,
+    "total_optimizer_steps": 20,
+    "limit_train": 64
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 1.0487054958939552,
+      "dev": {
+        "n_pred_spans": 325,
+        "n_pred_types": 73,
+        "list_ann_p": 0.1232876712328767,
+        "list_ann_r": 0.007853403141361256,
+        "list_ann_f1": 0.014766201804757998,
+        "list_nes_p": 0.1506849315068493,
+        "list_nes_r": 0.007046764894298526,
+        "list_nes_f1": 0.013463892288861688
+      },
+      "seconds": 10.5
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.6401376947760582,
+      "dev": {
+        "n_pred_spans": 3,
+        "n_pred_types": 2,
+        "list_ann_p": 0.0,
+        "list_ann_r": 0.0,
+        "list_ann_f1": 0.0,
+        "list_nes_p": 0.0,
+        "list_nes_r": 0.0,
+        "list_nes_f1": 0.0
+      },
+      "seconds": 9.9
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5290546864271164,
+      "dev": {
+        "n_pred_spans": 3,
+        "n_pred_types": 2,
+        "list_ann_p": 0.0,
+        "list_ann_r": 0.0,
+        "list_ann_f1": 0.0,
+        "list_nes_p": 0.0,
+        "list_nes_r": 0.0,
+        "list_nes_f1": 0.0
+      },
+      "seconds": 9.8
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.45868056267499924,
+      "dev": {
+        "n_pred_spans": 5,
+        "n_pred_types": 3,
+        "list_ann_p": 0.3333333333333333,
+        "list_ann_r": 0.0008726003490401396,
+        "list_ann_f1": 0.001740644038294169,
+        "list_nes_p": 0.3333333333333333,
+        "list_nes_r": 0.0006406149903907751,
+        "list_nes_f1": 0.001278772378516624
+      },
+      "seconds": 9.8
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.41947270929813385,
+      "dev": {
+        "n_pred_spans": 7,
+        "n_pred_types": 5,
+        "list_ann_p": 0.4,
+        "list_ann_r": 0.0017452006980802793,
+        "list_ann_f1": 0.003475238922675934,
+        "list_nes_p": 0.4,
+        "list_nes_r": 0.0012812299807815502,
+        "list_nes_f1": 0.0025542784163473816
+      },
+      "seconds": 9.9
+    }
+  ],
+  "test": null,
+  "reason": "T7 smoke: pipeline check, not a result",
+  "realised_optimizer_steps": 20,
+  "finished": "2026-09-09T04:34:59+00:00",
+  "duration_sec": 49.9
+}

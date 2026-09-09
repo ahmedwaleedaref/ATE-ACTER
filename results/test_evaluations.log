@@ -1,0 +1,1 @@
+2026-09-09T04:44:25+00:00	20260909-044422_bert-base-cased_lr3e-05_e5_seed42	seed=42	lr=3e-05	epochs=5	htfl_list_ann_f1=0.5200	htfl_list_nes_f1=0.5060	reason=T7 first end-to-end run; E01

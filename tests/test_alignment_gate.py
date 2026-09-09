@@ -141,6 +141,16 @@ def test_collator_pads_labels_with_ignore_index(tokenizer, data_cfg):
     dataset = ATEDataset(sorted(examples, key=lambda e: e.n_subwords)[:8])
     batch = Collator(tokenizer)([dataset[i] for i in range(len(dataset))])
 
+    # example_index is the only link from a batch row back to its Example --
+    # tokens, file_id and sent_idx never enter the batch, so if it goes missing
+    # the whole inference path loses the identity of what it just predicted.
+    # It went missing once, silently, and every other test still passed.
+    assert "example_index" in batch, "collator dropped example_index"
+    assert batch["example_index"].tolist() == list(range(len(dataset)))
+    for row, index in enumerate(batch["example_index"].tolist()):
+        example = dataset.examples[index]
+        assert batch["input_ids"][row, :example.n_subwords].tolist() == example.input_ids
+
     lengths = [example.n_subwords for example in dataset.examples]
     assert batch["labels"].shape == (len(dataset), max(lengths))
     for row, length in enumerate(lengths):

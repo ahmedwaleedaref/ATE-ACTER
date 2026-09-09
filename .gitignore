@@ -3,7 +3,9 @@ data/processed/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-runs/
+/runs/          # checkpoints; results/runs/*.json IS tracked
 *.pt
+*.safetensors
 .env
 .venv/
+.hf/            # HuggingFace cache: model weights, 415 MB for bert-base-cased alone
