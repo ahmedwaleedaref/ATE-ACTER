@@ -171,9 +171,15 @@ one place it can be wrong.
 **Write the training loop by hand.** ~40 lines, and it is where the LR schedule
 and warmup live — both of which T12 tests. `Trainer` hides them.
 
-**Expect:** training loss plateaus well above zero. That is `data_layout.md`
-§5.2b — the same string carries different labels depending on whether it sits
-inside a longer term. Not a bug, and not a reason to keep training.
+**Expect:** nothing in particular from the training loss. This task originally
+said it would plateau well above zero, citing `data_layout.md` §5.2b — the same
+string carrying different labels depending on whether it sits inside a longer
+term. **That premise was false and is now corrected in §5.2b and
+`Data_stats.md` §7.2:** a nested occurrence still carries a positive label, and
+`B` versus `I` follows from sentence context. E01 reached loss 0.0043, which is
+ordinary for a 110M-parameter model fitting 4,592 sentences, and needs no
+explanation. It raises no memorisation question either — htfl shares 0.4% of
+its term types with the training keys.
 
 **Done:** one dev number and one test number, produced end to end, logged with
 full config and seed.

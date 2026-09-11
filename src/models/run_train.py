@@ -116,6 +116,8 @@ def main() -> None:
     parser.add_argument("--reason", default="", help="why this run exists; goes in the test log")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--lr", type=float, default=None, help="override learning_rate")
+    parser.add_argument("--weight-decay", type=float, default=None, help="override weight_decay")
     parser.add_argument("--limit-train", type=int, default=None,
                         help="smoke only: train on the first N sentences")
     parser.add_argument("--skip-test", action="store_true", help="dev only, no htfl")
@@ -123,8 +125,18 @@ def main() -> None:
     args = parser.parse_args()
 
     cfg = load_train_config()
+    # CLI overrides exist so a one-number experiment is not a config edit that
+    # someone forgets to revert. The effective value is what gets logged.
+    overrides = {}
     if args.epochs is not None:
-        cfg = dataclasses.replace(cfg, num_epochs=args.epochs)
+        overrides["num_epochs"] = args.epochs
+    if args.lr is not None:
+        overrides["learning_rate"] = args.lr
+    if args.weight_decay is not None:
+        overrides["weight_decay"] = args.weight_decay
+    if overrides:
+        cfg = dataclasses.replace(cfg, **overrides)
+        print("overrides: " + ", ".join(f"{k}={v}" for k, v in overrides.items()))
     seed = args.seed if args.seed is not None else cfg.seed
     data_cfg = load_config()
     eval_cfg = load_eval_config()
@@ -171,7 +183,9 @@ def main() -> None:
         "device": str(device),
         "gpu": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
         "seed": seed,
-        "config": cfg.raw | {"num_epochs": cfg.num_epochs},
+        "config": cfg.raw | {f.name: getattr(cfg, f.name)
+                             for f in dataclasses.fields(cfg) if f.name != "raw"},
+        "overrides": overrides,
         "data": {
             "train_domains": list(data_cfg.train_domains),
             "dev_domain": dev_domain,

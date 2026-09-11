@@ -344,7 +344,7 @@ deliberately **not** an entry in the unique annotation list.
 So decoding gold BIO tags produces strings that are correct at the token level
 but count as **false positives** against the unique list.
 
-### 5.2b Annotation is not exhaustive — measured [T2]
+### 5.2b Annotation is not exhaustive — measured [T2], decomposed [T7]
 
 Related to both ceilings, and measured directly. For each gold term, compare
 (a) decoded gold-BIO span occurrences against (b) occurrences of the same token
@@ -357,19 +357,58 @@ sequence anywhere in the annotated stream, regardless of label:
 | wind | 4,982 | 9,304 | **1.87** |
 | htfl | 9,243 | 13,890 | 1.50 |
 
-A third to a half of the surface occurrences of gold terms carry no positive
-label. In wind, `wind` is tagged 57 times and appears 642; `rotor` 99 against
-284. In htfl, `heart failure` is tagged 350 times and appears 530.
+A third to a half of the surface occurrences of gold terms are not decoded as
+their own maximal span. In wind, `wind` is a maximal span 57 times and appears
+642; `rotor` 99 against 284. In htfl, `heart failure` 350 against 530.
 
-Two mechanisms, which these numbers do not separate: **nesting** (section 5.1 —
-BIO marks only the longest span, so `wind` inside `wind turbine` is invisible)
-and **genuinely unannotated occurrences**. The distinction matters — nesting is
-a representational limit to report, non-exhaustive annotation is training
-noise.
+Two mechanisms: **nesting** (section 5.1 — BIO marks only the longest span, so
+`wind` inside `wind velocity` cannot be decoded separately) and **genuinely
+unannotated occurrences**. The distinction matters — nesting is a
+representational limit to report, non-exhaustive annotation is training noise.
 
-**Consequence for training:** the same string carries different labels in
-different sentences, distinguished only by whether it sits inside a longer
-term. Training loss will not approach zero, and that is not a bug.
+#### Separated — measured [T7]
+
+The (a)/(b) table above does not separate them. Splitting each surface
+occurrence three ways — decoded as its own maximal span, carrying a positive
+label inside a longer term, or all-`O`:
+
+| case | surface | own maximal span | nested in a longer term | all-`O` |
+|---|--:|--:|--:|--:|
+| wind, `wind` | 642 | 57 | **585** | **0** |
+| wind, `power` | 399 | 63 | 336 | **0** |
+| wind, `rotor` | 284 | 99 | 182 | 3 |
+| corp, `anti-corruption` | 146 | 44 | 102 | **0** |
+| htfl, `heart failure` | 530 | 350 | 180 | **0** |
+
+**For all three examples the gap is nesting, not missing annotation.** The
+token `wind` never carries an `O` in this corpus — 478 `B`, 164 `I`, zero `O`
+across 642 occurrences. An earlier version of this section said these
+occurrences "carry no positive label"; that was wrong, and it invited reading
+the gap as training noise when it is the representational limit of section 5.1.
+
+The three all-`O` `rotor` occurrences are Turkish: `wind_en_01` carries a
+Turkish abstract inside the English corpus — 15 sentences, 507 tokens, ~1% of
+wind's tokens, at a 5.3% positive rate against wind prose's 15.6%. One further
+Turkish sentence is in `equi_en_002`. This is what the README's `İ` cleanup
+note (section 3) was pointing at.
+
+These three terms are examples, not the whole corpus: the full decomposition
+over every gold term is **T13**, which also splits nested terms by length,
+1-token (NOBI-addressable) against ≥2-token.
+
+**Consequence for training — the earlier claim was wrong.** The claim was that
+the same string carries contradictory labels, so training loss would not
+approach zero. The premise is false: a nested occurrence still carries a
+positive label, and `B` versus `I` is decided by whether a modifier precedes it
+*in the same sentence*, which is context the model has. That is a rule to
+learn, not a contradiction. Nothing here predicts a loss floor.
+
+In E01 training loss reached **0.0043** over 1,435 steps. A 110M-parameter
+model fitting 4,592 sentences to near-zero loss is ordinary and needs no
+special explanation. It also raises no memorisation question: type overlap
+between the training keys and htfl is 10 terms, **0.4%**, so a model scoring
+0.52 on htfl cannot be retrieving memorised terms — there are almost none to
+retrieve.
 
 ### 5.3 Measuring both
 

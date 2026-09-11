@@ -560,7 +560,7 @@ Domains differ in compositionality: equi is 55.7% single-word terms, wind only
 29.1%. The longest entries are almost entirely organisation names on the
 terms+NE keys.
 
-### 7.2 Annotation is not exhaustive — a third to a half of occurrences are untagged
+### 7.2 Most gold-term occurrences are nested, not untagged — corrected [T7]
 
 Three counts, deliberately distinguished:
 
@@ -575,10 +575,9 @@ Three counts, deliberately distinguished:
 | wind | 4,982 | 9,304 | **1.87** | 31,306 |
 | htfl | 9,243 | 13,890 | **1.50** | 13,890 |
 
-Individual cases are stark. In wind, `wind` is tagged 57 times and appears
-642; `power` 63 against 399; `rotor` 99 against 284. In corp,
-`anti-corruption` is tagged 44 times and appears 146. In htfl,
-`heart failure` is tagged 350 times and appears 530.
+Individual cases are stark. In wind, `wind` is a maximal span 57 times and
+appears 642; `power` 63 against 399; `rotor` 99 against 284. In corp,
+`anti-corruption` 44 against 146. In htfl, `heart failure` 350 against 530.
 
 **Two mechanisms, with different implications:**
 
@@ -591,14 +590,40 @@ compositional in the corpus (§7.1).
 *Genuinely unannotated occurrences,* where a term appears standalone and was
 not marked.
 
-These numbers do not separate the two. The distinction matters: nesting is a
-representational limit to report, non-exhaustive annotation is training noise.
+The (a)/(b) ratio does not separate the two. Measured separately [T7],
+splitting every surface occurrence three ways — decoded as its own maximal
+span, positive but inside a longer term, or all-`O`:
 
-**Consequence for training.** The model will see `wind` labelled `B` in one
-sentence and `O` in another, distinguished only by whether the occurrence sits
-inside a longer term. That is contradictory supervision unless the model
-learns the longest-match rule. **Training loss will not approach zero, and
-that is not a bug.**
+| case | surface | own maximal span | nested in a longer term | all-`O` |
+|---|--:|--:|--:|--:|
+| wind, `wind` | 642 | 57 | **585** | **0** |
+| wind, `power` | 399 | 63 | 336 | **0** |
+| wind, `rotor` | 284 | 99 | 182 | 3 |
+| corp, `anti-corruption` | 146 | 44 | 102 | **0** |
+| htfl, `heart failure` | 530 | 350 | 180 | **0** |
+
+**It is nesting, not missing annotation.** The token `wind` never carries an
+`O` in this corpus: 478 `B`, 164 `I`, zero `O` across 642 occurrences. The
+three all-`O` `rotor` cases are Turkish — `wind_en_01` contains a Turkish
+abstract, 15 sentences and 507 tokens, which is also what the README's `İ`
+cleanup note points at.
+
+These five terms are examples, not the corpus. The full decomposition over
+every gold term, split by nested-term length, is **T13**.
+
+**Consequence for training — the earlier claim was wrong.** The claim was that
+the same string carries contradictory labels, so training loss would not
+approach zero. The premise is false: a nested occurrence still carries a
+positive label, and `B` versus `I` is decided by whether a modifier precedes it
+*in the same sentence*, which is context the model has. That is a rule to
+learn, not a contradiction. Nothing here predicts a loss floor.
+
+In E01 training loss reached **0.0043** over 1,435 steps. A 110M-parameter
+model fitting 4,592 sentences to near-zero loss is ordinary and needs no
+special explanation. It also raises no memorisation question: type overlap
+between the training keys and htfl is 10 terms, **0.4%**, so a model scoring
+0.52 on htfl cannot be retrieving memorised terms — there are almost none to
+retrieve.
 
 ### 7.3 Hapax proportion — the ceiling on any frequency-based method
 

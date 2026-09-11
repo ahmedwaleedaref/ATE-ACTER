@@ -53,7 +53,7 @@ term list → `score_list`. A good score is not the goal.
 - §8.2 — 23% of htfl's multi-word terms share a final token with a training
   term. That head-position transfer is the channel that does exist.
 - Training loss will plateau well above zero (`data_layout.md` §5.2b). Expected,
-  not a bug.
+  not a bug. **[False premise — see Result. §5.2b is corrected.]**
 
 **Predicted (htfl unique-list F1, ANN key):**
  i predict around 0.4 to 0.5 f1 the winner team was using bert with no seq labeling we are using bert with seq labeling i expect f1 score to be around i do not suspect any gradien vanshing , exploding problem or even low postive rate which main problem with bert i do not thing there will be any here . still there is no reall
@@ -77,6 +77,16 @@ htfl: 5,201 predicted spans → 1,788 types, against a gold key of 2,339.
 
 Per-epoch, equi ANN F1: 0.4607 / 0.4471 / 0.4622 / 0.5081 / 0.4887.
 Train loss: 0.2438 / 0.0475 / 0.0196 / 0.0084 / 0.0043.
+
+**On the loss.** The pre-run expectation that it would plateau well above zero
+was wrong, and so was the premise behind it. `data_layout.md` §5.2b and
+`Data_stats.md` §7.2 are corrected: gold-term occurrences that are not their
+own maximal span are nested inside longer terms and still carry positive
+labels. The supervision is not contradictory, so nothing predicted a floor.
+Near-zero loss for a 110M-parameter model fitting 4,592 sentences over 1,435
+steps is ordinary and needs no explanation. It raises no memorisation question
+either: htfl shares 0.4% of its term types with the training keys, so a 0.52
+score cannot be retrieval — there is almost nothing to retrieve.
 
 **Reading:**
 
