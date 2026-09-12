@@ -23,7 +23,7 @@ gate   runs   noise   HP   │    encoders  breakdowns
 |---|---|
 | T6 — Dataloader + alignment gate | labels land where they should |
 | T7 — First end-to-end run | the pipeline runs at all |
-| T8 — Seed variance | what difference is detectable |
+| T8 — Seed variance | what difference is detectable — **s = 0.0179 on equi** (E02) |
 | T9 — Hyperparameter pass (BERT) | the config everything else is run at |
 | T10 — Encoder sweep | which encoder |
 | T11 — Breakdowns | where it fails, and the two predictions |
@@ -186,7 +186,7 @@ full config and seed.
 
 ---
 
-## T8 — Seed variance
+## T8 — Seed variance · Ahmed · DONE
 
 Same config as T7, **5 seeds**, `transformers.set_seed(n)`. Seeds fixed before
 the first run: **42, 43, 44, 45, 46**. Written into `configs/train.json`, not
@@ -273,6 +273,11 @@ mean.
 **Done:** a std, written prominently in `results/`, because every later table is
 read against it; five runs logged with full config and seed; the per-seed
 statistic stated.
+
+**Result (E02):** equi 0.4811 ± 0.0179, htfl 0.5278 ± 0.0156, 0 of 5 collapsed.
+A gap on equi must clear 0.0179 F1 to be detected at n=5 and 0.0358 to be taken
+seriously. Full report in `results/t8_seed_variance.md`; per-epoch curves, the
+six readings and a known defect in the `dirty` flag are in `EXPERIMENTS.md` E02.
 
 ---
 

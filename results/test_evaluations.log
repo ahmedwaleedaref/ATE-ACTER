@@ -1,1 +1,6 @@
 2026-09-09T04:44:25+00:00	20260909-044422_bert-base-cased_lr3e-05_e5_seed42	seed=42	lr=3e-05	epochs=5	htfl_list_ann_f1=0.5200	htfl_list_nes_f1=0.5060	reason=T7 first end-to-end run; E01
+2026-09-12T06:15:48+00:00	20260912-061545_bert-base-cased_lr3e-05_e5_seed42	seed=42	lr=3e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5441	htfl_list_nes_f1=0.5339	reason=T8 seed variance
+2026-09-12T06:21:13+00:00	20260912-062109_bert-base-cased_lr3e-05_e5_seed43	seed=43	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5356	htfl_list_nes_f1=0.5235	reason=T8 seed variance
+2026-09-12T06:26:17+00:00	20260912-062614_bert-base-cased_lr3e-05_e5_seed44	seed=44	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5029	htfl_list_nes_f1=0.4901	reason=T8 seed variance
+2026-09-12T06:31:21+00:00	20260912-063117_bert-base-cased_lr3e-05_e5_seed45	seed=45	lr=3e-05	epochs=5	best_epoch=5	htfl_list_ann_f1=0.5241	htfl_list_nes_f1=0.5086	reason=T8 seed variance
+2026-09-12T06:36:24+00:00	20260912-063620_bert-base-cased_lr3e-05_e5_seed46	seed=46	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5322	htfl_list_nes_f1=0.5207	reason=T8 seed variance
