@@ -24,7 +24,7 @@ gate   runs   noise   HP   │    encoders  breakdowns
 | T6 — Dataloader + alignment gate | labels land where they should |
 | T7 — First end-to-end run | the pipeline runs at all |
 | T8 — Seed variance | what difference is detectable — **s = 0.0179 on equi** (E02) |
-| T9 — Hyperparameter pass (BERT) | the config everything else is run at |
+| T9 — Hyperparameter pass (BERT) | the config everything else is run at — **LR 3e-5, 5 epochs** (E03) |
 | T10 — Encoder sweep | which encoder |
 | T11 — Breakdowns | where it fails, and the two predictions |
 | T12 — Warmup probe | branches after T9; runs alongside T10 |
@@ -281,7 +281,7 @@ six readings and a known defect in the `dirty` flag are in `EXPERIMENTS.md` E02.
 
 ---
 
-## T9 — Hyperparameter pass, BERT only
+## T9 — Hyperparameter pass, BERT only · Ahmed · DONE
 
 Grid: LR ∈ {2e-5, 3e-5, 5e-5} × epochs ∈ {3, 5}. Batch fixed at 16. Warmup
 fixed at 10% (T12 tests it separately — a third axis makes 18 configs).
@@ -312,15 +312,19 @@ that formula's 1-std and 2-std gaps and do not carry over.
 
 Ties go to the cheaper config, said so in the writeup.
 
-**Also settle here: argmax or a tuned decision threshold.**
-`data_layout.md` §9.2 — the training prior is ~0.14 under the adopted split
-against htfl's 0.2604, so a threshold tuned on training-domain data inherits the
-wrong prior. **Argmax plus a stated limitation is the defensible default.** If
-tuning, tune on equi and record the value. Tuning on htfl is fitting the test
-set.
+**Done:** a selected config with its selection number on equi; the full grid in
+`results/`, losers included.
 
-**Done:** a selected config with its selection number on equi; the threshold
-decision recorded; the full grid in `results/`, losers included.
+**Result (E03):** **LR 3e-5, 5 epochs**, equi 0.4811 ± 0.0179. Tie set is
+{2e-5, 5} alone, same 5-epoch cost, so the higher mean holds. 30 runs, 0
+collapses. `results/t9_selected.md`; grid in `results/t9_grid_step1.md` and
+`results/t9_grid_step2.md`, losers included.
+
+The epoch axis carried it — all three 3-epoch cells separate (paired t 2.47,
+3.03, 4.04) and land within 0.0020 of each other, so LR does almost nothing at
+3 epochs. That axis is confounded with schedule steepness: LR decays to zero
+across the whole run, so "5 epochs" is also "gentler decay". T12 separates
+them.
 
 ---
 
