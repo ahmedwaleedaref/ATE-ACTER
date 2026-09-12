@@ -265,7 +265,13 @@ def t9_compare() -> None:
             "applied silently; judge the family accordingly.", ""]
 
     if ties:
-        cheapest = min(ties + [ref], key=lambda k: (k[1], k[0]))
+        # "cheaper" means compute, and compute is epochs -- a learning rate costs
+        # nothing. Ranking by (epochs, lr) would hand the win to the lowest LR
+        # among equal-cost cells, which is meaningless. Tied on epochs is tied on
+        # cost, so the higher mean takes it.
+        pool = ties + [ref]
+        fewest = min(k[1] for k in pool)
+        cheapest = max((k for k in pool if k[1] == fewest), key=lambda k: means[k])
         out += ["## Tie set", "",
                 "Not distinguishable from the reference at n = 5: "
                 + ", ".join(f"LR {k[0]:g}/{k[1]}ep" for k in ties) + ".", "",

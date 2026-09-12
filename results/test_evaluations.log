@@ -4,3 +4,28 @@
 2026-09-12T06:26:17+00:00	20260912-062614_bert-base-cased_lr3e-05_e5_seed44	seed=44	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5029	htfl_list_nes_f1=0.4901	reason=T8 seed variance
 2026-09-12T06:31:21+00:00	20260912-063117_bert-base-cased_lr3e-05_e5_seed45	seed=45	lr=3e-05	epochs=5	best_epoch=5	htfl_list_ann_f1=0.5241	htfl_list_nes_f1=0.5086	reason=T8 seed variance
 2026-09-12T06:36:24+00:00	20260912-063620_bert-base-cased_lr3e-05_e5_seed46	seed=46	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5322	htfl_list_nes_f1=0.5207	reason=T8 seed variance
+2026-09-12T08:45:28+00:00	20260912-084525_bert-base-cased_lr2e-05_e3_seed42	seed=42	lr=2e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5257	htfl_list_nes_f1=0.5131	reason=T9 grid lr=2e-5 epochs=3
+2026-09-12T08:48:41+00:00	20260912-084837_bert-base-cased_lr2e-05_e3_seed43	seed=43	lr=2e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5345	htfl_list_nes_f1=0.5224	reason=T9 grid lr=2e-5 epochs=3
+2026-09-12T08:51:53+00:00	20260912-085149_bert-base-cased_lr2e-05_e3_seed44	seed=44	lr=2e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5227	htfl_list_nes_f1=0.5144	reason=T9 grid lr=2e-5 epochs=3
+2026-09-12T08:55:04+00:00	20260912-085501_bert-base-cased_lr2e-05_e3_seed45	seed=45	lr=2e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5056	htfl_list_nes_f1=0.4930	reason=T9 grid lr=2e-5 epochs=3
+2026-09-12T08:58:16+00:00	20260912-085812_bert-base-cased_lr2e-05_e3_seed46	seed=46	lr=2e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5292	htfl_list_nes_f1=0.5179	reason=T9 grid lr=2e-5 epochs=3
+2026-09-12T09:01:27+00:00	20260912-090123_bert-base-cased_lr2e-05_e5_seed42	seed=42	lr=2e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5464	htfl_list_nes_f1=0.5352	reason=T9 grid lr=2e-5 epochs=5
+2026-09-12T09:06:30+00:00	20260912-090626_bert-base-cased_lr2e-05_e5_seed43	seed=43	lr=2e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5369	htfl_list_nes_f1=0.5253	reason=T9 grid lr=2e-5 epochs=5
+2026-09-12T09:11:32+00:00	20260912-091128_bert-base-cased_lr2e-05_e5_seed44	seed=44	lr=2e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5151	htfl_list_nes_f1=0.5039	reason=T9 grid lr=2e-5 epochs=5
+2026-09-12T09:16:34+00:00	20260912-091631_bert-base-cased_lr2e-05_e5_seed45	seed=45	lr=2e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5262	htfl_list_nes_f1=0.5147	reason=T9 grid lr=2e-5 epochs=5
+2026-09-12T09:21:36+00:00	20260912-092132_bert-base-cased_lr2e-05_e5_seed46	seed=46	lr=2e-05	epochs=5	best_epoch=2	htfl_list_ann_f1=0.5138	htfl_list_nes_f1=0.5031	reason=T9 grid lr=2e-5 epochs=5
+2026-09-12T09:26:38+00:00	20260912-092635_bert-base-cased_lr3e-05_e3_seed42	seed=42	lr=3e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5152	htfl_list_nes_f1=0.4998	reason=T9 grid lr=3e-5 epochs=3
+2026-09-12T09:29:51+00:00	20260912-092947_bert-base-cased_lr3e-05_e3_seed43	seed=43	lr=3e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5281	htfl_list_nes_f1=0.5170	reason=T9 grid lr=3e-5 epochs=3
+2026-09-12T09:33:02+00:00	20260912-093259_bert-base-cased_lr3e-05_e3_seed44	seed=44	lr=3e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5231	htfl_list_nes_f1=0.5155	reason=T9 grid lr=3e-5 epochs=3
+2026-09-12T09:36:13+00:00	20260912-093610_bert-base-cased_lr3e-05_e3_seed45	seed=45	lr=3e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5093	htfl_list_nes_f1=0.4947	reason=T9 grid lr=3e-5 epochs=3
+2026-09-12T09:39:25+00:00	20260912-093921_bert-base-cased_lr3e-05_e3_seed46	seed=46	lr=3e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5212	htfl_list_nes_f1=0.5098	reason=T9 grid lr=3e-5 epochs=3
+2026-09-12T09:42:36+00:00	20260912-094232_bert-base-cased_lr5e-05_e3_seed42	seed=42	lr=5e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5062	htfl_list_nes_f1=0.4908	reason=T9 grid lr=5e-5 epochs=3
+2026-09-12T09:45:47+00:00	20260912-094544_bert-base-cased_lr5e-05_e3_seed43	seed=43	lr=5e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5263	htfl_list_nes_f1=0.5143	reason=T9 grid lr=5e-5 epochs=3
+2026-09-12T09:48:59+00:00	20260912-094855_bert-base-cased_lr5e-05_e3_seed44	seed=44	lr=5e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5042	htfl_list_nes_f1=0.4933	reason=T9 grid lr=5e-5 epochs=3
+2026-09-12T09:52:10+00:00	20260912-095206_bert-base-cased_lr5e-05_e3_seed45	seed=45	lr=5e-05	epochs=3	best_epoch=3	htfl_list_ann_f1=0.5153	htfl_list_nes_f1=0.5021	reason=T9 grid lr=5e-5 epochs=3
+2026-09-12T09:55:21+00:00	20260912-095518_bert-base-cased_lr5e-05_e3_seed46	seed=46	lr=5e-05	epochs=3	best_epoch=2	htfl_list_ann_f1=0.5365	htfl_list_nes_f1=0.5266	reason=T9 grid lr=5e-5 epochs=3
+2026-09-12T09:58:33+00:00	20260912-095830_bert-base-cased_lr5e-05_e5_seed42	seed=42	lr=5e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5283	htfl_list_nes_f1=0.5145	reason=T9 grid lr=5e-5 epochs=5
+2026-09-12T10:03:38+00:00	20260912-100334_bert-base-cased_lr5e-05_e5_seed43	seed=43	lr=5e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5498	htfl_list_nes_f1=0.5402	reason=T9 grid lr=5e-5 epochs=5
+2026-09-12T10:08:42+00:00	20260912-100838_bert-base-cased_lr5e-05_e5_seed44	seed=44	lr=5e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5114	htfl_list_nes_f1=0.5003	reason=T9 grid lr=5e-5 epochs=5
+2026-09-12T10:13:46+00:00	20260912-101343_bert-base-cased_lr5e-05_e5_seed45	seed=45	lr=5e-05	epochs=5	best_epoch=5	htfl_list_ann_f1=0.5346	htfl_list_nes_f1=0.5192	reason=T9 grid lr=5e-5 epochs=5
+2026-09-12T10:18:51+00:00	20260912-101847_bert-base-cased_lr5e-05_e5_seed46	seed=46	lr=5e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5311	htfl_list_nes_f1=0.5191	reason=T9 grid lr=5e-5 epochs=5

@@ -315,7 +315,66 @@ this comes from why epc 3 wins in E02 .
 i guass there will be t < 1.58 aka identical runs 
 **Mechanism:**
 
-**Result:**
+**Result:** 30 runs, 0 collapses, commit `05a6c041` (25 new) and `fa0e9255`
+(E02's 5). Full tables in `results/t9_grid_step1.md` and
+`results/t9_grid_step2.md`.
+
+Step 1, equi mean ± std:
+
+| | epochs 3 | epochs 5 |
+|---|---|---|
+| **LR 2e-5** | 0.4637 ± 0.0233 | 0.4744 ± 0.0232 |
+| **LR 3e-5** | 0.4657 ± 0.0236 | **0.4811 ± 0.0179** (E02) |
+| **LR 5e-5** | 0.4652 ± 0.0228 | 0.4710 ± 0.0250 |
+
+Step 2, paired against the highest-mean cell {3e-5, 5}:
+
+| cell | gap | s_d | t paired | t unpaired | signs | reading |
+|---|--:|--:|--:|--:|--:|---|
+| 2e-5 / 5ep | +0.0067 | 0.0082 | 1.82 | 0.51 | 5+/0− | not detected |
+| 5e-5 / 5ep | +0.0101 | 0.0106 | 2.13 | 0.73 | 4+/1− | suggestive |
+| 3e-5 / 3ep | +0.0154 | 0.0140 | 2.47 | 1.16 | 4+/1− | suggestive |
+| 5e-5 / 3ep | +0.0159 | 0.0117 | 3.03 | 1.22 | 5+/0− | take seriously |
+| 2e-5 / 3ep | +0.0175 | 0.0097 | 4.04 | 1.33 | 5+/0− | take seriously |
+
+**Selected: LR 3e-5, 5 epochs.** Tie set is {2e-5, 5} alone; it costs the same
+5 epochs, so "take the cheaper" does not discriminate and the higher mean holds.
+
+**Four things this shows.**
+
+1. **The epoch axis carries the result; the LR axis barely moves anything.** All
+   three 3-epoch cells separate from the reference (t = 2.47, 3.03, 4.04) and
+   land within 0.0020 of each other (0.4637 / 0.4652 / 0.4657) against stds of
+   ~0.023 — at 3 epochs the learning rate does essentially nothing. At 5 epochs
+   only 5e-5 is even suggestive.
+
+2. **Nothing survives Bonferroni.** Five tests against one reference needs
+   t > 4.604 at df = 4; the largest is 4.04. Under strict family-wise control
+   at 0.05, T9 establishes nothing. What carries weight instead is the
+   uniformity: all five cells fall below the reference, and three have all five
+   per-seed differences of one sign (p = 0.0625 each, distribution-free).
+
+3. **"3 epochs" and "5 epochs" are not the same schedule, and the axis is
+   confounded.** The LR decays linearly to zero over the whole run, so a
+   3-epoch run decays roughly 1.7× faster and is at LR ≈ 0 by its epoch 3,
+   where a 5-epoch run still has ~44% of peak left. The 3-epoch cells peak at
+   epoch 2–3 and the 5-epoch cells at 3–4, which is what that predicts. So the
+   finding is "longer with a gentler decay beats shorter with a steeper decay",
+   not "more passes over the data helps". Separating the two needs a fixed
+   schedule length with a varying stop point — T12's territory.
+
+4. **The paired correction decided the outcome.** Every unpaired t is 2.5–3×
+   smaller than its paired counterpart and none reaches 1.58. Run as E03
+   originally specified, all six cells would have been declared a tie and T9
+   would have reported that its grid was unresolvable at n = 5. That
+   conclusion would have been an artefact of the test.
+
+**htfl, looked at only now that the choice is made** (E03 step 2's stated
+condition). Both domains rank every 5-epoch cell above every 3-epoch cell, so
+equi-selection tracked htfl on the axis that mattered. They disagree only
+inside the 5-epoch group — htfl prefers 5e-5 (0.5310) where equi prefers 3e-5
+(0.5278 htfl) — and that is the group where equi could not separate the cells
+anyway. The E02 rank-crossing worry did not materialise where it counted.
 
 **Reading:**
 
