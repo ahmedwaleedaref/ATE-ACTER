@@ -4,21 +4,27 @@ Generated scaffolding. The training step, the eval loop and the optimizer /
 scheduler construction are hand-written in ``src/models/train_loop.py``; this
 file only sequences them and records what happened.
 
-Run:
-    python -m src.models.run_train --reason "T7 first end-to-end run"
-    python -m src.models.run_train --limit-train 64 --epochs 1 --skip-test   # smoke
+Run one seed:
+    python -m src.models.run_train --seed 42 --reason "T8 seed variance"
+    python -m src.models.run_train --seed 42 --limit-train 64 --epochs 1 --skip-test
+
+T8's five seeds, then the aggregation:
+    for s in 42 43 44 45 46; do python -m src.models.run_train --seed $s --reason "T8 seed variance" || break; done && python -m src.aggregate
 
 Writes:
-    results/runs/<run_id>.json      full config, seed, git commit, per-epoch loss,
-                                    dev scores per epoch, one test score
+    results/runs/seed_<seed>.json   full config, seed, git commit, per-epoch loss
+                                    and equi scores, best epoch, one htfl score
     results/test_evaluations.log    one line per htfl evaluation, with its reason
-    /runs/<run_id>/                 checkpoint, gitignored, only if save_checkpoint
+
+No checkpoints are written to disk. The best-epoch weights live in memory for
+the single htfl evaluation at the end of the run and are then dropped.
 """
 
 from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import json
 import subprocess
 import time
@@ -26,6 +32,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import torch
+import transformers
 from transformers import AutoModelForTokenClassification, set_seed
 
 from src.data.dataset import (ID2LABEL, LABEL2ID, build_splits, get_tokenizer,
@@ -38,7 +45,6 @@ from src.stats.loading import load_config
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _RUNS_JSON = _REPO_ROOT / "results" / "runs"
 _TEST_LOG = _REPO_ROOT / "results" / "test_evaluations.log"
-_CKPT_ROOT = _REPO_ROOT / "runs"
 
 
 def resolve_device(name: str) -> torch.device:
@@ -72,6 +78,31 @@ def build_model(cfg, device: torch.device):
     return model.to(device)
 
 
+def encoder_weight_hash(model) -> str:
+    """sha256 over the pretrained encoder weights only, classifier head excluded.
+
+    Must be byte-identical across seeds: from_pretrained reads these from the
+    checkpoint, and the head (768 x 3 + 3 = 2,307 parameters) is the only thing
+    ``set_seed`` touches at construction. If this differs between two runs they
+    are not two samples of one config, and T8's std means nothing --
+    ``src/aggregate.py`` asserts on it.
+
+    Selection is by ``base_model_prefix`` ("bert" here, "roberta"/"deberta" for
+    T10's encoders) rather than by excluding the name "classifier", so the head
+    stays excluded when the encoder changes.
+    """
+    prefix = model.base_model_prefix + "."
+    named = [(n, t) for n, t in model.named_parameters() if n.startswith(prefix)]
+    assert named, f"no parameters under {prefix!r} -- base_model_prefix is wrong"
+    digest = hashlib.sha256()
+    for name, tensor in sorted(named, key=lambda kv: kv[0]):
+        digest.update(name.encode())
+        # .numpy() assumes fp32 weights, which is what from_pretrained gives here;
+        # it raises rather than hashing something wrong if that ever changes
+        digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
+    return digest.hexdigest()
+
+
 def gold_for(domain: str, data_cfg, eval_cfg) -> dict[str, set[str]]:
     """Both tokenised gold keys for one domain, loaded once. The scorers never
     see a path -- that boundary is T3's, and it is why evaluate() takes sets."""
@@ -79,7 +110,8 @@ def gold_for(domain: str, data_cfg, eval_cfg) -> dict[str, set[str]]:
             for key in eval_cfg["keys"]}
 
 
-def train_one_epoch(model, loader, optimizer, scheduler, cfg, device, *, step_counter) -> float:
+def train_one_epoch(model, loader, optimizer, scheduler, cfg, device, *,
+                    step_counter, first_indices=None) -> float:
     """Returns the mean of the micro-batch losses.
 
     Mean of per-batch means, not a token-weighted mean: batches hold different
@@ -92,6 +124,11 @@ def train_one_epoch(model, loader, optimizer, scheduler, cfg, device, *, step_co
     total = 0.0
 
     for i, batch in enumerate(loader, start=1):
+        # read before train_step, which pops "example_index" off the batch.
+        # This is the shuffle order the seed controls -- the third noise source.
+        if first_indices is not None and len(first_indices) < 10:
+            want = 10 - len(first_indices)
+            first_indices.extend(batch["example_index"].tolist()[:want])
         # the epoch's last window may be partial; it still steps, which is what
         # ceil(micro_batches / accumulation) in total_steps accounts for
         is_update = (i % accumulation == 0) or (i == n_micro)
@@ -114,7 +151,8 @@ def train_one_epoch(model, loader, optimizer, scheduler, cfg, device, *, step_co
 def main() -> None:
     parser = argparse.ArgumentParser(description="T7 end-to-end run.")
     parser.add_argument("--reason", default="", help="why this run exists; goes in the test log")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--seed", type=int, required=True,
+                        help="required: T8 fixes 42-46 up front, never chosen as you go")
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--lr", type=float, default=None, help="override learning_rate")
     parser.add_argument("--weight-decay", type=float, default=None, help="override weight_decay")
@@ -137,7 +175,7 @@ def main() -> None:
     if overrides:
         cfg = dataclasses.replace(cfg, **overrides)
         print("overrides: " + ", ".join(f"{k}={v}" for k, v in overrides.items()))
-    seed = args.seed if args.seed is not None else cfg.seed
+    seed = args.seed
     data_cfg = load_config()
     eval_cfg = load_eval_config()
     device = resolve_device(cfg.device)
@@ -164,7 +202,11 @@ def main() -> None:
             shuffle=True, length_grouped=cfg.length_grouped_batching, seed=seed)
 
     train_loader = splits.loaders["train"]
+    # set_seed above ran BEFORE this line: from_pretrained initialises the
+    # classifier head randomly, and that head is the dominant noise source.
     model = build_model(cfg, device)
+    enc_hash = encoder_weight_hash(model)   # before any training step
+    print(f"encoder sha256 {enc_hash[:16]}... (must match across seeds)")
     optimizer, scheduler, total_steps = build_optimizer_and_scheduler(
         model, cfg, micro_batches_per_epoch=len(train_loader))
 
@@ -183,6 +225,10 @@ def main() -> None:
         "device": str(device),
         "gpu": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
         "seed": seed,
+        "encoder_weight_hash": enc_hash,
+        "versions": {"torch": torch.__version__,
+                     "transformers": transformers.__version__},
+        "cudnn_deterministic": bool(torch.backends.cudnn.deterministic),
         "config": cfg.raw | {f.name: getattr(cfg, f.name)
                              for f in dataclasses.fields(cfg) if f.name != "raw"},
         "overrides": overrides,
@@ -198,26 +244,44 @@ def main() -> None:
             "limit_train": args.limit_train,
         },
         "epochs": [],
+        "first_batch_indices": [],
+        "best_epoch": None,
+        "best_equi_f1": None,
+        "htfl_f1": None,
+        "collapsed": None,
         "test": None,
         "reason": args.reason,
     }
 
     step_counter = [0]
+    # best epoch on equi, held in memory only -- item 7, no checkpoints on disk.
+    # .clone() because .cpu() is a no-op returning the live tensor on a CPU run,
+    # which would leave best_state aliasing weights that keep training.
+    best_epoch, best_equi_f1, best_state = None, -1.0, None
     started = time.time()
     for epoch in range(1, cfg.num_epochs + 1):
         epoch_started = time.time()
         loss = train_one_epoch(model, train_loader, optimizer, scheduler, cfg, device,
-                               step_counter=step_counter)
+                               step_counter=step_counter,
+                               first_indices=record["first_batch_indices"] if epoch == 1 else None)
         dev = evaluate(model, splits.loaders["dev"], splits.datasets["dev"],
                        device=device, id2label=ID2LABEL, gold_lists=dev_gold)
+        # ANN unique-list F1 is the headline metric (configs/eval.yaml), and the
+        # per-seed statistic T8 fixes is the best epoch on equi under it
+        equi_f1 = dev["list_ann_f1"]
         record["epochs"].append({
             "epoch": epoch, "train_loss": loss, "dev": dev,
+            "equi_f1": equi_f1, "equi_p": dev["list_ann_p"], "equi_r": dev["list_ann_r"],
             "seconds": round(time.time() - epoch_started, 1),
         })
+        if equi_f1 > best_equi_f1:
+            best_epoch, best_equi_f1 = epoch, equi_f1
+            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
         print(f"  epoch {epoch}/{cfg.num_epochs}  train_loss {loss:.4f}  "
-              f"{dev_domain} list_ann_f1 {dev['list_ann_f1']:.4f} "
+              f"{dev_domain} list_ann_f1 {equi_f1:.4f} "
               f"(P {dev['list_ann_p']:.4f} R {dev['list_ann_r']:.4f}, "
-              f"{dev['n_pred_types']} types)  {time.time() - epoch_started:.0f}s", flush=True)
+              f"{dev['n_pred_types']} types)  {time.time() - epoch_started:.0f}s"
+              + ("  <- best" if epoch == best_epoch else ""), flush=True)
 
     # the tripwire: the schedule's horizon and the number of updates that
     # actually happened must be the same number, or warmup was not 10% of
@@ -226,11 +290,24 @@ def main() -> None:
         f"optimizer stepped {step_counter[0]} times, schedule was built for {total_steps}")
     record["realised_optimizer_steps"] = step_counter[0]
 
+    assert best_state is not None, "no epoch ran, so there is no best epoch"
+    record["best_epoch"] = best_epoch
+    record["best_equi_f1"] = best_equi_f1
+    # flat, majority-class output: every token O, nothing decoded. Recorded and
+    # kept -- Tasks_week2.md T8 -- never dropped and never re-rolled.
+    record["collapsed"] = (best_equi_f1 == 0.0)
+    print(f"  best epoch {best_epoch} ({dev_domain} list_ann_f1 {best_equi_f1:.4f})"
+          + ("  COLLAPSED" if record["collapsed"] else ""))
+
     if not args.skip_test:
+        # htfl is evaluated ONCE per run, on the best-equi weights -- never per
+        # epoch. Selection already happened above, on equi.
+        model.load_state_dict(best_state)
         test_gold = gold_for(test_domain, data_cfg, eval_cfg)
         test = evaluate(model, splits.loaders["test"], splits.datasets["test"],
                         device=device, id2label=ID2LABEL, gold_lists=test_gold)
         record["test"] = test
+        record["htfl_f1"] = test["list_ann_f1"]
         print(f"  {test_domain} list_ann_f1 {test['list_ann_f1']:.4f} "
               f"(P {test['list_ann_p']:.4f} R {test['list_ann_r']:.4f}) "
               f"| nes_f1 {test['list_nes_f1']:.4f} | {test['n_pred_types']} types")
@@ -240,24 +317,21 @@ def main() -> None:
         with open(_TEST_LOG, "a", encoding="utf-8") as fh:
             fh.write(f"{record['started']}\t{run_id}\tseed={seed}\t"
                      f"lr={cfg.learning_rate:g}\tepochs={cfg.num_epochs}\t"
+                     f"best_epoch={best_epoch}\t"
                      f"htfl_list_ann_f1={test['list_ann_f1']:.4f}\t"
                      f"htfl_list_nes_f1={test['list_nes_f1']:.4f}\t"
                      f"reason={args.reason or 'UNSTATED'}\n")
 
     record["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    record["duration_sec"] = round(time.time() - started, 1)
+    record["wall_time_sec"] = round(time.time() - started, 1)
 
+    # seed_<seed>.json, not <run_id>.json: src/aggregate.py globs seed_*.json and
+    # T8 is five runs of ONE config. A second config reusing these seeds would
+    # overwrite them -- T9 needs its own directory or its own name.
     _RUNS_JSON.mkdir(parents=True, exist_ok=True)
-    out = _RUNS_JSON / f"{run_id}.json"
+    out = _RUNS_JSON / f"seed_{seed}.json"
     out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out.relative_to(_REPO_ROOT)}")
-
-    if cfg.save_checkpoint:
-        ckpt = _CKPT_ROOT / run_id
-        ckpt.mkdir(parents=True, exist_ok=True)
-        model.save_pretrained(ckpt)
-        tokenizer.save_pretrained(ckpt)
-        print(f"wrote checkpoint {ckpt} (gitignored)")
 
 
 if __name__ == "__main__":

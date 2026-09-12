@@ -188,36 +188,91 @@ full config and seed.
 
 ## T8 — Seed variance
 
-Same config as T7, **5 seeds**, `transformers.set_seed(n)`.
+Same config as T7, **5 seeds**, `transformers.set_seed(n)`. Seeds fixed before
+the first run: **42, 43, 44, 45, 46**. Written into `configs/train.json`, not
+chosen as they go.
 
 Randomness has three sources: the classifier head (768 × 3 + 3 = 2,307
 parameters, the only randomly initialised weights), data shuffle order, and
 dropout masks. Seeding weights alone stabilises nothing.
 
-**Report:** mean ± std on **equi**. Also record the std on htfl — informative,
-never used for selection.
+**Per-seed statistic — fixed here, used everywhere after.** Each seed
+contributes its **best epoch on equi**, which is how selection works
+downstream. Max-over-epochs is biased upward and its spread is not the spread
+of final-epoch scores; the bias is harmless only if every cell in T9 and T10
+uses the identical rule. Whichever is chosen, it is chosen once, in this task.
 
-**This number gates every later comparison.** Interpreting differences between
-5-seed means:
+**Report:** mean ± std on **equi**, sample std (`ddof=1`). Also record the std
+on htfl — informative, never used for selection.
 
-| difference | reading |
-|---|---|
-| < 1 s | not established |
-| 1–2 s | suggestive; add seeds before claiming |
-| > 2 s | take seriously |
+### What the std is for
 
-**If a seed collapses** — flat, majority-class output — do not discard it and do
-not restart. **Train that seed longer at the same LR.** Two accounts of
-fine-tuning instability exist: the head corrupting pretrained weights early, and
-the run simply being stuck in optimization. They predict different fixes. If the
-seed recovers with more steps, the second fits this setup; if it stays flat, the
-first does. One extra run on a seed already in hand.
+Every later comparison is two 5-seed means. The question is never "is this mean
+bigger" — it is "is this gap larger than gaps produced by seed luck alone."
 
-Collapse is less likely here than in typical NER: the positive rate is 13–26%,
-not 1–2%.
+```
+SE(gap) = sqrt( s_A^2 / 5 + s_B^2 / 5 )
+t       = |mean_A - mean_B| / SE(gap)
+```
+
+Both configs contribute their own std; they are not assumed equal. Subtraction
+adds variance, so the noise floor on a gap is larger than on either mean.
+
+| t | reading | action |
+|---|---|---|
+| < 1.58 | no difference detected | tie — take the cheaper config, say so in the writeup |
+| 1.58 – 3.16 | suggestive | add seeds; SE shrinks as √n, the gap does not move |
+| > 3.16 | take seriously | scoped to equi, this metric, this n |
+
+`t < 1.58` is **not** "the configs are identical." It is "this experiment
+cannot see a difference at n=5." Never write the first sentence.
+
+`t > 3.16` is **not** "better over these 5 seeds." The sample mean already said
+that and needed no statistics. It is that the gap is too large to be seed luck,
+so the configs plausibly differ underneath.
+
+**Report the gap in F1 points alongside t.** t grows with √n, so a large enough
+n makes a 0.002 gap significant and still worthless.
+
+**Sanity check, not a second verdict:** if every run of A beats every run of B,
+the mean is not being carried by one lucky seed. If t is large but the runs
+interleave, look for an outlier before believing it.
+
+σ̂ is itself noisy at n=5. df = 4 puts the true σ plausibly in
+[0.6·σ̂, 2.1·σ̂]. The measuring stick has a measuring error, which is why the
+middle band says add seeds rather than probably yes.
+
+### If a seed collapses
+
+Flat, majority-class output — every token `O`, zero terms decoded, F1 exactly
+0.0000. Token accuracy stays high because `O` is 74–87% of labels, so accuracy
+will not reveal it. Collapse is less likely here than in typical NER: the
+positive rate is 13–26%, not 1–2%.
+
+**Do not discard it.** The mean estimates what this config does under the seed
+lottery, and collapse is an outcome of that lottery. Dropping it reports the
+mean of the runs that worked — a different and flattering quantity, and the
+exact failure mode `EXPERIMENTS.md` exists to prevent.
+
+**Do not restart it.** Re-rolling until a seed behaves is selection on the
+outcome.
+
+**Train that same seed longer at the same LR.** Two accounts of fine-tuning
+instability predict different outcomes: the run stuck in optimization should
+recover with more steps; early corruption of the pretrained encoder by the
+randomly initialised head's first gradients stays flat. One extra run on a seed
+already in hand, and the answer feeds T12 — the corruption account is the
+mechanism the warmup prediction rests on.
+
+**With a collapse in the set, do not compute t.** The std is dominated by one
+point and the distribution is not remotely normal. Report the five-seed mean
+and std including the zero, the collapse rate, and the diagnostic outcome. A
+1-in-5 collapse rate is a property of the config and matters more than its
+mean.
 
 **Done:** a std, written prominently in `results/`, because every later table is
-read against it.
+read against it; five runs logged with full config and seed; the per-seed
+statistic stated.
 
 ---
 
