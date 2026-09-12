@@ -166,10 +166,25 @@ Train loss is near-identical across seeds — e1 0.2302–0.2590, e5 0.0041–0.
    likely be wasted compute; the useful question on that axis is whether 3 beats
    5, not whether 10 beats 5.
 
-3. **Optimization is stable; the decoded output is what varies.** Loss curves
-   are almost indistinguishable across seeds while equi F1 spans 0.0472. The
-   variance lives after argmax — in decode and the unique-list projection — not
-   in training.
+3. **Train loss does not discriminate between these five models.** All five fit
+   the training set equally well — e5 loss 0.0041–0.0045, e3 loss 0.0181–0.0202
+   — and still land 0.0472 apart on equi (that is the range of the five; the std
+   is 0.0179). Train loss measures fit to corp+wind, equi F1 measures
+   generalisation to a domain never seen, so the two are free to disagree: the
+   variance is in what each seed generalises to, not in how well any run
+   optimised.
+
+   It is **not** in the scoring path. `decode()` and `spans_to_unique_list()`
+   are deterministic functions of the predicted labels — identical labels give
+   identical output — so they cannot contribute variance. An earlier draft of
+   this entry claimed the spread lived "after argmax"; that was wrong, and the
+   commit message on 8eaac16 repeats the error.
+
+   Separating "different fit" from "same fit, different decoding" needs **equi
+   loss** logged per seed beside equi F1: tight equi loss with scattered equi F1
+   would point at the label→span→type projection amplifying small logit
+   differences near decision boundaries. `evaluate()` returns no loss today, so
+   T8 cannot answer it.
 
 4. **htfl scores above equi on every seed**, and higher against its own ceiling
    (0.580 vs 0.505). equi is the harder domain despite being the dev set.
