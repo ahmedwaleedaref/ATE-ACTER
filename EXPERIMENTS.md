@@ -313,7 +313,19 @@ it hard to tell but it is between LR (3e-5 , 3) or (LR 2e-5 , 5) i think that th
 this comes from why epc 3 wins in E02 .
 **Predicted (does anything clear t = 1.58 at all):**
 i guass there will be t < 1.58 aka identical runs 
-**Mechanism:**
+**Mechanism:** the prediction above already contains one — *"i think that the
+decay of the learning rate here play a role"* — and it is the one that
+survived. Written out, because E02's "epoch 3 wins" supports two incompatible
+mechanisms and T9 can tell them apart:
+
+| mechanism | predicts |
+|---|---|
+| **Overfitting.** Past epoch 3 the model has learnt what it can and begins memorising, so the extra passes cost accuracy. | 3-epoch cells beat 5-epoch cells |
+| **Schedule.** LR decays to zero across the whole run, so epoch 3 of a 5-epoch run is a different state from epoch 3 of a 3-epoch run. The peak epoch index does not transfer between cells. | 5-epoch cells can still win |
+
+Same observation, opposite consequences. Whichever way T9 falls, one of these
+is refuted — which is the point of writing them down before the runs rather
+than explaining the result afterwards.
 
 **Result:** 30 runs, 0 collapses, commit `05a6c041` (25 new) and `fa0e9255`
 (E02's 5). Full tables in `results/t9_grid_step1.md` and
@@ -376,7 +388,62 @@ inside the 5-epoch group — htfl prefers 5e-5 (0.5310) where equi prefers 3e-5
 (0.5278 htfl) — and that is the group where equi could not separate the cells
 anyway. The E02 rank-crossing worry did not materialise where it counted.
 
-**Reading:**
+### Selected configuration and its test number
+
+**LR 3e-5, 5 epochs. Seed 42** — highest on equi (dev), which is what selection
+is allowed to use.
+
+| | equi (dev) | htfl (test) |
+|---|--:|--:|
+| F1 | **0.5081** | **0.5441** |
+| P / R | 0.5241 / 0.4930 | 0.5611 / 0.5280 |
+| / ceiling | 0.534 of 0.9523 | 0.598 of 0.9096 |
+
+Run `20260912-061545_bert-base-cased_lr3e-05_e5_seed42`, best epoch 4, 6,174
+predicted spans → 2,201 types against a gold key of 2,339.
+
+**0.5441 is a selected number and must not be reported as the config's score.**
+It is the max of five on dev, and its htfl score comes along with that
+selection, so it carries the max's upward bias. The defensible headline for
+this config is the five-seed mean, **htfl 0.5278 ± 0.0156**; 0.5441 is what one
+particular seed did, useful for the breakdowns in T11 where a single concrete
+model is needed.
+
+Two observations about this seed. It is **also the highest htfl of the five**
+(rank 1 of 5) — but at n = 5 that happens 20% of the time by chance, so it is
+not evidence that dev-selection reliably finds the best test seed. And it is
+the only seed whose equi precision and recall are close (0.5241 / 0.4930);
+the other four sit at P ≈ 0.55 against R ≈ 0.40–0.43. Seed 42 predicts far more
+(2,201 types where the others give 1,737–1,927), which buys recall and is where
+its lead comes from.
+
+Against E01: the same seed at the same config reported htfl 0.5200 there and
+0.5441 here. The model is identical — only the per-seed statistic changed, from
+final epoch to best epoch on equi.
+
+**Reading:** the two predictions failed in different ways, and the difference
+is worth keeping.
+
+**The winner was missed, narrowly.** {3e-5, 3} and {2e-5, 5} were called; it was
+{3e-5, 5}. But {2e-5, 5} turned out to be the sole member of the tie set — the
+one config T9 genuinely could not separate from the winner.
+
+**"t < 1.58, aka identical runs" was exactly right about the test as
+specified.** Every unpaired t landed below 1.58 — 0.51, 0.73, 1.16, 1.22, 1.33,
+not one exception. Had step 2 run as this entry originally described, that
+prediction would have been a clean hit on all five pairs, and T9 would have
+concluded its grid was unresolvable at n = 5.
+
+Under the corrected paired test three cells separate. So the prediction was
+correct about the instrument and wrong about the world. That is a different
+failure from being wrong about both, and the distinction only survives because
+the wrong test is still recorded here beside the right one.
+
+**The mechanism prediction was a hit.** The schedule row of the table above is
+what the data supports: every 5-epoch cell above every 3-epoch cell on both
+domains, 3-epoch cells peaking at epoch 2–3 and 5-epoch cells at 3–4. The
+overfitting mechanism is refuted. It also means T9's epoch axis measured
+duration and schedule steepness together and cannot separate them — T12 can.
 
 ---
 
