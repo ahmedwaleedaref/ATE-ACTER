@@ -244,7 +244,10 @@ Measurement only. No cell is called better than another in this step.
 | **LR 5e-5** | — | — |
 
 Each cell is `mean ± std` of five best-epoch equi ANN F1 scores, std with
-ddof=1. htfl is not in this table and is not looked at in step 1.
+ddof=1. **htfl is scored on every run and recorded per cell**, deliberately:
+nothing is checkpointed, so a score skipped now cannot be recovered without
+retraining that cell. Recording it is not selecting on it — the 3 × 2 table
+above and the comparison in step 2 are both equi only.
 
 Per-cell detail to be recorded alongside: the five raw equi numbers, the five
 best epochs, the collapse count, and the encoder hash.
@@ -269,8 +272,16 @@ cells is not readable. With 6 cells this is the expected outcome for most
 pairs, and **"no cell separates from the others, take the cheapest" is a
 legitimate result of T9**, not a failure of it.
 
-Selection is on equi. htfl is evaluated once, on the winner, after step 2
-concludes — not per cell, not per seed, not to break a tie.
+**Selection is on equi in both steps.** htfl is present for all 30 runs and
+must not enter the comparison — not to rank cells, not to break a tie, not as a
+sanity check on the winner before it is chosen. It is recorded so that after
+the choice is made, the grid can be asked whether equi-selection tracked htfl
+rank at all, which is the question E02 raised when seeds 44 and 45 crossed
+between domains. Asking it before the choice is fitting the test set.
+
+This adds 25 tuning looks to `results/test_evaluations.log`, each tagged with
+its cell. That cost is accepted here in exchange for the rank data being
+recoverable at all.
 
 **Predicted (which cell wins, and by how much):**
 

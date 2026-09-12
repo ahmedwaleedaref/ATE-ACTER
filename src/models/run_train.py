@@ -160,6 +160,9 @@ def main() -> None:
                         help="smoke only: train on the first N sentences")
     parser.add_argument("--skip-test", action="store_true", help="dev only, no htfl")
     parser.add_argument("--tag", default="", help="suffix for the run id")
+    parser.add_argument("--group", default="",
+                        help="subdirectory under results/runs/ to write into. T9 gives "
+                             "each grid cell its own, so cells cannot overwrite each other")
     args = parser.parse_args()
 
     cfg = load_train_config()
@@ -325,11 +328,14 @@ def main() -> None:
     record["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     record["wall_time_sec"] = round(time.time() - started, 1)
 
-    # seed_<seed>.json, not <run_id>.json: src/aggregate.py globs seed_*.json and
-    # T8 is five runs of ONE config. A second config reusing these seeds would
-    # overwrite them -- T9 needs its own directory or its own name.
-    _RUNS_JSON.mkdir(parents=True, exist_ok=True)
-    out = _RUNS_JSON / f"seed_{seed}.json"
+    # seed_<seed>.json, not <run_id>.json: one directory holds the five seeds of
+    # ONE config and aggregate.py globs seed_*.json inside it. --group is what
+    # keeps T9's cells from overwriting each other, and E02, at the default path.
+    assert not Path(args.group).is_absolute() and ".." not in Path(args.group).parts, \
+        f"--group must be a relative path under results/runs/: {args.group!r}"
+    out_dir = _RUNS_JSON / args.group if args.group else _RUNS_JSON
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = out_dir / f"seed_{seed}.json"
     out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out.relative_to(_REPO_ROOT)}")
 
