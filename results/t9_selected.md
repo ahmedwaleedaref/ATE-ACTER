@@ -38,11 +38,17 @@ having all five per-seed differences of one sign, p = 0.0625 each.
 Losers included: `t9_grid_step1.md`, `t9_grid_step2.md`, and the 30 run JSONs
 under `runs/` and `runs/t9/`.
 
-## Reference run for T11 — not part of the selection
+## What T9 hands downstream
 
-T9 selects hyperparameters. A seed is noise, not a hyperparameter, so the run
-below is **not** part of the selected config; it is the single concrete model
-carried into T11's breakdowns, where one is needed.
+The **hyperparameters**, nothing else. T10 holds LR 3e-5 and 5 epochs fixed
+while it sweeps encoders; whichever encoder wins there is the selected model,
+and it need not be `bert-base-cased`. T11's breakdowns run on that, over all
+five seeds. No model is selected by this task.
+
+## Highest-dev seed in this cell
+
+Recorded because it was asked for. It has no standing downstream — T9's output
+is the config, and this is one of its five samples.
 
 `20260912-061545_bert-base-cased_lr3e-05_e5_seed42`, best epoch 4:
 
@@ -51,10 +57,10 @@ carried into T11's breakdowns, where one is needed.
 | F1 | 0.5081 | 0.5441 |
 | P / R | 0.5241 / 0.4930 | 0.5611 / 0.5280 |
 
-Seed 42 is the highest of the five on equi, which is what selecting a run is
-allowed to use. **Its htfl 0.5441 is a selected number and is not this
-config's score** — it is the max of five on dev and inherits that bias. The
-config's htfl figure is the five-seed mean, 0.5278 ± 0.0156.
+Seed 42 is the highest of the five on equi. **Its htfl 0.5441 is a selected
+number and is not this config's score** — it is the max of five on dev and
+inherits that bias. The config's htfl figure is the five-seed mean,
+0.5278 ± 0.0156.
 
-If the config is re-run, the config survives and these particular numbers do
-not.
+Nothing was checkpointed, so this model's weights no longer exist. The row
+above is what remains of it.
