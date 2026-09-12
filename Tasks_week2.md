@@ -283,11 +283,22 @@ six readings and a known defect in the `dirty` flag are in `EXPERIMENTS.md` E02.
 
 ## T9 — Hyperparameter pass, BERT only
 
-Grid: LR ∈ {2e-5, 3e-5, 5e-5} × epochs ∈ {3, 5, 10}. Batch fixed at 16. Warmup
-fixed at 10% (T12 tests it separately — a third axis makes 27 configs).
+Grid: LR ∈ {2e-5, 3e-5, 5e-5} × epochs ∈ {3, 5}. Batch fixed at 16. Warmup
+fixed at 10% (T12 tests it separately — a third axis makes 18 configs).
 
-5 seeds per cell. **Select on equi.** Anything inside the T8 std is a tie — take
-the cheaper config and say so in the writeup.
+**10 epochs dropped.** E02's per-epoch curves peak at epoch 3 in three seeds of
+five and at 4 and 5 in the others, and seed 46 is 0.0387 *below* its epoch-3
+score by epoch 5. Nothing in that data suggests 10 epochs is worth the compute;
+the live question on this axis is 3 against 5.
+
+**{3e-5, 5} is already measured** — it is E02, the T8 cell. Five seeds at that
+config exist in `results/runs/`. Do not recompute it; reuse those five numbers
+as the grid cell, which leaves **5 cells × 5 seeds = 25 runs**.
+
+5 seeds per cell. **Select on equi.** The T8 std makes that comparison
+readable: t = |mean_A − mean_B| / sqrt(s_A²/5 + s_B²/5), and with s ≈ 0.0179
+a gap under **0.0179** F1 is no difference detected. Ties go to the cheaper
+config, said so in the writeup.
 
 **Also settle here: argmax or a tuned decision threshold.**
 `data_layout.md` §9.2 — the training prior is ~0.14 under the adopted split

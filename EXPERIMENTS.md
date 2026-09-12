@@ -209,6 +209,81 @@ intact — one commit, five runs — but the flag is not trustworthy as written.
 
 ---
 
+## E03 — T9, hyperparameter pass (bert-base-cased)
+
+**Written before the runs.** Step 1 is measurement only; the comparison in
+step 2 does not begin until every cell in the table below is filled.
+
+**Purpose:** choose the LR and epoch count everything after this is run at.
+Not to find a good score — to find the config T10's encoder sweep and T11's
+breakdowns are built on, and to know whether the choice is even resolvable at
+n=5.
+
+**Grid:** LR ∈ {2e-5, 3e-5, 5e-5} × epochs ∈ {3, 5} = 6 cells, 5 seeds each
+(42–46), 30 runs. Batch fixed at effective 16, warmup fixed at 10%, everything
+else as E01. **10 epochs was dropped** — E02's curves peak at epoch 3 in three
+seeds of five, and seed 46 ends 0.0387 below its own epoch-3 score.
+
+**{3e-5, 5} is E02 and is not recomputed.** Its five runs already exist at
+commit `fa0e9255`. That leaves **25 new runs**. Reusing it is only legitimate
+because the per-seed statistic, the seeds and the config are identical — the
+same reason `src/aggregate.py` asserts on all three.
+
+**Per-seed statistic:** best epoch on equi, ANN unique-list F1 — fixed in T8,
+identical in every cell. Max-over-epochs is biased upward; the bias is harmless
+only while every cell carries it equally, so no cell may deviate.
+
+### Step 1 — mean and std per cell
+
+Measurement only. No cell is called better than another in this step.
+
+| | epochs 3 | epochs 5 |
+|---|---|---|
+| **LR 2e-5** | — | — |
+| **LR 3e-5** | — | **0.4811 ± 0.0179** (E02) |
+| **LR 5e-5** | — | — |
+
+Each cell is `mean ± std` of five best-epoch equi ANN F1 scores, std with
+ddof=1. htfl is not in this table and is not looked at in step 1.
+
+Per-cell detail to be recorded alongside: the five raw equi numbers, the five
+best epochs, the collapse count, and the encoder hash.
+
+**A cell containing a collapse gets no t-statistic in step 2.** Its std is
+dominated by one point. Record the mean and std including the zero, plus the
+collapse rate, and treat the rate as the cell's headline property.
+
+### Step 2 — comparison (not started until step 1 is complete)
+
+t = |mean_A − mean_B| / sqrt(s_A²/5 + s_B²/5), both cells contributing their
+own std.
+
+| t | reading |
+|---|---|
+| < 1.58 | no difference detected at n=5 |
+| 1.58 – 3.16 | suggestive; add seeds |
+| > 3.16 | too large to be seed luck |
+
+E02 puts s ≈ 0.0179 on equi, so a gap under ≈0.0179 F1 between two same-std
+cells is not readable. With 6 cells this is the expected outcome for most
+pairs, and **"no cell separates from the others, take the cheapest" is a
+legitimate result of T9**, not a failure of it.
+
+Selection is on equi. htfl is evaluated once, on the winner, after step 2
+concludes — not per cell, not per seed, not to break a tie.
+
+**Predicted (which cell wins, and by how much):**
+
+**Predicted (does anything clear t = 1.58 at all):**
+
+**Mechanism:**
+
+**Result:**
+
+**Reading:**
+
+---
+
 <!--
 Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
 0.9096 (htfl) and 0.9523 (equi); Tasks_week2.md quotes 0.9097 and 0.9524,
