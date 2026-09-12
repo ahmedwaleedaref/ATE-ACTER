@@ -258,19 +258,44 @@ collapse rate, and treat the rate as the cell's headline property.
 
 ### Step 2 — comparison (not started until step 1 is complete)
 
-t = |mean_A − mean_B| / sqrt(s_A²/5 + s_B²/5), both cells contributing their
-own std.
+**The test is paired, on the seed.** An earlier draft of this entry specified
+the unpaired `t = |mean_A − mean_B| / sqrt(s_A²/5 + s_B²/5)`. That was wrong
+here and is recorded as wrong rather than quietly replaced: every cell runs the
+same five seeds, and because `set_seed(n)` precedes `from_pretrained`, seed n
+has an identical classifier-head init and an identical shuffle order in every
+cell — verified, `first_batch_indices` for seed 42 is the same ten indices in
+all six. Same subject, two treatments. The unpaired formula throws that away
+and charges the between-seed spread to its own uncertainty twice, so on
+{2e-5,5} vs {3e-5,5} it returns t = 0.51 where the paired test returns 1.82 on
+the same data — a denominator 3.6× too large.
 
-| t | reading |
-|---|---|
-| < 1.58 | no difference detected at n=5 |
-| 1.58 – 3.16 | suggestive; add seeds |
-| > 3.16 | too large to be seed luck |
+Per pair of cells: take the five per-seed differences d = B − A, discard the
+raw scores, and run a one-sample t against zero.
 
-E02 puts s ≈ 0.0179 on equi, so a gap under ≈0.0179 F1 between two same-std
-cells is not readable. With 6 cells this is the expected outcome for most
-pairs, and **"no cell separates from the others, take the cheapest" is a
-legitimate result of T9**, not a failure of it.
+    mean(d) / (s_d / sqrt(5))    df = 4
+
+| t (df = 4) | p two-tailed | reading |
+|---|--:|---|
+| < 2.132 | > 0.10 | no difference detected at n=5 |
+| 2.132 – 2.776 | 0.05 – 0.10 | suggestive; add seeds |
+| > 2.776 | < 0.05 | take seriously |
+
+These are t-distribution points. T8's 1.58/3.16 were the unpaired 1-std and
+2-std gaps rewritten and do not transfer.
+
+**Sign test alongside, because df = 4 cannot verify normality.** Five
+differences sharing a sign has probability 2·(1/2)⁵ = 0.0625 under the null —
+the strongest distribution-free statement available at this n. Reported for
+every pair.
+
+**Scope: the highest-mean cell against each of the other five.** Five tests,
+not fifteen. Bonferroni at df = 4 would demand t > 4.604; the raw t is reported
+and the count stated rather than a correction applied silently.
+
+Cells not separated from the reference form the tie set, and the cheapest
+config in it wins. **"No cell separates, take the cheapest" is a legitimate
+result of T9**, not a failure of it — it means this experiment cannot see a
+difference at n = 5, which is not the same as there being none.
 
 **Selection is on equi in both steps.** htfl is present for all 30 runs and
 must not enter the comparison — not to rank cells, not to break a tie, not as a
@@ -284,9 +309,10 @@ its cell. That cost is accepted here in exchange for the rank data being
 recoverable at all.
 
 **Predicted (which cell wins, and by how much):**
-
+it hard to tell but it is between LR (3e-5 , 3) or (LR 2e-5 , 5) i think that the decay of the learning rate here play a role maybe we want to invistegate more about differen mechansims not .
+this comes from why epc 3 wins in E02 .
 **Predicted (does anything clear t = 1.58 at all):**
-
+i guass there will be t < 1.58 aka identical runs 
 **Mechanism:**
 
 **Result:**

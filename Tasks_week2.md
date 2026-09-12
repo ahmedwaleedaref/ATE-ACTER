@@ -295,10 +295,22 @@ the live question on this axis is 3 against 5.
 config exist in `results/runs/`. Do not recompute it; reuse those five numbers
 as the grid cell, which leaves **5 cells × 5 seeds = 25 runs**.
 
-5 seeds per cell. **Select on equi.** The T8 std makes that comparison
-readable: t = |mean_A − mean_B| / sqrt(s_A²/5 + s_B²/5), and with s ≈ 0.0179
-a gap under **0.0179** F1 is no difference detected. Ties go to the cheaper
-config, said so in the writeup.
+5 seeds per cell, the same five in every cell. **Select on equi.**
+
+**The comparison is paired on the seed**, not the unpaired two-sample test this
+line used to specify. `set_seed(n)` runs before `from_pretrained`, so seed n
+carries an identical head init and shuffle order into every cell — the cells
+are the same five subjects under different treatments. Take the five per-seed
+differences and run a one-sample t against zero, df = 4: below 2.132 no
+difference detected, above 2.776 take it seriously. Report the sign test too;
+five differences of one sign is p = 0.0625 and assumes no distribution.
+
+The unpaired test is not merely weaker here, it is the wrong test: it charges
+the between-seed spread to its own uncertainty twice, and on measured cells
+returns t = 0.51 where the paired test returns 1.82. T8's 1.58/3.16 bands were
+that formula's 1-std and 2-std gaps and do not carry over.
+
+Ties go to the cheaper config, said so in the writeup.
 
 **Also settle here: argmax or a tuned decision threshold.**
 `data_layout.md` §9.2 — the training prior is ~0.14 under the adopted split
