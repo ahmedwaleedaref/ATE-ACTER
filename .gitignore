@@ -1,5 +1,7 @@
-data/raw/
-data/processed/
+# anchor-free: a data/raw/ created anywhere -- e.g. by running a script from a
+# subdirectory -- must be ignored too. ACTER is CC BY-NC-SA, never committed.
+**/data/raw/
+**/data/processed/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
