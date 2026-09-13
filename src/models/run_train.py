@@ -67,14 +67,28 @@ def git_state() -> dict:
 
 def build_model(cfg, device: torch.device):
     """id2label / label2id go onto the config so a checkpoint is self-describing
-    and a later run cannot silently reorder the classes."""
+    and a later run cannot silently reorder the classes.
+
+    ``dtype=torch.float32`` is load-bearing, not tidiness. from_pretrained keeps
+    the checkpoint's own dtype, and deberta-v3-base ships fp16 where bert and
+    roberta ship fp32. Training fp16 weights with AdamW and no GradScaler is
+    silently broken: exp_avg_sq = (1-b2)*g^2 = 1e-3*g^2 underflows to 0 in fp16,
+    and AdamW's eps=1e-8 is below fp16's smallest subnormal (~6e-8) so it
+    underflows too. denom becomes 0, the update becomes exp_avg/0 = inf, and the
+    parameter goes NaN on the FIRST step -- at any learning rate, including the
+    lr=0 that warmup starts at. It presents as "deberta diverges", not as an
+    error. The assertion below is what stops it coming back.
+    """
     model = AutoModelForTokenClassification.from_pretrained(
         cfg.model_name,
         cache_dir=cfg.hf_cache_dir,
         num_labels=len(LABEL2ID),
         id2label=ID2LABEL,
         label2id=LABEL2ID,
+        dtype=torch.float32,
     )
+    bad = {n: p.dtype for n, p in model.named_parameters() if p.dtype is not torch.float32}
+    assert not bad, f"non-fp32 parameters would break AdamW silently: {bad}"
     return model.to(device)
 
 
