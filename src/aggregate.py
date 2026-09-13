@@ -52,6 +52,7 @@ GRIDS = {
         "epochs": (3, 5),
         "inherited": {(3e-5, 5): ("results/runs", "E02")},
         "root": "t9",
+        "cell": "lr{lr:g}_e{ep}",
         # historical name: EXPERIMENTS.md E03 and results/t9_selected.md cite it
         "out": "t9_grid",
     },
@@ -61,6 +62,7 @@ GRIDS = {
         "epochs": (3, 5),
         "inherited": {(3e-5, 5): ("results/runs/t10/deberta-v3-base", "E04")},
         "root": "deberta_grid",
+        "cell": "deberta_lr{lr:g}_e{ep}",
         "out": "deberta_grid",
     },
 }
@@ -70,7 +72,7 @@ def cell_dir(encoder: str, lr: float, epochs: int) -> Path:
     g = GRIDS[encoder]
     if (lr, epochs) in g["inherited"]:
         return _REPO_ROOT / g["inherited"][(lr, epochs)][0]
-    return _RUNS_JSON / g["root"] / f"lr{lr:g}_e{epochs}"
+    return _RUNS_JSON / g["root"] / g["cell"].format(lr=lr, ep=epochs)
 
 
 # kept so nothing that already calls it breaks
@@ -84,17 +86,8 @@ def t9_cell_dir(lr: float, epochs: int) -> Path:
 def load_runs(runs_dir: Path | None = None) -> list[dict]:
     runs_dir = runs_dir or _RUNS_JSON
     paths = sorted(runs_dir.glob("seed_*.json"))
-    if paths:
-        runs = [json.loads(p.read_text(encoding="utf-8")) for p in paths]
-    else:
-        # A cell may instead be one bundle beside its directory, named for the
-        # cell: <parent>/*<dirname>.json. Same five records, one file.
-        bundles = sorted(runs_dir.parent.glob(f"*{runs_dir.name}.json"))
-        assert len(bundles) == 1, (
-            f"no seed_*.json in {runs_dir} and "
-            f"{len(bundles)} bundles matching *{runs_dir.name}.json beside it "
-            "-- run the five seeds first, or leave exactly one bundle")
-        runs = json.loads(bundles[0].read_text(encoding="utf-8"))["runs"]
+    assert paths, f"no seed_*.json in {runs_dir} -- run the five seeds first"
+    runs = [json.loads(p.read_text(encoding="utf-8")) for p in paths]
     del paths
 
     found = sorted(r["seed"] for r in runs)
