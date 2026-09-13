@@ -84,8 +84,17 @@ def t9_cell_dir(lr: float, epochs: int) -> Path:
 def load_runs(runs_dir: Path | None = None) -> list[dict]:
     runs_dir = runs_dir or _RUNS_JSON
     paths = sorted(runs_dir.glob("seed_*.json"))
-    assert paths, f"no seed_*.json in {runs_dir} -- run the five seeds first"
-    runs = [json.loads(p.read_text(encoding="utf-8")) for p in paths]
+    if paths:
+        runs = [json.loads(p.read_text(encoding="utf-8")) for p in paths]
+    else:
+        # A cell may instead be one bundle beside its directory, named for the
+        # cell: <parent>/*<dirname>.json. Same five records, one file.
+        bundles = sorted(runs_dir.parent.glob(f"*{runs_dir.name}.json"))
+        assert len(bundles) == 1, (
+            f"no seed_*.json in {runs_dir} and "
+            f"{len(bundles)} bundles matching *{runs_dir.name}.json beside it "
+            "-- run the five seeds first, or leave exactly one bundle")
+        runs = json.loads(bundles[0].read_text(encoding="utf-8"))["runs"]
     del paths
 
     found = sorted(r["seed"] for r in runs)
