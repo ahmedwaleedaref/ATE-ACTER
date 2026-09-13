@@ -309,18 +309,17 @@ def t9_compare(encoder: str = "bert") -> None:
             "accordingly.", ""]
 
     if ties:
-        # "cheaper" means compute, and compute is epochs -- a learning rate costs
-        # nothing. Ranking by (epochs, lr) would hand the win to the lowest LR
-        # among equal-cost cells, which is meaningless. Tied on epochs is tied on
-        # cost, so the higher mean takes it.
+        # Tiebreak: highest mean on the selection domain. The reference cell is the
+        # highest mean by construction, so it takes the tie set. (The earlier rule
+        # was "cheapest in the tie set"; it did not change T9's outcome, whose tie
+        # set member cost the same 5 epochs as its reference.)
         pool = ties + [ref]
-        fewest = min(k[1] for k in pool)
-        cheapest = max((k for k in pool if k[1] == fewest), key=lambda k: means[k])
+        cheapest = max(pool, key=lambda k: means[k])
         out += ["## Tie set", "",
                 "Not distinguishable from the reference at n = 5: "
                 + ", ".join(f"LR {k[0]:g}/{k[1]}ep" for k in ties) + ".", "",
                 "Not the same as identical — this experiment cannot separate them. "
-                f"Cheapest config in the tie set including the reference: "
+                f"Tiebreak is highest mean on the selection domain, which takes "
                 f"**LR {cheapest[0]:g}, {cheapest[1]} epochs**.", ""]
     else:
         out += ["## Tie set", "", "Every cell separated from the reference.", ""]

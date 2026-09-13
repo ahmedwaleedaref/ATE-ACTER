@@ -310,7 +310,10 @@ the between-seed spread to its own uncertainty twice, and on measured cells
 returns t = 0.51 where the paired test returns 1.82. T8's 1.58/3.16 bands were
 that formula's 1-std and 2-std gaps and do not carry over.
 
-Ties go to the cheaper config, said so in the writeup.
+Ties go to the highest mean on the selection domain, said so in the writeup.
+(This replaces an earlier "take the cheaper config" rule. It does not change
+T9's recorded outcome: that tie set's only member cost the same 5 epochs as
+its reference, so cost never broke the tie there.)
 
 **Done:** a selected config with its selection number on equi; the full grid in
 `results/`, losers included.

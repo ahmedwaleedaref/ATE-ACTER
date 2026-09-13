@@ -29,5 +29,5 @@ Bands: t < 2.132 not detected, 2.132–2.776 suggestive, > 2.776 take seriously 
 
 Not distinguishable from the reference at n = 5: LR 1e-05/3ep, LR 2e-05/5ep.
 
-Not the same as identical — this experiment cannot separate them. Cheapest config in the tie set including the reference: **LR 1e-05, 3 epochs**.
+Not the same as identical — this experiment cannot separate them. Tiebreak is highest mean on the selection domain, which takes **LR 1e-05, 5 epochs**.
 
