@@ -1,6 +1,6 @@
 # Hyperparameter grid, step 2 — paired comparison (bert-base-cased)
 
-Reference cell: **LR 3e-05, 5 epochs** — highest equi mean (0.4811). Compared against the other five.
+Reference cell: **LR 3e-05, 5 epochs** — highest equi mean (0.4811). Compared against the other 5.
 
 Paired t on five per-seed differences, df = 4. The same seeds ran in every cell with identical head init and shuffle order, so the seed's own strength cancels in the difference. Unpaired t shown alongside for contrast only — it discards the pairing and is not the test.
 
@@ -27,7 +27,7 @@ Bands: t < 2.132 not detected, 2.132–2.776 suggestive, > 2.776 take seriously 
 
 ## Multiple comparisons
 
-Five tests were run against one reference. Bonferroni at df = 4 would demand t > 4.604 rather than 2.776. The raw t is reported above and the count is stated here rather than a correction being applied silently; judge the family accordingly.
+5 tests were run against one reference. Bonferroni at df = 4 would demand t > 4.604 rather than 2.776. The raw t is reported above and the count is stated here rather than a correction being applied silently; judge the family accordingly.
 
 ## Tie set
 

@@ -58,9 +58,14 @@ GRIDS = {
     },
     "deberta": {
         "model": "microsoft/deberta-v3-base",
-        "lrs": (1e-5, 2e-5, 3e-5),
+        # 3e-5 is NOT a cell of this grid. {3e-5,5} is E04 -- a different question
+        # (deberta at BERT's config, for the encoder comparison) whose run JSONs
+        # were lost with the Colab session, and {3e-5,3} was never run. E04's
+        # numbers are recorded in EXPERIMENTS.md and cited there, not inherited
+        # here: a grid cell has to be backed by artifacts this tool can read.
+        "lrs": (1e-5, 2e-5),
         "epochs": (3, 5),
-        "inherited": {(3e-5, 5): ("results/runs/t10/deberta-v3-base", "E04")},
+        "inherited": {},
         "root": "deberta_grid",
         "cell": "deberta_lr{lr:g}_e{ep}",
         "out": "deberta_grid",
@@ -249,7 +254,7 @@ def t9_compare(encoder: str = "bert") -> None:
 
     out = [f"# Hyperparameter grid, step 2 — paired comparison ({g['model']})", "",
            f"Reference cell: **LR {ref[0]:g}, {ref[1]} epochs** — highest equi mean "
-           f"({means[ref]:.4f}). Compared against the other five.", "",
+           f"({means[ref]:.4f}). Compared against the other {len(cells) - 1}.", "",
            "Paired t on five per-seed differences, df = 4. The same seeds ran in "
            "every cell with identical head init and shuffle order, so the seed's own "
            "strength cancels in the difference. Unpaired t shown alongside for "
@@ -291,11 +296,17 @@ def t9_compare(encoder: str = "bert") -> None:
         out.append(f"| LR {k[0]:g} / {k[1]}ep | "
                    + " | ".join(f"{x:+.4f}" for x in c["d"]) + " |")
 
+    n_tests = len(cells) - 1
+    # Bonferroni: the same family-wise 0.05 split across the tests actually run.
+    # Computed, not quoted -- it moves with the number of cells.
+    from scipy import stats
+    t_bonf = stats.t.ppf(1 - 0.05 / (2 * n_tests), _PAIRED_DF)
     out += ["", "## Multiple comparisons", "",
-            f"Five tests were run against one reference. Bonferroni at df = 4 would "
-            f"demand t > 4.604 rather than {T_PAIRED_SERIOUS}. The raw t is reported "
-            "above and the count is stated here rather than a correction being "
-            "applied silently; judge the family accordingly.", ""]
+            f"{n_tests} tests were run against one reference. Bonferroni at "
+            f"df = {_PAIRED_DF} would demand t > {t_bonf:.3f} rather than "
+            f"{T_PAIRED_SERIOUS}. The raw t is reported above and the count is stated "
+            "here rather than a correction being applied silently; judge the family "
+            "accordingly.", ""]
 
     if ties:
         # "cheaper" means compute, and compute is epochs -- a learning rate costs
