@@ -537,6 +537,101 @@ for 5 tests is 4.604), signs 5+/0−, sign test p = 0.0625. DeBERTa also carries
 
 ---
 
+## E05 — deberta-v3-base learning-rate grid
+
+**Entry written after the runs.** Like E04 this breaks the file's
+prediction-first protocol; no prediction was recorded in advance. Flagged
+rather than backfilled.
+
+**Purpose:** E04 ran deberta-v3-base at 3e-5, the LR T9 selected *on BERT*, and
+its per-epoch curves peaked at the end of warmup then dipped hard at epoch 2 —
+a precision/recall trade, not a collapse — which is what too high an LR looks
+like. This grid tests lower ones.
+
+**Grid:** LR ∈ {1e-5, 2e-5} × epochs ∈ {3, 5}, seeds 42–46, 20 runs. 3e-5 is
+**not** a cell: `{3e-5,5}` is E04, whose run JSONs were lost, and `{3e-5,3}`
+was never run. E04's numbers are cited below for context and are not part of
+any table `src/aggregate.py` produces.
+
+**Environment, and it is not uniform.** `{1e-5,3}` ran on Colab (torch
+2.11.0+cu128); the other three on Kaggle (torch 2.10.0+cu128). Both Tesla T4,
+Python 3.13, `transformers==5.16.1` and `tokenizers==0.23.1` throughout. E01–E03
+are local: RTX 3050, torch 2.14.0+cu130, Python 3.14.4. Any bert-vs-deberta
+comparison therefore spans environments, and one cell of this grid differs from
+its three neighbours.
+
+### Step 1 — measurement
+
+| equi | epochs 3 | epochs 5 |
+|---|---|---|
+| **LR 1e-5** | 0.5589 ± 0.0071 | **0.5590 ± 0.0086** |
+| **LR 2e-5** | 0.5504 ± 0.0054 | 0.5523 ± 0.0048 |
+
+| cell | equi mean ± std | htfl mean ± std | best epochs |
+|---|--:|--:|---|
+| 1e-5 / 3ep | 0.5589 ± 0.0071 | 0.5801 ± 0.0160 | 1, 3, 3, 3, 3 |
+| 1e-5 / 5ep | 0.5590 ± 0.0086 | 0.5784 ± 0.0228 | 1, 1, 3, 4, 5 |
+| 2e-5 / 3ep | 0.5504 ± 0.0054 | 0.5870 ± 0.0133 | 1, 1, 3, 3, 3 |
+| 2e-5 / 5ep | 0.5523 ± 0.0048 | 0.5902 ± 0.0126 | 1, 1, 2, 4, 5 |
+| *3e-5 / 5ep (E04)* | *0.5463* | *0.5850* | *1, 1, 2, 5, 5* |
+
+0 of 20 collapsed.
+
+### Step 2 — paired, reference `{1e-5, 5}`
+
+| cell | gap | s_d | t paired | signs | reading |
+|---|--:|--:|--:|--:|---|
+| 1e-5 / 3ep | +0.0000 | 0.0062 | 0.01 | 2+/3− | not detected |
+| 2e-5 / 5ep | +0.0067 | 0.0088 | 1.71 | 4+/1− | not detected |
+| 2e-5 / 3ep | +0.0086 | 0.0085 | 2.26 | 4+/1− | suggestive |
+
+Bonferroni for 3 tests at df = 4 needs t > 3.961. Nothing reaches it.
+
+**Selected: LR 1e-5, 5 epochs** — `results/deberta_selected.md`. Reference run
+seed 42, best epoch 4, equi 0.5657, htfl 0.6039.
+
+**The tiebreak rule was changed during this experiment, after the results were
+visible.** It was "take the cheaper config in the tie set"; it is now "highest
+mean on the selection domain". Recorded here because the timing matters to how
+much the selection is worth. The change does not alter T9's outcome — that tie
+set's only member cost the same 5 epochs as its reference, so cost never broke
+the tie there — and it does not alter this one either: `{1e-5,5}` is the
+highest equi mean of the four cells, so both rules and the plain ranking agree.
+The rule that *would* have differed is one ranking on htfl, which would take
+`{2e-5,5}`, and that is selection on the test set.
+
+### Five readings
+
+1. **The LR hypothesis holds on dev.** 1e-5 beats E04's 3e-5 by +0.0127 paired,
+   t = 3.55, 5+/0− signs, and beats 2e-5 with 4+/1− at t = 1.71–2.26. The
+   epoch-2 dip in E04 did point at a real problem.
+
+2. **The epoch axis is flat — the flattest result in this project.**
+   `{1e-5,3}` and `{1e-5,5}` differ by **0.0001** at t = 0.01. Against 286 s
+   and 440 s per run, the same score is available for 35% less compute.
+
+3. **htfl cannot see the LR axis at all.** Paired against the best-htfl cell,
+   every comparison returns t = 0.89–1.09, not detected. The spread of the four
+   cell means on htfl is 0.0118; the typical within-cell seed std is 0.0162.
+   The differences are smaller than the noise, so the apparent htfl ordering —
+   which runs opposite to equi's — is not established and must not be reported
+   as an inversion.
+
+4. **htfl is roughly twice as seed-noisy as equi here.** In the selected cell,
+   0.0228 against 0.0086; across cells, 0.0126–0.0228 against 0.0048–0.0086.
+   One config spans 0.0565 on htfl across its five seeds. The best single htfl
+   run in the grid (0.6039) sits in the cell with the **lowest** htfl mean,
+   which is what a max over five noisy draws does.
+
+5. **Nothing survives Bonferroni**, so strictly this grid separates no cell
+   from the reference. What carries weight is direction and consistency: 1e-5
+   above 2e-5 in 4 of 5 seeds at both epoch counts, and above E04's 3e-5 in
+   5 of 5.
+
+**Reading:**
+
+---
+
 <!--
 Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
 0.9096 (htfl) and 0.9523 (equi); Tasks_week2.md quotes 0.9097 and 0.9524,
