@@ -154,6 +154,9 @@ def main() -> None:
     parser.add_argument("--seed", type=int, required=True,
                         help="required: T8 fixes 42-46 up front, never chosen as you go")
     parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--model", default=None,
+                        help="override model_name. T10 sweeps encoders at T9's fixed "
+                             "hyperparameters, so the encoder is a flag, not a config edit")
     parser.add_argument("--lr", type=float, default=None, help="override learning_rate")
     parser.add_argument("--weight-decay", type=float, default=None, help="override weight_decay")
     parser.add_argument("--limit-train", type=int, default=None,
@@ -169,6 +172,8 @@ def main() -> None:
     # CLI overrides exist so a one-number experiment is not a config edit that
     # someone forgets to revert. The effective value is what gets logged.
     overrides = {}
+    if args.model is not None:
+        overrides["model_name"] = args.model
     if args.epochs is not None:
         overrides["num_epochs"] = args.epochs
     if args.lr is not None:
