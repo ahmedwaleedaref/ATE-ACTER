@@ -13,3 +13,6 @@ __pycache__/
 .venv/
 # HuggingFace cache: model weights, 415 MB for bert-base-cased alone
 .hf/
+
+# stray clones from running the Colab notebook on the wrong machine
+scripts/ate-acter/

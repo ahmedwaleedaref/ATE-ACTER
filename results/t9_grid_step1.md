@@ -1,4 +1,4 @@
-# T9 — hyperparameter grid, step 1 (bert-base-cased)
+# Hyperparameter grid, step 1 (bert-base-cased)
 
 Each cell is `mean ± std` of five best-epoch equi ANN F1 scores, ddof=1. Measurement only: nothing here is a comparison.
 

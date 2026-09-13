@@ -42,17 +42,43 @@ T_PAIRED_SUGGESTIVE, T_PAIRED_SERIOUS = 2.132, 2.776   # two-tailed p = 0.10, 0.
 _PAIRED_DF = 4
 
 
-# T9 grid: (learning_rate, num_epochs) -> the directory holding that cell's five
-# seeds. {3e-5, 5} is E02, reused rather than recomputed, which is why it points
-# at the default runs directory instead of a t9/ subdirectory.
-T9_LRS = (2e-5, 3e-5, 5e-5)
-T9_EPOCHS = (3, 5)
+# A grid is (learning_rate, num_epochs) -> the directory holding that cell's five
+# seeds. One cell of each grid is inherited rather than recomputed, so it points
+# somewhere else: bert's {3e-5, 5} is E02, and deberta's is the T10 encoder cell.
+GRIDS = {
+    "bert": {
+        "model": "bert-base-cased",
+        "lrs": (2e-5, 3e-5, 5e-5),
+        "epochs": (3, 5),
+        "inherited": {(3e-5, 5): ("results/runs", "E02")},
+        "root": "t9",
+        # historical name: EXPERIMENTS.md E03 and results/t9_selected.md cite it
+        "out": "t9_grid",
+    },
+    "deberta": {
+        "model": "microsoft/deberta-v3-base",
+        "lrs": (1e-5, 2e-5, 3e-5),
+        "epochs": (3, 5),
+        "inherited": {(3e-5, 5): ("results/runs/t10/deberta-v3-base", "E04")},
+        "root": "deberta_grid",
+        "out": "deberta_grid",
+    },
+}
+
+
+def cell_dir(encoder: str, lr: float, epochs: int) -> Path:
+    g = GRIDS[encoder]
+    if (lr, epochs) in g["inherited"]:
+        return _REPO_ROOT / g["inherited"][(lr, epochs)][0]
+    return _RUNS_JSON / g["root"] / f"lr{lr:g}_e{epochs}"
+
+
+# kept so nothing that already calls it breaks
+T9_LRS, T9_EPOCHS = GRIDS["bert"]["lrs"], GRIDS["bert"]["epochs"]
 
 
 def t9_cell_dir(lr: float, epochs: int) -> Path:
-    if (lr, epochs) == (3e-5, 5):
-        return _RUNS_JSON
-    return _RUNS_JSON / "t9" / f"lr{lr:g}_e{epochs}"
+    return cell_dir("bert", lr, epochs)
 
 
 def load_runs(runs_dir: Path | None = None) -> list[dict]:
@@ -106,13 +132,15 @@ def cell_stats(runs: list[dict]) -> dict:
     return out
 
 
-def t9_grid() -> None:
-    """Step 1 of E03: the 3 x 2 table. Measurement only -- no cell is compared
-    to another here, and nothing is selected."""
+def t9_grid(encoder: str = "bert") -> None:
+    """Step 1: the LR x epochs table. Measurement only -- no cell is compared to
+    another here, and nothing is selected."""
+    g = GRIDS[encoder]
+    T9_LRS, T9_EPOCHS = g["lrs"], g["epochs"]
     cells, missing = {}, []
     for lr in T9_LRS:
         for ep in T9_EPOCHS:
-            d = t9_cell_dir(lr, ep)
+            d = cell_dir(encoder, lr, ep)
             try:
                 cells[(lr, ep)] = cell_stats(load_runs(d))
             except AssertionError as e:
@@ -120,7 +148,7 @@ def t9_grid() -> None:
     if missing:
         print("cells not yet measured:\n" + "\n".join(missing) + "\n")
 
-    out = ["# T9 — hyperparameter grid, step 1 (bert-base-cased)", "",
+    out = [f"# Hyperparameter grid, step 1 ({g['model']})", "",
            "Each cell is `mean ± std` of five best-epoch equi ANN F1 scores, "
            "ddof=1. Measurement only: nothing here is a comparison.", "",
            "| | " + " | ".join(f"epochs {e}" for e in T9_EPOCHS) + " |",
@@ -133,7 +161,8 @@ def t9_grid() -> None:
                 row.append("—")
             else:
                 mark = f" **{len(c['collapsed'])}/{c['n']} COLLAPSED**" if c["collapsed"] else ""
-                note = " (E02)" if (lr, ep) == (3e-5, 5) else ""
+                note = (f" ({g['inherited'][(lr, ep)][1]})"
+                        if (lr, ep) in g["inherited"] else "")
                 row.append(f"{c['equi_mean']:.4f} ± {c['equi_std']:.4f}{note}{mark}")
         out.append("| " + " | ".join(row) + " |")
 
@@ -150,7 +179,7 @@ def t9_grid() -> None:
             "enter the comparison in step 2.", ""]
 
     text = "\n".join(out) + "\n"
-    dest = _REPO_ROOT / "results" / "t9_grid_step1.md"
+    dest = _REPO_ROOT / "results" / f"{g['out']}_step1.md"
     dest.write_text(text, encoding="utf-8")
     print(text)
     print(f"wrote {dest.relative_to(_REPO_ROOT)}")
@@ -202,19 +231,21 @@ def reading(t: float) -> str:
     return "take seriously"
 
 
-def t9_compare() -> None:
-    """Step 2 of E03. Highest-mean cell against each of the other five."""
+def t9_compare(encoder: str = "bert") -> None:
+    """Step 2. Highest-mean cell paired against each of the others."""
+    g = GRIDS[encoder]
+    T9_LRS, T9_EPOCHS = g["lrs"], g["epochs"]
     cells = {}
     for lr in T9_LRS:
         for ep in T9_EPOCHS:
-            cells[(lr, ep)] = load_runs(t9_cell_dir(lr, ep))
+            cells[(lr, ep)] = load_runs(cell_dir(encoder, lr, ep))
     assert len(cells) == len(T9_LRS) * len(T9_EPOCHS), "step 2 needs every cell"
 
     collapsed = {k: [r["seed"] for r in v if r["collapsed"]] for k, v in cells.items()}
     means = {k: statistics.fmean(r["best_equi_f1"] for r in v) for k, v in cells.items()}
     ref = max(means, key=means.get)
 
-    out = ["# T9 — hyperparameter grid, step 2 (paired comparison)", "",
+    out = [f"# Hyperparameter grid, step 2 — paired comparison ({g['model']})", "",
            f"Reference cell: **LR {ref[0]:g}, {ref[1]} epochs** — highest equi mean "
            f"({means[ref]:.4f}). Compared against the other five.", "",
            "Paired t on five per-seed differences, df = 4. The same seeds ran in "
@@ -282,7 +313,7 @@ def t9_compare() -> None:
         out += ["## Tie set", "", "Every cell separated from the reference.", ""]
 
     text = "\n".join(out) + "\n"
-    dest = _REPO_ROOT / "results" / "t9_grid_step2.md"
+    dest = _REPO_ROOT / "results" / f"{g['out']}_step2.md"
     dest.write_text(text, encoding="utf-8")
     print(text)
     print(f"wrote {dest.relative_to(_REPO_ROOT)}")
@@ -292,16 +323,16 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="T8 seed variance / T9 grid step 1.")
     ap.add_argument("--cell", default=None,
                     help="directory of one cell's five seeds (default: results/runs/)")
-    ap.add_argument("--grid", action="store_true",
-                    help="E03 step 1: walk every T9 cell into the 3 x 2 table")
-    ap.add_argument("--compare", action="store_true",
-                    help="E03 step 2: paired comparison, best cell against the rest")
+    ap.add_argument("--grid", nargs="?", const="bert", choices=sorted(GRIDS),
+                    help="step 1: walk every cell of an encoder's grid into its table")
+    ap.add_argument("--compare", nargs="?", const="bert", choices=sorted(GRIDS),
+                    help="step 2: paired comparison, best cell against the rest")
     args = ap.parse_args()
     if args.grid:
-        t9_grid()
+        t9_grid(args.grid)
         return
     if args.compare:
-        t9_compare()
+        t9_compare(args.compare)
         return
     runs = load_runs(Path(args.cell) if args.cell else None)
     collapsed = [r["seed"] for r in runs if r["collapsed"]]

@@ -1,4 +1,4 @@
-# T9 — hyperparameter grid, step 2 (paired comparison)
+# Hyperparameter grid, step 2 — paired comparison (bert-base-cased)
 
 Reference cell: **LR 3e-05, 5 epochs** — highest equi mean (0.4811). Compared against the other five.
 
