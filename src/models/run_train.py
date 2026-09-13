@@ -204,6 +204,12 @@ def main() -> None:
         cfg = dataclasses.replace(cfg, **overrides)
         print("overrides: " + ", ".join(f"{k}={v}" for k, v in overrides.items()))
     seed = args.seed
+    # cfg.seed must reflect what actually ran. record["config"] is built from cfg,
+    # and --seed was never folded in, so every run recorded config.seed = whatever
+    # train.json said -- a seed-46 run wrote config.seed = 42. Not in `overrides`:
+    # that dict is for axes a run deliberately varies, and the seed is already the
+    # top-level "seed" field and half the filename.
+    cfg = dataclasses.replace(cfg, seed=seed)
     data_cfg = load_config()
     eval_cfg = load_eval_config()
     device = resolve_device(cfg.device)
