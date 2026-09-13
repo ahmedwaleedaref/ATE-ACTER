@@ -45,6 +45,7 @@ from src.stats.loading import load_config
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _RUNS_JSON = _REPO_ROOT / "results" / "runs"
 _TEST_LOG = _REPO_ROOT / "results" / "test_evaluations.log"
+_CKPT_ROOT = _REPO_ROOT / "runs"          # gitignored
 
 
 def resolve_device(name: str) -> torch.device:
@@ -176,6 +177,11 @@ def main() -> None:
     parser.add_argument("--limit-train", type=int, default=None,
                         help="smoke only: train on the first N sentences")
     parser.add_argument("--skip-test", action="store_true", help="dev only, no htfl")
+    parser.add_argument("--save-weights", action="store_true",
+                        help="write the BEST-EPOCH weights to /runs/<run_id>/ (gitignored). "
+                             "Off by default: T8-T10 are 55 runs and none of them needs a "
+                             "checkpoint. T11's breakdowns do -- they need per-span "
+                             "predictions from a concrete model.")
     parser.add_argument("--tag", default="", help="suffix for the run id")
     parser.add_argument("--group", default="",
                         help="subdirectory under results/runs/ to write into. T9 gives "
@@ -343,6 +349,17 @@ def main() -> None:
                      f"htfl_list_ann_f1={test['list_ann_f1']:.4f}\t"
                      f"htfl_list_nes_f1={test['list_nes_f1']:.4f}\t"
                      f"reason={args.reason or 'UNSTATED'}\n")
+
+    if args.save_weights:
+        # best_state, not the final weights: the run's number is its best epoch,
+        # so saving the last epoch would ship a model that scores something else.
+        ckpt = _CKPT_ROOT / run_id
+        ckpt.mkdir(parents=True, exist_ok=True)
+        model.load_state_dict(best_state)
+        model.save_pretrained(ckpt)
+        tokenizer.save_pretrained(ckpt)
+        record["checkpoint"] = str(ckpt.relative_to(_REPO_ROOT))
+        print(f"  wrote best-epoch weights to {ckpt.relative_to(_REPO_ROOT)}/ (gitignored)")
 
     record["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     record["wall_time_sec"] = round(time.time() - started, 1)

@@ -447,6 +447,96 @@ duration and schedule steepness together and cannot separate them — T12 can.
 
 ---
 
+## E04 — T10, deberta-v3-base at the T9 config
+
+**Run artifacts were lost.** The five runs happened on a Colab T4 and the JSONs
+were never downloaded before the session ended. The numbers below are
+transcribed from the run console output and are real measurements; they are
+**not** backed by `results/runs/` files, and `src/aggregate.py` cannot read
+this cell. Nothing here was reconstructed or inferred — the full 64-character
+`encoder_weight_hash` is simply unavailable, since the console prints only its
+first 16, which is why no run JSON was written by hand to stand in for them.
+
+**Purpose:** the first cell of T10's encoder sweep. bert-base-cased's
+hyperparameters from T9 are held fixed; only the encoder changes.
+
+**Config:** `microsoft/deberta-v3-base`, LR 3e-5, 5 epochs, effective batch 16,
+warmup 10% — identical to E02/E03's selected cell. Seeds 42–46.
+1,435/1,435 optimizer steps, 4,592 train / 3,090 dev / 2,432 test, matching
+local exactly. Encoder sha256 `eef90bafbd38f054…`, identical across all five.
+
+**Environment differs from E01–E03 and this is a confound to carry forward:**
+Tesla T4 on Colab, Python 3.13, Colab's torch — against Python 3.14.4 and
+torch 2.14.0 locally. `transformers==5.16.1` and `tokenizers==0.23.1` matched.
+seqeval would not build there, so 46 of 47 tests ran; `score_exact_spans` is
+unverified against seqeval on that machine, though verified locally.
+
+**Result:**
+
+| seed | best epoch | equi ANN F1 | htfl ANN F1 | htfl P | htfl R | htfl NES | types |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| 42 | 2 | 0.5402 | 0.5879 | 0.5996 | 0.5767 | 0.5710 | 2,250 |
+| 43 | 1 | 0.5455 | 0.5811 | 0.5969 | 0.5661 | 0.5672 | 2,218 |
+| 44 | 1 | 0.5451 | 0.5554 | 0.5742 | 0.5378 | 0.5384 | 2,191 |
+| 45 | 5 | 0.5460 | 0.6004 | 0.6125 | 0.5887 | 0.5824 | 2,248 |
+| 46 | 5 | 0.5545 | 0.6002 | 0.6183 | 0.5832 | 0.5808 | 2,206 |
+
+| | mean | std (ddof=1) | ceiling | / ceiling |
+|---|--:|--:|--:|--:|
+| **equi (dev), ANN** | **0.5463** | **0.0052** | 0.9523 | 0.574 |
+| **htfl (test), ANN** | **0.5850** | 0.0185 | 0.9096 | 0.643 |
+
+0 of 5 collapsed.
+
+**Against bert-base-cased (E03's selected cell), paired on the same five seeds:**
+
+| seed | 42 | 43 | 44 | 45 | 46 |
+|---|--:|--:|--:|--:|--:|
+| equi difference | +0.0321 | +0.0573 | +0.0696 | +0.0731 | +0.0936 |
+
+mean **+0.0651**, s_d 0.0226, **t = 6.44** (df = 4; 2.776 is p<0.05, Bonferroni
+for 5 tests is 4.604), signs 5+/0−, sign test p = 0.0625. DeBERTa also carries
+**a third of BERT's seed variance** on equi: 0.0052 against 0.0179.
+
+**Per-epoch equi ANN F1** (best in bold):
+
+| seed | e1 | e2 | e3 | e4 | e5 |
+|---|--:|--:|--:|--:|--:|
+| 42 | 0.5377 | **0.5402** | 0.5389 | 0.5263 | 0.5282 |
+| 43 | **0.5455** | 0.4785 | 0.5309 | 0.5389 | 0.5259 |
+| 44 | **0.5451** | 0.4802 | 0.5180 | 0.5241 | 0.5219 |
+| 45 | 0.5081 | 0.4642 | 0.4808 | 0.5455 | **0.5460** |
+| 46 | 0.5438 | 0.5407 | 0.5498 | 0.5425 | **0.5545** |
+
+**Four readings.**
+
+1. **3e-5 is probably too high for this encoder.** Seeds 43, 44 and 45 dip hard
+   at epoch 2, exactly where LR peaks — and the dip is a precision/recall
+   trade, not a general collapse: seed 43 goes P 0.5412 → 0.6349 while
+   R 0.5497 → 0.3839 and predicted types fall 1,164 → 693. The model turns
+   conservative under high LR, then recovers as the schedule decays. 3e-5 was
+   selected in T9 **on BERT**. This is what E05 tests.
+
+2. **The top of the curve is flat.** Best epoch scatters across 2, 1, 1, 5, 5
+   while the peak *value* has std 0.0052. Epochs are not where the leverage is
+   for DeBERTa, whatever they were worth for BERT.
+
+3. **Train loss again fails to predict the good epoch.** Seeds 45 and 46 reach
+   their best equi at train loss 0.0076 and 0.0074; seeds 43 and 44 reach
+   theirs at 0.2576 and 0.2996. Same score either way. Same finding as E02
+   reading 3, now on a second encoder.
+
+4. **The same seed is not bit-reproducible on a T4.** Seed 43 was run twice in
+   different sessions: epoch 1 agreed exactly (0.5455) and the later epochs
+   diverged (e2 0.4793 vs 0.4785, e3 0.5338 vs 0.5309), while best epoch and
+   htfl were identical because the peak was epoch 1 in both. `cudnn_deterministic`
+   is false, so nondeterminism accumulates with steps. Worth knowing before any
+   claim rests on a single late-epoch number.
+
+**Reading:**
+
+---
+
 <!--
 Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
 0.9096 (htfl) and 0.9523 (equi); Tasks_week2.md quotes 0.9097 and 0.9524,
