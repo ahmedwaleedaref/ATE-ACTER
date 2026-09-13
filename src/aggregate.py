@@ -337,6 +337,12 @@ def main() -> None:
         t9_compare(args.compare)
         return
     runs = load_runs(Path(args.cell) if args.cell else None)
+    # --cell used to write results/t8_seed_variance.md whatever it was pointed at,
+    # so inspecting any other cell silently overwrote T8's committed report with
+    # that cell's numbers, under T8's heading. Named per cell now.
+    global _OUT
+    if args.cell:
+        _OUT = _REPO_ROOT / "results" / f"cell_{Path(args.cell).name}.md"
     collapsed = [r["seed"] for r in runs if r["collapsed"]]
 
     for r in runs:
