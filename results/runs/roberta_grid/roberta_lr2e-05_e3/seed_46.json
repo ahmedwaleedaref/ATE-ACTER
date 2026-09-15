@@ -1,0 +1,165 @@
+{
+  "run_id": "20260914-194326_FacebookAI-roberta-base_lr2e-05_e3_seed46",
+  "started": "2026-09-14T19:43:29+00:00",
+  "git": {
+    "commit": "4d8ffc599923ee742352cc1c03ce382b61ca8f92",
+    "dirty": true
+  },
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "seed": 46,
+  "encoder_weight_hash": "d941b5d11bc60f3c6f1fb7b0af92e63b1b6c1f00370203a8f1a1803c3ceaea8b",
+  "versions": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.16.1"
+  },
+  "cudnn_deterministic": false,
+  "config": {
+    "_purpose": "What one run does. configs/data.json says where the corpus is and how it is split; that file is stable all month and is read by week-1 code. This one varies per run and is copied into results/ with every experiment.",
+    "model_name": "FacebookAI/roberta-base",
+    "hf_cache_dir": ".hf/hub",
+    "max_length": 256,
+    "truncation": true,
+    "effective_train_batch_size": 16,
+    "per_device_train_batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "_batch_note": "16 is the hyperparameter. 4 GB of VRAM is binding, so it is reached as 8 x 2 accumulation steps. T9's grid is stated in EFFECTIVE batch size; per-device size is a memory knob and must never be read as the hyperparameter. per_device * gradient_accumulation_steps == effective is asserted on load.",
+    "eval_batch_size": 32,
+    "learning_rate": 2e-05,
+    "num_epochs": 3,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "_clip_note": "torch.nn.utils.clip_grad_norm_ on the accumulated gradient, once per optimizer step, before optimizer.step(). 1.0 is the HF Trainer default, so it matches the published BERT fine-tuning recipes T5 compares against. Fixed for T7-T12: it is a constant of the setup, not a tuned hyperparameter. If it ever varies it becomes an experimental axis and needs its own row in the results.",
+    "lr_schedule": "linear",
+    "warmup_ratio": 0.1,
+    "seed": 46,
+    "device": "auto",
+    "log_every_steps": 50,
+    "save_checkpoint": false,
+    "_run_note": "device auto -> cuda when available, else cpu; never hardcoded, because T10 may run on Colab and a code edit between runs stops results being comparable. log_every_steps counts OPTIMIZER steps. Checkpoints go to /runs/<run_id>/ which is gitignored; the JSON log goes to results/runs/<run_id>.json which is tracked.",
+    "length_grouped_batching": true,
+    "_length_grouped_note": "Batches are formed from length-sorted megabatches so padding, and therefore peak activation memory, is bounded by the batch's own longest sentence rather than the corpus maximum. Order within an epoch still varies with the seed.",
+    "short_sentence_filter": {
+      "max_tokens": 2,
+      "domains": [
+        "wind"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl.",
+    "filter_max_tokens": 2,
+    "filter_domains": [
+      "wind"
+    ],
+    "filter_splits": [
+      "train"
+    ]
+  },
+  "overrides": {
+    "model_name": "FacebookAI/roberta-base",
+    "num_epochs": 3,
+    "learning_rate": 2e-05
+  },
+  "data": {
+    "train_domains": [
+      "corp",
+      "wind"
+    ],
+    "dev_domain": "equi",
+    "test_domain": "htfl",
+    "n_train": 4592,
+    "n_dev": 3090,
+    "n_test": 2432,
+    "micro_batches_per_epoch": 574,
+    "total_optimizer_steps": 861,
+    "limit_train": null
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.24227282086694338,
+      "dev": {
+        "n_pred_spans": 3536,
+        "n_pred_types": 677,
+        "list_ann_p": 0.6056129985228951,
+        "list_ann_r": 0.35776614310645727,
+        "list_ann_f1": 0.44980800877674165,
+        "list_nes_p": 0.6115214180206795,
+        "list_nes_r": 0.26521460602178093,
+        "list_nes_f1": 0.36997319034852555
+      },
+      "equi_f1": 0.44980800877674165,
+      "equi_p": 0.6056129985228951,
+      "equi_r": 0.35776614310645727,
+      "seconds": 57.0
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.06882641549902208,
+      "dev": {
+        "n_pred_spans": 5151,
+        "n_pred_types": 1002,
+        "list_ann_p": 0.5668662674650699,
+        "list_ann_r": 0.4956369982547993,
+        "list_ann_f1": 0.5288640595903165,
+        "list_nes_p": 0.5728542914171657,
+        "list_nes_r": 0.36771300448430494,
+        "list_nes_f1": 0.44791260241904024
+      },
+      "equi_f1": 0.5288640595903165,
+      "equi_p": 0.5668662674650699,
+      "equi_r": 0.4956369982547993,
+      "seconds": 56.9
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.04385291913687333,
+      "dev": {
+        "n_pred_spans": 4487,
+        "n_pred_types": 857,
+        "list_ann_p": 0.588098016336056,
+        "list_ann_r": 0.4397905759162304,
+        "list_ann_f1": 0.5032451323015478,
+        "list_nes_p": 0.5939323220536756,
+        "list_nes_r": 0.32607303010890454,
+        "list_nes_f1": 0.42100909842845324
+      },
+      "equi_f1": 0.5032451323015478,
+      "equi_p": 0.588098016336056,
+      "equi_r": 0.4397905759162304,
+      "seconds": 56.9
+    }
+  ],
+  "first_batch_indices": [
+    3606,
+    4180,
+    145,
+    3654,
+    4120,
+    583,
+    2901,
+    644,
+    3652,
+    2644
+  ],
+  "best_epoch": 2,
+  "best_equi_f1": 0.5288640595903165,
+  "htfl_f1": 0.5463320463320464,
+  "collapsed": false,
+  "test": {
+    "n_pred_spans": 4594,
+    "n_pred_types": 1805,
+    "list_ann_p": 0.6271468144044321,
+    "list_ann_r": 0.4839675074818298,
+    "list_ann_f1": 0.5463320463320464,
+    "list_nes_p": 0.6360110803324099,
+    "list_nes_r": 0.4491392801251956,
+    "list_nes_f1": 0.5264847512038523
+  },
+  "reason": "E07: roberta grid lr=2e-5 epochs=3",
+  "realised_optimizer_steps": 861,
+  "finished": "2026-09-14T19:46:34+00:00",
+  "wall_time_sec": 185.2
+}

@@ -25,7 +25,7 @@ gate   runs   noise   HP   │    encoders  breakdowns
 | T7 — First end-to-end run | the pipeline runs at all |
 | T8 — Seed variance | what difference is detectable — **s = 0.0179 on equi** (E02) |
 | T9 — Hyperparameter pass (BERT) | the config everything else is run at — **LR 3e-5, 5 epochs** (E03) |
-| T10 — Encoder sweep | which encoder |
+| T10 — Encoder sweep | which encoder — **deberta-v3-base**, roberta second (E04–E07) |
 | T11 — Breakdowns | where it fails, and the two predictions |
 | T12 — Warmup probe | branches after T9; runs alongside T10 |
 
@@ -331,7 +331,7 @@ them.
 
 ---
 
-## T10 — Encoder sweep
+## T10 — Encoder sweep · Ahmed · DONE
 
 **Tune LR per encoder** — 3 values each, selected on equi, epochs and batch
 fixed from T9. Carrying BERT's LR to every encoder biases the comparison toward
@@ -364,6 +364,36 @@ hypothesis is weaker than §8.1 suggests — also a finding.
 
 **Done:** a table of mean ± std per encoder, one selected model, the prediction
 resolved either way in `EXPERIMENTS.md`.
+
+**Result (E04–E07).** Each encoder at its selected config, 5 seeds:
+
+| encoder | config | equi mean ± std | htfl mean ± std |
+|---|---|--:|--:|
+| bert-base-cased | 3e-5 / 5ep | 0.4811 ± 0.0179 | 0.5278 ± 0.0156 |
+| roberta-base | 3e-5 / 5ep | 0.5063 ± 0.0266 | 0.5632 ± 0.0124 |
+| **deberta-v3-base** | 1e-5 / 5ep | **0.5590 ± 0.0086** | **0.5784 ± 0.0228** |
+
+**The prediction holds: DeBERTa-v3 wins, on both domains.** So the
+fragmentation account in `data_layout.md` §8.1 survives — deberta fragments
+htfl terms at 1.382 against bert's 2.043, and first-subword labelling makes the
+first piece carry the classification.
+
+**Two caveats the table cannot show.** DeBERTa ran on Colab/Kaggle T4s at torch
+2.10–2.11 while bert and roberta ran locally at 2.14.0, so only the
+bert-vs-roberta pair is free of an environment confound. And LR was tuned per
+encoder as this task requires (bert T9/E03, deberta E05, roberta E07) — but
+roberta's grid came back with all six cells tied on equi, so its LR is not
+tuned so much as untunable at n = 5.
+
+**Selected model: `deberta-v3-base`, 1e-5 / 5 epochs, seed 42** —
+`results/model_selection.md`, which also records the run chosen for each of the
+three encoders. It wins both domains. Its E05 cell has artifacts under
+`results/runs/deberta_grid/deberta_lr1e-05_e5/` — the cell lost with the Colab
+session was E04's `{3e-5, 5}`, a different config.
+
+The cost of that choice: deberta cannot train on this machine (2.94 GB of fp32
+weights, gradients and AdamW moments against 3.65 GB usable, OOM at every batch
+size), so T11's breakdowns require rented GPU time rather than a local re-run.
 
 ---
 

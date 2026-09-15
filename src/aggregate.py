@@ -70,6 +70,18 @@ GRIDS = {
         "cell": "deberta_lr{lr:g}_e{ep}",
         "out": "deberta_grid",
     },
+    "roberta": {
+        "model": "FacebookAI/roberta-base",
+        # Same axes bert got in T9/E03, so the two encoders are tuned alike.
+        # {3e-5, 5} is E06 and is reused, not recomputed: it ran on this machine
+        # at this stack, so unlike deberta's E04 it has artifacts aggregate reads.
+        "lrs": (1e-5, 2e-5, 3e-5),
+        "epochs": (3, 5),
+        "inherited": {(3e-5, 5): ("results/runs/t10/roberta-base", "E06")},
+        "root": "roberta_grid",
+        "cell": "roberta_lr{lr:g}_e{ep}",
+        "out": "roberta_grid",
+    },
 }
 
 

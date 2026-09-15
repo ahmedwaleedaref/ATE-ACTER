@@ -632,6 +632,265 @@ The rule that *would* have differed is one ranking on htfl, which would take
 
 ---
 
+## E06 — T10, roberta-base at the T9 config
+
+**Written before the runs.** E04 and E05 were both written afterwards; this one
+is not. The predictions below are the author's, stated before any seed ran, and
+are recorded verbatim.
+
+**Purpose:** the second cell of T10's encoder sweep. bert-base-cased's
+hyperparameters from T9 are held fixed; only the encoder changes. Same design
+as E04, which did this for deberta-v3-base.
+
+**Config:** `FacebookAI/roberta-base`, LR 3e-5, 5 epochs, effective batch 16,
+warmup 10%, AdamW weight decay 0.01 — `configs/train.json` unchanged, so the
+only CLI override is `--model`. Seeds 42–46.
+
+**Environment: local, and this matters.** RTX 3050, torch 2.14.0+cu130, Python
+3.14.4 — the same machine and stack as E01–E03. roberta-base fits in 4 GB
+(2.64 G allocated, 3.06 G reserved, 0.62 G headroom, measured). So **E06 is
+directly comparable to bert's E03 with no environment confound**, which E04 and
+E05 cannot claim: those ran on T4s at torch 2.10–2.11. A roberta-vs-bert
+comparison is therefore cleaner than any deberta-vs-bert comparison so far.
+
+**Two things that could have broken and did not:** roberta's byte-level BPE
+needs `add_prefix_space=True` with `is_split_into_words=True`, already handled
+in `get_tokenizer` — without it the failure presents as "roberta is bad at this
+task" rather than as an error. And its checkpoint is fp32, so the AdamW-on-fp16
+NaN that killed deberta-v3-base does not apply.
+
+**Reference points** (E03's selected cell, same config, same machine):
+
+| | bert-base-cased |
+|---|--:|
+| equi (dev), ANN | 0.4811 ± 0.0179 |
+| htfl (test), ANN | 0.5278 ± 0.0156 |
+| equi ceiling | 0.9523 |
+| htfl ceiling | 0.9096 |
+
+For scale, deberta-v3-base at this same config (E04) reached equi 0.5463 and
+htfl 0.5850, +0.0651 over bert on equi.
+
+**Predicted (equi and htfl against bert):**
+> "Benchmark target: RoBERTa should outperform BERT due to its pretraining on
+> larger datasets."
+
+**Predicted (seed stability):**
+> "Fine-tuning stability is expected to align with BERT's baseline."
+
+Read as: equi std near bert's **0.0179**, rather than deberta's much tighter
+0.0052.
+
+**Mechanism:**
+> "RoBERTa shares virtually the same underlying architecture as BERT."
+
+More pretraining data on an architecture that is otherwise the same predicts a
+better starting representation and so a higher score, with the optimisation
+behaviour — and therefore the seed spread — unchanged. This is falsifiable in a
+way the score alone is not: if roberta wins but its seed std also collapses
+toward deberta's 0.0052, the "same architecture, more data" account is
+incomplete, because something changed how the fine-tuning behaves and not just
+where it starts.
+
+**Result:** 5 runs, 0 collapsed, local RTX 3050 / torch 2.14.0+cu130 / Python
+3.14.4 — same stack as E01–E03. Encoder sha256 `d941b5d11bc60f3c…`, identical
+across all five. 1,435/1,435 optimizer steps each.
+
+| seed | best epoch | equi ANN F1 | htfl ANN F1 | htfl P | htfl R |
+|---|--:|--:|--:|--:|--:|
+| 42 | 5 | 0.4749 | 0.5755 | 0.6188 | 0.5378 |
+| 43 | 1 | 0.5150 | 0.5561 | 0.5617 | 0.5507 |
+| 44 | 1 | 0.5328 | 0.5451 | 0.5682 | 0.5237 |
+| 45 | 4 | 0.4814 | 0.5681 | 0.6350 | 0.5139 |
+| 46 | 2 | 0.5276 | 0.5710 | 0.6075 | 0.5387 |
+
+| encoder | equi mean ± std | / ceiling | htfl mean ± std | / ceiling |
+|---|--:|--:|--:|--:|
+| bert-base-cased (E03) | 0.4811 ± 0.0179 | 0.505 | 0.5278 ± 0.0156 | 0.580 |
+| **roberta-base** | **0.5063 ± 0.0266** | 0.532 | **0.5632 ± 0.0124** | 0.619 |
+| deberta-v3-base (E04)* | 0.5463 ± 0.0052 | 0.574 | 0.5850 ± 0.0185 | 0.643 |
+
+\* E04 is T4 / torch 2.11, transcript numbers, no artifacts. roberta and bert
+share a machine and a stack, so only that pair is confound-free.
+
+**Paired against bert, same five seeds:**
+
+| | per-seed differences | mean | s_d | t | signs | reading |
+|---|---|--:|--:|--:|--:|---|
+| equi | −0.0332 +0.0268 +0.0573 +0.0085 +0.0667 | +0.0252 | 0.0402 | **1.40** | 4+/1− | not detected |
+| htfl | +0.0314 +0.0205 +0.0421 +0.0439 +0.0389 | +0.0354 | 0.0096 | **8.26** | 5+/0− | take seriously |
+
+t = 8.26 is the largest in this project and clears Bonferroni for the encoder
+family (2 tests against bert, df = 4, needs t > 3.495) several times over.
+
+**Reading:** the two predictions came apart, and so did the two domains.
+
+**The score prediction holds on test and is not established on dev.** htfl
++0.0354 at t = 8.26 with all five seeds positive and s_d of only 0.0096 — the
+per-seed gaps span 0.0205 to 0.0439, remarkably tight. equi +0.0252 at t = 1.40
+is not detectable, because the per-seed differences swing from −0.0332 to
++0.0667: s_d there is 0.0402, four times htfl's.
+
+**The stability prediction is refuted, and inverted between domains.** Predicted
+was equi std near bert's 0.0179; measured is **0.0266**, 49% wider. On htfl it
+goes the other way — 0.0124 against bert's 0.0156, *tighter*. roberta is more
+seed-sensitive than bert on dev and less on test, which no reading of "more
+pretraining data, same architecture" predicts.
+
+**The mechanism's second half is what fails.** "Same architecture, more data"
+predicts a better starting representation with fine-tuning behaviour unchanged.
+Behaviour did change: best epochs are `1, 1, 2, 4, 5` against bert's
+`3, 3, 3, 4, 5` — roberta peaks earlier and far more scattered. Three of five
+seeds peak by epoch 2, where bert has none before epoch 3. Whatever the extra
+pretraining bought, it did not leave the optimisation trajectory alone.
+
+**Consequence for T10, and it is uncomfortable.** Selection happens on equi.
+On equi, roberta and bert are a tie at n = 5. On htfl, roberta beats bert about
+as decisively as this project can measure anything. An encoder sweep that
+selects on dev would call this pair indistinguishable and would be wrong by
+0.0354 on the number that matters. Note this is the mirror of E05, where equi
+separated the LR cells and htfl could not resolve them at all — the two domains
+have now each been the only one able to see a real effect, in different
+experiments.
+
+---
+
+## E07 — roberta-base hyperparameter grid
+
+**Written before the runs.** Second entry in a row to manage it.
+
+**Purpose:** E06 found roberta beating bert decisively on htfl (+0.0354,
+t = 8.26) while equi could not separate them (t = 1.40) — because roberta's
+per-seed differences on equi swing from −0.0332 to +0.0667, giving an equi std
+of 0.0266 against bert's 0.0179. 3e-5 is bert's LR, selected in T9 **on bert**.
+This grid asks whether another LR is steadier on equi.
+
+**Grid:** LR ∈ {1e-5, 2e-5, 3e-5} × epochs ∈ {3, 5} — the same axes bert got in
+E03, so the two encoders are tuned alike. Seeds 42–46. `{3e-5, 5}` is E06 and
+is **reused, not recomputed**: it ran on this machine at this stack and has
+artifacts, unlike deberta's E04. That leaves **5 cells × 5 seeds = 25 runs**,
+about 95 minutes locally.
+
+**Environment: local throughout.** RTX 3050, torch 2.14.0+cu130, Python 3.14.4 —
+same as E01–E03 and E06. No cell of this grid crosses a machine boundary, which
+neither E05 nor the bert-vs-deberta comparison can say.
+
+**Per-seed statistic:** best epoch on equi, ANN unique-list F1 — fixed in T8,
+identical in every cell.
+
+**Selection stays on equi.** The prediction below is about dev and test
+agreeing, which is an empirical claim about the grid, not a selection rule:
+htfl is recorded per run and read only after a cell is chosen on equi.
+
+**Reference points:**
+
+| | equi | htfl |
+|---|--:|--:|
+| roberta at 3e-5/5 (E06) | 0.5063 ± 0.0266 | 0.5632 ± 0.0124 |
+| bert at 3e-5/5 (E03) | 0.4811 ± 0.0179 | 0.5278 ± 0.0156 |
+| deberta at 1e-5/5 (E05) | 0.5590 ± 0.0086 | 0.5784 ± 0.0228 |
+
+**Predicted:**
+> "i predict that we will find some stable LR, epoch that have good dev and
+> test score together."
+
+Two claims, separable:
+
+1. **Stability** — some cell has an equi std materially below E06's 0.0266,
+   nearer bert's 0.0179 or deberta's 0.0086.
+2. **Agreement** — that same cell is also strong on htfl, rather than the two
+   domains picking different winners as they did in E05 (equi ranked the LR
+   axis, htfl could not) and in E06 (htfl separated the encoders, equi could
+   not).
+
+Claim 2 is the harder one and the more interesting if it lands. In every grid
+so far, the domain that could resolve an effect was the *only* one that could.
+
+**Mechanism:** *(left blank before the runs — no mechanism was offered for why
+a particular LR should be steadier on equi.)*
+
+**Result:** 25 new runs plus E06's 5, 30 total, 0 collapsed. Local RTX 3050 /
+torch 2.14.0+cu130 / Python 3.14.4 throughout — no cell crosses a machine
+boundary. Encoder sha256 `d941b5d11bc60f3c…` identical across all 30.
+
+| equi | epochs 3 | epochs 5 |
+|---|---|---|
+| **LR 1e-5** | 0.5011 ± 0.0185 | 0.5040 ± 0.0202 |
+| **LR 2e-5** | 0.5008 ± 0.0210 | **0.5085 ± 0.0184** |
+| **LR 3e-5** | 0.5032 ± 0.0229 | 0.5063 ± 0.0266 (E06) |
+
+| cell | equi mean ± std | htfl mean ± std | best epochs |
+|---|--:|--:|---|
+| 1e-5 / 3ep | 0.5011 ± 0.0185 | 0.5399 ± 0.0151 | 1, 1, 2, 3, 3 |
+| 1e-5 / 5ep | 0.5040 ± 0.0202 | 0.5445 ± 0.0101 | 1, 1, 1, 2, 3 |
+| 2e-5 / 3ep | 0.5008 ± 0.0210 | 0.5527 ± 0.0080 | 1, 2, 2, 2, 3 |
+| 2e-5 / 5ep | 0.5085 ± 0.0184 | 0.5525 ± 0.0136 | 1, 1, 2, 3, 4 |
+| 3e-5 / 3ep | 0.5032 ± 0.0229 | 0.5454 ± 0.0313 | 1, 1, 2, 2, 3 |
+| 3e-5 / 5ep (E06) | 0.5063 ± 0.0266 | **0.5632 ± 0.0124** | 1, 1, 2, 4, 5 |
+
+**Step 2, paired, reference `{2e-5, 5}` (highest equi mean):**
+
+| cell | gap | s_d | t | signs | reading |
+|---|--:|--:|--:|--:|---|
+| 3e-5 / 5ep | +0.0022 | 0.0126 | 0.38 | 2+/3− | not detected |
+| 1e-5 / 5ep | +0.0045 | 0.0131 | 0.77 | 3+/2− | not detected |
+| 3e-5 / 3ep | +0.0053 | 0.0142 | 0.83 | 3+/2− | not detected |
+| 1e-5 / 3ep | +0.0074 | 0.0171 | 0.96 | 3+/2− | not detected |
+| 2e-5 / 3ep | +0.0077 | 0.0150 | 1.15 | 3+/2− | not detected |
+
+**Every cell is in the tie set.** Selected by the tiebreak: LR 2e-5, 5 epochs.
+
+**The same grid read on htfl**, reference `{3e-5, 5}` — recorded after the
+selection above, not used for it:
+
+| cell | gap | s_d | t | signs | reading |
+|---|--:|--:|--:|--:|---|
+| 2e-5 / 3ep | +0.0104 | 0.0184 | 1.27 | 4+/1− | not detected |
+| **2e-5 / 5ep** | +0.0107 | 0.0068 | **3.54** | **5+/0−** | **take seriously** |
+| 3e-5 / 3ep | +0.0178 | 0.0227 | 1.75 | 3+/2− | not detected |
+| **1e-5 / 5ep** | +0.0187 | 0.0107 | **3.89** | **5+/0−** | **take seriously** |
+| **1e-5 / 3ep** | +0.0232 | 0.0139 | **3.72** | **5+/0−** | **take seriously** |
+
+**Reading:** claim 1 is hollow, claim 2 is refuted, and the reason is the same.
+
+**equi cannot resolve this grid at all.** Six cells, five comparisons, every t
+between 0.38 and 1.15. The spread of the cell means is 0.0077 against a typical
+within-cell std of 0.0213 — a ratio of **0.36**. The differences are a third of
+the noise. Selecting a roberta config on equi is selecting on noise.
+
+**htfl can.** Spread 0.0232 against a typical std of 0.0151, ratio **1.54**, and
+three of five comparisons land at t = 3.54–3.89 with all five seeds agreeing in
+sign. (None clears Bonferroni for 5 tests, t > 4.604, so family-wise nothing is
+established; three independent 5+/0− sign patterns at p = 0.0625 each is what
+carries the weight.)
+
+**The two domains disagree, and this time the disagreement is established.**
+equi's pick is `{2e-5, 5}`; htfl's is `{3e-5, 5}` — E06's config, bert's LR,
+the one this grid was run to improve on. And htfl does not merely prefer its
+own: it says equi's pick is **worse by 0.0107 at t = 3.54 with 5+/0− signs**.
+In E05 and E06 only one domain could see anything at a time; here they see
+opposite things, and the one that can see is not the one selection uses.
+
+**Claim 1, stability, is technically satisfied and means little.** `{2e-5, 5}`
+does have the lowest equi std, 0.0184 against E06's 0.0266, a 31% reduction.
+But at n = 5 a std estimate has df = 4 and the true σ sits plausibly in
+[0.6σ̂, 2.1σ̂] (T8), so 0.0184 and 0.0266 are not separable; and stability in a
+measurement that cannot distinguish any cell from any other is not a property
+worth selecting on.
+
+**Claim 2, agreement, is refuted.** No cell is good on both, because "good on
+equi" is not a thing this grid can identify. The cell strongest on htfl is the
+one already in hand from E06.
+
+**What this does not license.** The response to "dev cannot tune roberta" is
+not to tune on htfl — that converts the test set into a second dev set and
+there is no third domain to check it against. It is a finding about the
+measurement: equi, at n = 5, has no power over roberta's hyperparameters. The
+options are more seeds, a different dev domain, or accepting that roberta's
+config is untunable here and keeping E06's.
+
+---
+
 <!--
 Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
 0.9096 (htfl) and 0.9523 (equi); Tasks_week2.md quotes 0.9097 and 0.9524,
