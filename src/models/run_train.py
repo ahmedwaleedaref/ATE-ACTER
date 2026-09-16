@@ -37,6 +37,7 @@ from transformers import AutoModelForTokenClassification, set_seed
 
 from src.data.dataset import (ID2LABEL, LABEL2ID, build_splits, get_tokenizer,
                               load_train_config)
+from src.eval.nobi import NOBI_ID2LABEL, NOBI_LABEL2ID
 from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
 from src.models.train_loop import build_optimizer_and_scheduler, evaluate, train_step
@@ -46,6 +47,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _RUNS_JSON = _REPO_ROOT / "results" / "runs"
 _TEST_LOG = _REPO_ROOT / "results" / "test_evaluations.log"
 _CKPT_ROOT = _REPO_ROOT / "runs"          # gitignored
+_EVAL_CONFIGS = {
+    "bio": _REPO_ROOT / "configs" / "eval.yaml",
+    "nobi": _REPO_ROOT / "configs" / "nobi_eval.yaml",
+}
 
 
 def resolve_device(name: str) -> torch.device:
@@ -66,7 +71,7 @@ def git_state() -> dict:
     }
 
 
-def build_model(cfg, device: torch.device):
+def build_model(cfg, device: torch.device, *, id2label=None, label2id=None):
     """id2label / label2id go onto the config so a checkpoint is self-describing
     and a later run cannot silently reorder the classes.
 
@@ -80,13 +85,16 @@ def build_model(cfg, device: torch.device):
     lr=0 that warmup starts at. It presents as "deberta diverges", not as an
     error. The assertion below is what stops it coming back.
     """
+    id2label = ID2LABEL if id2label is None else id2label
+    label2id = LABEL2ID if label2id is None else label2id
     model = AutoModelForTokenClassification.from_pretrained(
         cfg.model_name,
         cache_dir=cfg.hf_cache_dir,
-        num_labels=len(LABEL2ID),
-        id2label=ID2LABEL,
-        label2id=LABEL2ID,
+        num_labels=len(label2id),
+        id2label=id2label,
+        label2id=label2id,
         dtype=torch.float32,
+        ignore_mismatched_sizes=(len(label2id) != len(LABEL2ID)),
     )
     bad = {n: p.dtype for n, p in model.named_parameters() if p.dtype is not torch.float32}
     assert not bad, f"non-fp32 parameters would break AdamW silently: {bad}"
@@ -174,8 +182,12 @@ def main() -> None:
                              "hyperparameters, so the encoder is a flag, not a config edit")
     parser.add_argument("--lr", type=float, default=None, help="override learning_rate")
     parser.add_argument("--weight-decay", type=float, default=None, help="override weight_decay")
+    parser.add_argument("--scheme", choices=("bio", "nobi"), default="bio",
+                        help="labeling scheme; BIO is the compatibility default")
     parser.add_argument("--limit-train", type=int, default=None,
                         help="smoke only: train on the first N sentences")
+    parser.add_argument("--limit-eval", type=int, default=None,
+                        help="smoke only: evaluate the first N dev/test sentences")
     parser.add_argument("--skip-test", action="store_true", help="dev only, no htfl")
     parser.add_argument("--save-weights", action="store_true",
                         help="write the BEST-EPOCH weights to /runs/<run_id>/ (gitignored). "
@@ -187,6 +199,10 @@ def main() -> None:
                         help="subdirectory under results/runs/ to write into. T9 gives "
                              "each grid cell its own, so cells cannot overwrite each other")
     args = parser.parse_args()
+
+    scheme = args.scheme
+    id2label = ID2LABEL if scheme == "bio" else NOBI_ID2LABEL
+    label2id = LABEL2ID if scheme == "bio" else NOBI_LABEL2ID
 
     cfg = load_train_config()
     # CLI overrides exist so a one-number experiment is not a config edit that
@@ -211,7 +227,8 @@ def main() -> None:
     # top-level "seed" field and half the filename.
     cfg = dataclasses.replace(cfg, seed=seed)
     data_cfg = load_config()
-    eval_cfg = load_eval_config()
+    eval_config_path = _EVAL_CONFIGS[scheme]
+    eval_cfg = load_eval_config(eval_config_path)
     device = resolve_device(cfg.device)
 
     # one seed for weight init, dropout and data order -- the three sources T8
@@ -225,7 +242,7 @@ def main() -> None:
           + (f" ({torch.cuda.get_device_name(0)})" if device.type == "cuda" else ""))
 
     tokenizer = get_tokenizer(cfg)
-    splits = build_splits(cfg, data_cfg, tokenizer=tokenizer, seed=seed)
+    splits = build_splits(cfg, data_cfg, tokenizer=tokenizer, seed=seed, scheme=scheme)
 
     if args.limit_train is not None:
         from src.data.dataset import ATEDataset, build_dataloader
@@ -235,10 +252,23 @@ def main() -> None:
             small, tokenizer=tokenizer, batch_size=cfg.per_device_train_batch_size,
             shuffle=True, length_grouped=cfg.length_grouped_batching, seed=seed)
 
+    if args.limit_eval is not None:
+        from src.data.dataset import ATEDataset, build_dataloader
+        for split in ("dev", "test"):
+            limited = ATEDataset(splits.datasets[split].examples[:args.limit_eval])
+            splits.datasets[split] = limited
+            splits.loaders[split] = build_dataloader(
+                limited,
+                tokenizer=tokenizer,
+                batch_size=cfg.eval_batch_size,
+                shuffle=False,
+                length_grouped=False,
+            )
+
     train_loader = splits.loaders["train"]
     # set_seed above ran BEFORE this line: from_pretrained initialises the
     # classifier head randomly, and that head is the dominant noise source.
-    model = build_model(cfg, device)
+    model = build_model(cfg, device, id2label=id2label, label2id=label2id)
     enc_hash = encoder_weight_hash(model)   # before any training step
     print(f"encoder sha256 {enc_hash[:16]}... (must match across seeds)")
     optimizer, scheduler, total_steps = build_optimizer_and_scheduler(
@@ -259,6 +289,8 @@ def main() -> None:
         "device": str(device),
         "gpu": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
         "seed": seed,
+        "scheme": scheme,
+        "eval_config": str(eval_config_path.relative_to(_REPO_ROOT)),
         "encoder_weight_hash": enc_hash,
         "versions": {"torch": torch.__version__,
                      "transformers": transformers.__version__},
@@ -276,6 +308,7 @@ def main() -> None:
             "micro_batches_per_epoch": len(train_loader),
             "total_optimizer_steps": total_steps,
             "limit_train": args.limit_train,
+            "limit_eval": args.limit_eval,
         },
         "epochs": [],
         "first_batch_indices": [],
@@ -299,7 +332,8 @@ def main() -> None:
                                step_counter=step_counter,
                                first_indices=record["first_batch_indices"] if epoch == 1 else None)
         dev = evaluate(model, splits.loaders["dev"], splits.datasets["dev"],
-                       device=device, id2label=ID2LABEL, gold_lists=dev_gold)
+                       device=device, id2label=id2label, gold_lists=dev_gold,
+                       scheme=scheme)
         # ANN unique-list F1 is the headline metric (configs/eval.yaml), and the
         # per-seed statistic T8 fixes is the best epoch on equi under it
         equi_f1 = dev["list_ann_f1"]
@@ -339,7 +373,8 @@ def main() -> None:
         model.load_state_dict(best_state)
         test_gold = gold_for(test_domain, data_cfg, eval_cfg)
         test = evaluate(model, splits.loaders["test"], splits.datasets["test"],
-                        device=device, id2label=ID2LABEL, gold_lists=test_gold)
+                        device=device, id2label=id2label, gold_lists=test_gold,
+                        scheme=scheme)
         record["test"] = test
         record["htfl_f1"] = test["list_ann_f1"]
         print(f"  {test_domain} list_ann_f1 {test['list_ann_f1']:.4f} "
@@ -350,6 +385,7 @@ def main() -> None:
         _TEST_LOG.parent.mkdir(parents=True, exist_ok=True)
         with open(_TEST_LOG, "a", encoding="utf-8") as fh:
             fh.write(f"{record['started']}\t{run_id}\tseed={seed}\t"
+                     f"scheme={scheme}\t"
                      f"lr={cfg.learning_rate:g}\tepochs={cfg.num_epochs}\t"
                      f"best_epoch={best_epoch}\t"
                      f"htfl_list_ann_f1={test['list_ann_f1']:.4f}\t"
@@ -375,7 +411,8 @@ def main() -> None:
     # keeps T9's cells from overwriting each other, and E02, at the default path.
     assert not Path(args.group).is_absolute() and ".." not in Path(args.group).parts, \
         f"--group must be a relative path under results/runs/: {args.group!r}"
-    out_dir = _RUNS_JSON / args.group if args.group else _RUNS_JSON
+    output_group = args.group or ("nobi" if scheme == "nobi" else "")
+    out_dir = _RUNS_JSON / output_group if output_group else _RUNS_JSON
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"seed_{seed}.json"
     out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")

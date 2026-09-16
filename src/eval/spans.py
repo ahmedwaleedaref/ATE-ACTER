@@ -15,6 +15,10 @@ def decode(tokens: list[str], labels: list[str], scheme: str) -> list[tuple[int,
     Returns (start, end) pairs with end EXCLUSIVE: tokens[start:end] is the term.
     Spans never cross a sentence boundary, because one call sees one sentence.
     """
+    if scheme == "nobi": #Talaat may change the way if works 
+        from src.eval.nobi import decode_nobi
+
+        return decode_nobi(tokens, labels)
     assert scheme == "bio", f"unsupported scheme: {scheme}"
     assert len(tokens) == len(labels), f"{len(tokens)} tokens vs {len(labels)} labels"
 

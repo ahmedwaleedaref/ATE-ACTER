@@ -32,6 +32,8 @@ from torch.utils.data import DataLoader, Dataset, Sampler
 from transformers import AutoTokenizer, DataCollatorForTokenClassification
 
 from src.data.align import ID2LABEL, IGNORE_INDEX, LABEL2ID, align_labels
+from src.data.nobi_labels import build_nobi_labels, load_domain_terms
+from src.eval.nobi import NOBI_ID2LABEL, NOBI_LABEL2ID
 from src.stats.loading import DataConfig, load_config, load_domain
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -227,6 +229,7 @@ def build_examples(
     max_length: int | None,
     filter_max_tokens: int | None,
     data_cfg: DataConfig | None = None,
+    scheme: str = "bio",
 ) -> list[Example]:
     """Tokenize and align one domain.
 
@@ -240,8 +243,11 @@ def build_examples(
     fails on the 8 corpus-wide sentences that exceed 256 pieces for a reason
     that is not a bug -- ``data_layout.md`` section 8.2.
     """
+    assert scheme in {"bio", "nobi"}, f"unsupported dataset scheme: {scheme}"
     assert truncation or max_length is None, "max_length is meaningless with truncation off"
+    data_cfg = data_cfg or load_config()
     documents = load_domain(domain, data_cfg)
+    domain_terms = load_domain_terms(data_cfg, domain) if scheme == "nobi" else None
 
     examples: list[Example] = []
     for doc in documents:
@@ -252,6 +258,12 @@ def build_examples(
             # wrong.
             if filter_max_tokens is not None and len(tokens) <= filter_max_tokens:
                 continue
+
+            model_labels = labels
+            label2id = LABEL2ID
+            if scheme == "nobi":
+                model_labels = build_nobi_labels(tokens, labels, domain_terms)
+                label2id = NOBI_LABEL2ID
 
             encoding = tokenizer(
                 tokens,
@@ -265,12 +277,12 @@ def build_examples(
                 file_id=doc.file_id,
                 sent_idx=sent_idx,
                 tokens=list(tokens),
-                gold_labels=list(labels),
+                gold_labels=list(model_labels),
                 #input_ids are indices that model will use them to look-up for emmeding vector that correspond to each model-token .
                 input_ids=encoding["input_ids"],
                 #A binary mask (1 for real tokens, 0 for padding) that instructs the encoder transformer to ignore padded positions during self-attention calculations.
                 attention_mask=encoding["attention_mask"],
-                labels=align_labels(word_ids, labels, LABEL2ID),
+                labels=align_labels(word_ids, model_labels, label2id),
                 word_ids=word_ids,
             ))
     return examples
@@ -418,7 +430,8 @@ class Splits:
 
 
 def build_splits(train_cfg: TrainConfig, data_cfg: DataConfig | None = None,
-                 tokenizer=None, seed: int | None = None) -> Splits:
+                 tokenizer=None, seed: int | None = None,
+                 scheme: str = "bio") -> Splits:
     """Train (corp + wind, pooled and shuffled), dev (equi), test (htfl).
 
     The domain assignment comes from ``configs/data.json`` -- one file states
@@ -447,6 +460,7 @@ def build_splits(train_cfg: TrainConfig, data_cfg: DataConfig | None = None,
                 max_length=train_cfg.max_length if train_cfg.truncation else None,
                 filter_max_tokens=train_cfg.filter_for(domain, split),
                 data_cfg=data_cfg,
+                scheme=scheme,
             ))
         dataset = ATEDataset(examples)
         datasets[split] = dataset

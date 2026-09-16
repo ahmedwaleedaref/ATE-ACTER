@@ -29,3 +29,11 @@
 2026-09-12T10:08:42+00:00	20260912-100838_bert-base-cased_lr5e-05_e5_seed44	seed=44	lr=5e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5114	htfl_list_nes_f1=0.5003	reason=T9 grid lr=5e-5 epochs=5
 2026-09-12T10:13:46+00:00	20260912-101343_bert-base-cased_lr5e-05_e5_seed45	seed=45	lr=5e-05	epochs=5	best_epoch=5	htfl_list_ann_f1=0.5346	htfl_list_nes_f1=0.5192	reason=T9 grid lr=5e-5 epochs=5
 2026-09-12T10:18:51+00:00	20260912-101847_bert-base-cased_lr5e-05_e5_seed46	seed=46	lr=5e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5311	htfl_list_nes_f1=0.5191	reason=T9 grid lr=5e-5 epochs=5
+2026-09-15T17:05:31+00:00	20260915-170341_bert-base-cased_lr3e-05_e1_seed42	seed=42	scheme=nobi	lr=3e-05	epochs=1	best_epoch=1	htfl_list_ann_f1=0.0000	htfl_list_nes_f1=0.0000	reason=NOBI smoke test with held-out evaluation
+2026-09-15T17:38:44+00:00	20260915-173711_bert-base-cased_lr3e-05_e5_seed42	seed=42	scheme=nobi	lr=3e-05	epochs=5	best_epoch=4	htfl_list_ann_f1=0.5247	htfl_list_nes_f1=0.5124	reason=NOBI five-seed comparison
+2026-09-15T19:27:47+00:00	20260915-192634_bert-base-cased_lr3e-05_e5_seed43	seed=43	scheme=nobi	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5316	htfl_list_nes_f1=0.5205	reason=NOBI five-seed comparison
+2026-09-15T20:32:27+00:00	20260915-203126_bert-base-cased_lr3e-05_e5_seed44	seed=44	scheme=nobi	lr=3e-05	epochs=5	best_epoch=3	htfl_list_ann_f1=0.5139	htfl_list_nes_f1=0.5036	reason=NOBI five-seed comparison
+2026-09-15T22:11:04+00:00	20260915-220957_microsoft-deberta-v3-base_lr3e-05_e5_seed42	seed=42	scheme=nobi	lr=3e-05	epochs=5	best_epoch=1	htfl_list_ann_f1=0.5794	htfl_list_nes_f1=0.5682	reason=UNSTATED
+2026-09-15T23:55:48+00:00	20260915-235447_microsoft-deberta-v3-base_lr3e-05_e5_seed42	seed=42	scheme=nobi	lr=3e-05	epochs=5	best_epoch=1	htfl_list_ann_f1=0.5794	htfl_list_nes_f1=0.5682	reason=UNSTATED
+2026-09-16T10:02:23+00:00	20260916-100125_microsoft-deberta-v3-base_lr1e-05_e5_seed42	seed=42	scheme=nobi	lr=1e-05	epochs=5	best_epoch=5	htfl_list_ann_f1=0.5887	htfl_list_nes_f1=0.5766	reason=UNSTATED
+2026-09-16T12:05:25+00:00	20260916-120427_microsoft-deberta-v3-base_lr1e-05_e5_seed42	seed=42	scheme=nobi	lr=1e-05	epochs=5	best_epoch=2	htfl_list_ann_f1=0.5757	htfl_list_nes_f1=0.5647	reason=UNSTATED

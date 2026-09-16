@@ -86,18 +86,50 @@ def train_step(
     max_grad_norm: float,
     is_update_step: bool,
 ) -> float:
-    batch.pop("example_index") 
-    #we need to make data and model on same device 
-    batch = {k : t.to(device) for k , t in batch.items() }#now each tensor in dict on same device as model 
-    output = model(**batch) 
-    loss = output.loss  / gradient_accumulation_steps 
+    batch.pop("example_index")
+    batch = {k: t.to(device) for k, t in batch.items()}
+
+    # NOBI has 5 labels: O, B, I, BN, IN
+    # BIO has 3 labels: O, B, I
+    if model.num_labels == 5:
+        labels = batch["labels"]
+
+        # Do not pass labels to the model because we calculate
+        # the weighted loss ourselves for NOBI.
+        model_inputs = {k: v for k, v in batch.items() if k != "labels"}
+        output = model(**model_inputs)
+
+        class_weights = torch.tensor(
+            [1.0, 1.0, 1.0, 3.0, 3.0],
+            dtype=torch.float32,
+            device=device,
+        )
+
+        loss_fn = torch.nn.CrossEntropyLoss(
+            weight=class_weights,
+            ignore_index=-100,
+        )
+
+        raw_loss = loss_fn(
+            output.logits.view(-1, output.logits.size(-1)),
+            labels.view(-1),
+        )
+
+    else:
+        # BIO: keep the original Hugging Face loss unchanged.
+        output = model(**batch)
+        raw_loss = output.loss
+
+    loss = raw_loss / gradient_accumulation_steps
     loss.backward()
-    
-    if is_update_step : 
-         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm) # do normal cliping so gradient stay in same direction 
-         optimizer.step(); scheduler.step(); optimizer.zero_grad()
-    return output.loss.item() 
-    
+
+    if is_update_step:
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+        optimizer.step()
+        scheduler.step()
+        optimizer.zero_grad()
+
+    return raw_loss.item()    
 
 
 def evaluate(
@@ -108,6 +140,7 @@ def evaluate(
     device: "torch.device",
     id2label: dict[int, str],
     gold_lists: dict[str, set[str]],
+    scheme: str = "bio",
     #exact-span metric deferred: accepted and IGNORED for now. T7's headline is
     #unique-list F1; span F1 is diagnostic and T11 is what needs it. Adding it is
     #one score_exact_spans call over (file_id, sent_idx, start, end) keys built
@@ -128,7 +161,10 @@ def evaluate(
                 #pred[index] is padded to the batch max; recover_token_labels walks
                 #word_ids, which is this example's own length, so padding is never read
                 model_labels = recover_token_labels(example.word_ids , pred[index] , len(example.tokens) , id2label)
-                spans_used_for_uniqe_list.append(( example.tokens , decode(example.tokens , model_labels , "bio")))
+                spans_used_for_uniqe_list.append((
+                    example.tokens,
+                    decode(example.tokens, model_labels, scheme),
+                ))
 
     #spans_to_unique_list returns a 3-tuple, not a set; the counts are the span/type ratio
     uniqe_list_predicted , n_spans , n_unique = spans_to_unique_list(spans_used_for_uniqe_list)

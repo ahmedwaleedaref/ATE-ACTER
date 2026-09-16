@@ -1,0 +1,8 @@
+headline_metric: unique_list_f1
+secondary_metric: exact_span_f1
+scheme: nobi
+labels: without_named_entities
+keys: [ann, nes]
+dangling_i_policy: drop
+seqeval_mode: strict
+seqeval_scheme: IOB2

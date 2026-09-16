@@ -12,7 +12,7 @@
   "_batch_note": "16 is the hyperparameter. 4 GB of VRAM is binding, so it is reached as 8 x 2 accumulation steps. T9's grid is stated in EFFECTIVE batch size; per-device size is a memory knob and must never be read as the hyperparameter. per_device * gradient_accumulation_steps == effective is asserted on load.",
   "eval_batch_size": 32,
 
-  "learning_rate": 3e-5,
+  "learning_rate": 1e-5, 
   "num_epochs": 5,
   "weight_decay": 0.01,
   "max_grad_norm": 1.0,

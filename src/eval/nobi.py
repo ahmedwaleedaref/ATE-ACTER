@@ -11,13 +11,47 @@ from __future__ import annotations
 
 Span = tuple[int, int]
 
-NOBI_LABELS = frozenset({"O", "B", "I", "BN", "IN"})
+NOBI_LABEL2ID = {"O": 0, "B": 1, "I": 2, "BN": 3, "IN": 4}
+NOBI_ID2LABEL = {index: label for label, index in NOBI_LABEL2ID.items()}
+NOBI_LABELS = frozenset(NOBI_LABEL2ID)
 
 
 def _validate_spans(tokens: list[str], spans: list[Span]) -> None:
 	for start, end in spans:
 		if not 0 <= start < end <= len(tokens):
 			raise AssertionError(f"invalid span {(start, end)} for {len(tokens)} tokens")
+
+
+def resolve_nested_spans(
+	tokens: list[str],
+	outer_spans: list[Span],
+	nested_spans: list[Span],
+) -> list[Span]:
+	"""Apply NOBI's left-to-right, longest-match-first resolution rule."""
+	_validate_spans(tokens, [*outer_spans, *nested_spans])
+	selected: list[Span] = []
+	occupied: set[int] = set()
+
+	for start, end in sorted(
+		nested_spans,
+		key=lambda span: (span[0], -(span[1] - span[0]), span[1]),
+	):
+		containing = [
+			(outer_start, outer_end)
+			for outer_start, outer_end in outer_spans
+			if outer_start <= start and end <= outer_end
+		]
+		if not containing:
+			continue
+		# The outer B has absolute priority at its left boundary.
+		if any(start == outer_start for outer_start, _outer_end in containing):
+			continue
+		if any(index in occupied for index in range(start, end)):
+			continue
+		selected.append((start, end))
+		occupied.update(range(start, end))
+
+	return sorted(selected)
 
 
 def encode_nobi(
@@ -27,12 +61,12 @@ def encode_nobi(
 ) -> list[str]:
 	"""Encode outer BIO spans plus nested spans as NOBI labels.
 
-	``nested_spans`` must be strictly inside an outer span. Nested spans may
-	contain one or more tokens; a one-token span is represented by ``BN``.
-	Overlapping nested spans are rejected because one label cannot represent
-	two nested spans beginning at the same token.
+	Nested spans outside an outer span, sharing its start, or overlapping a
+	previously selected nested span are ignored according to the NOBI rules.
+	Nested spans may contain one or more tokens; a one-token span is represented
+	by ``BN``.
 	"""
-	_validate_spans(tokens, [*outer_spans, *nested_spans])
+	_validate_spans(tokens, outer_spans)
 	labels = ["O"] * len(tokens)
 
 	for start, end in outer_spans:
@@ -42,22 +76,9 @@ def encode_nobi(
 				raise AssertionError(f"overlapping outer spans at token {index}")
 			labels[index] = wanted
 
-	occupied_nested: set[int] = set()
-	for nested_start, nested_end in nested_spans:
-		containing = any(
-			outer_start <= nested_start and nested_end <= outer_end
-			for outer_start, outer_end in outer_spans
-		)
-		if not containing:
-			raise AssertionError(f"nested span {(nested_start, nested_end)} is outside an outer span")
-
+	for nested_start, nested_end in resolve_nested_spans(tokens, outer_spans, nested_spans):
 		for index in range(nested_start, nested_end):
-			if index in occupied_nested:
-				raise AssertionError(f"overlapping nested spans at token {index}")
-			if labels[index] == "O":
-				raise AssertionError(f"nested span {(nested_start, nested_end)} is outside the labels")
 			labels[index] = "BN" if index == nested_start else "IN"
-			occupied_nested.add(index)
 
 	return labels
 
@@ -99,19 +120,15 @@ def decode_nobi(tokens: list[str], labels: list[str]) -> list[Span]:
 			close_outer(index)
 			outer_start = index
 		elif label == "I":
-			if outer_start is None:
-				raise ValueError(f"I at index {index} has no outer span")
-			close_nested(index)
+			if outer_start is not None:
+				close_nested(index)
 		elif label == "BN":
-			if outer_start is None:
-				raise ValueError(f"BN at index {index} has no outer span")
-			close_nested(index)
-			nested_start = index
+			if outer_start is not None:
+				close_nested(index)
+				nested_start = index
 		elif label == "IN":
-			if outer_start is None:
-				raise ValueError(f"IN at index {index} has no outer span")
-			if nested_start is None:
-				raise ValueError(f"IN at index {index} has no nested span")
+			if outer_start is not None and nested_start is not None:
+				continue
 
 	close_outer(len(labels))
 	return spans
