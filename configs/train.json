@@ -34,5 +34,12 @@
     "domains": ["wind"],
     "splits": ["train"]
   },
-  "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl."
+  "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl.",
+
+  "rare_term_weighting": {
+    "enabled": false,
+    "formula": "inverse_sqrt_freq",
+    "hapax_weight": 2.0
+  },
+  "_rare_term_note": "src/data/rare_terms.py. Frequency is counted from train_domains only (configs/data.json), post short_sentence_filter -- never equi or htfl. formula is 'hapax_binary' (hapax_weight for freq==1, else 1.0) or 'inverse_sqrt_freq' (1/sqrt(freq)); hapax_weight is read only by hapax_binary. enabled=false is a no-op: every subword weight is 1.0, matching pre-rare-term-weighting behaviour exactly."
 }

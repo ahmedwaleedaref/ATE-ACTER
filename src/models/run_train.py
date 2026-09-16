@@ -186,6 +186,18 @@ def main() -> None:
     parser.add_argument("--group", default="",
                         help="subdirectory under results/runs/ to write into. T9 gives "
                              "each grid cell its own, so cells cannot overwrite each other")
+    parser.add_argument("--rare-term-weighting", action="store_true",
+                        help="turn on src/data/rare_terms.py weighting for this run. "
+                             "Off by default, matching configs/train.json's enabled=false, "
+                             "so a plain run is unaffected unless this is passed explicitly")
+    parser.add_argument("--rare-term-formula", default=None,
+                        choices=["hapax_binary", "inverse_sqrt_freq"],
+                        help="override rare_term_weighting.formula. Only read when "
+                             "--rare-term-weighting is also passed (or already enabled "
+                             "in the config)")
+    parser.add_argument("--rare-term-hapax-weight", type=float, default=None,
+                        help="override rare_term_weighting.hapax_weight. Only read by "
+                             "the hapax_binary formula")
     args = parser.parse_args()
 
     cfg = load_train_config()
@@ -198,6 +210,12 @@ def main() -> None:
         overrides["num_epochs"] = args.epochs
     if args.lr is not None:
         overrides["learning_rate"] = args.lr
+    if args.rare_term_weighting:
+        overrides["rare_term_weighting_enabled"] = True
+    if args.rare_term_formula is not None:
+        overrides["rare_term_formula"] = args.rare_term_formula
+    if args.rare_term_hapax_weight is not None:
+        overrides["rare_term_hapax_weight"] = args.rare_term_hapax_weight
     if args.weight_decay is not None:
         overrides["weight_decay"] = args.weight_decay
     if overrides:

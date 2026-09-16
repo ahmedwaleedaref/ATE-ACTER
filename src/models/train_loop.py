@@ -89,8 +89,19 @@ def train_step(
     batch.pop("example_index") 
     #we need to make data and model on same device 
     batch = {k : t.to(device) for k , t in batch.items() }#now each tensor in dict on same device as model 
-    output = model(**batch) 
-    loss = output.loss  / gradient_accumulation_steps 
+
+    weights = batch.pop("weights")
+    output = model(**batch)
+    per_position_loss = torch.nn.functional.cross_entropy(
+        output.logits.view(-1, output.logits.size(-1)),
+        batch["labels"].view(-1),
+        ignore_index=-100,
+        reduction="none",
+    )
+    n_scored = (batch["labels"] != -100).sum()
+    loss = (per_position_loss * weights.view(-1)).sum() / n_scored
+    loss = loss / gradient_accumulation_steps
+
     loss.backward()
     
     if is_update_step : 

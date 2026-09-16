@@ -32,6 +32,12 @@ from torch.utils.data import DataLoader, Dataset, Sampler
 from transformers import AutoTokenizer, DataCollatorForTokenClassification
 
 from src.data.align import ID2LABEL, IGNORE_INDEX, LABEL2ID, align_labels
+from src.data.rare_terms import (
+    BASELINE_WEIGHT,
+    align_weights,
+    count_term_frequencies,
+    token_weights_for_sentence,
+)
 from src.stats.loading import DataConfig, load_config, load_domain
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -71,6 +77,9 @@ class TrainConfig:
     filter_max_tokens: int
     filter_domains: tuple[str, ...]
     filter_splits: tuple[str, ...]
+    rare_term_weighting_enabled: bool
+    rare_term_formula: str          # "hapax_binary" | "inverse_sqrt_freq"
+    rare_term_hapax_weight: float   # only read by "hapax_binary"
     raw: dict           # the file as-loaded, for the per-run results/ header
 
     def filter_for(self, domain: str, split: str) -> int | None:
@@ -103,6 +112,10 @@ def load_train_config(path=None) -> TrainConfig:
     )
 
     filt = raw["short_sentence_filter"]
+    # Optional block: absent entirely in older configs, which must keep
+    # loading unchanged -- the feature defaults OFF, matching current
+    # behaviour exactly (build_examples() falls back to weight 1.0 everywhere).
+    rare = raw.get("rare_term_weighting", {})
     return TrainConfig(
         model_name=raw["model_name"],
         hf_cache_dir=raw["hf_cache_dir"],
@@ -126,6 +139,9 @@ def load_train_config(path=None) -> TrainConfig:
         filter_max_tokens=filt["max_tokens"],
         filter_domains=tuple(filt["domains"]),
         filter_splits=tuple(filt["splits"]),
+        rare_term_weighting_enabled=rare.get("enabled", False),
+        rare_term_formula=rare.get("formula", "inverse_sqrt_freq"),
+        rare_term_hapax_weight=float(rare.get("hapax_weight", 2.0)),
         raw=raw,
     )
 
@@ -166,6 +182,10 @@ class Example:
     attention_mask: list[int]
     labels: list[int]
     word_ids: list[int | None]
+    # Rare-term loss weight per subword position, same shape as ``labels``.
+    # All 1.0 (BASELINE_WEIGHT) when rare-term weighting is off or this split
+    # is not train -- a pure no-op in that case, never read by evaluate().
+    subword_weights: list[float]
 
     @property
     def n_subwords(self) -> int:
@@ -227,6 +247,9 @@ def build_examples(
     max_length: int | None,
     filter_max_tokens: int | None,
     data_cfg: DataConfig | None = None,
+    term_frequencies: dict[str, int] | None = None,
+    rare_term_formula: str = "inverse_sqrt_freq",
+    rare_term_hapax_weight: float = 2.0,
 ) -> list[Example]:
     """Tokenize and align one domain.
 
@@ -239,6 +262,13 @@ def build_examples(
     the loader's labels for exact equality. Under truncation the comparison
     fails on the 8 corpus-wide sentences that exceed 256 pieces for a reason
     that is not a bug -- ``data_layout.md`` section 8.2.
+
+    ``term_frequencies`` is ``None`` by default: every ``subword_weights``
+    entry is then ``BASELINE_WEIGHT`` (1.0), a pure no-op -- this is what dev
+    and test callers, and any caller from before rare-term weighting existed,
+    get automatically. Pass a table (built by
+    ``src.data.rare_terms.count_term_frequencies`` over the train domains
+    only) to turn per-term weighting on for this call.
     """
     assert truncation or max_length is None, "max_length is meaningless with truncation off"
     documents = load_domain(domain, data_cfg)
@@ -260,6 +290,15 @@ def build_examples(
                 max_length=max_length,
             )
             word_ids = encoding.word_ids()
+
+            if term_frequencies is not None:
+                token_weights = token_weights_for_sentence(
+                    tokens, labels, term_frequencies,
+                    formula=rare_term_formula, hapax_weight=rare_term_hapax_weight)
+                subword_weights = align_weights(word_ids, token_weights)
+            else:
+                subword_weights = [BASELINE_WEIGHT] * len(word_ids)
+
             examples.append(Example(
                 domain=domain,
                 file_id=doc.file_id,
@@ -272,6 +311,7 @@ def build_examples(
                 attention_mask=encoding["attention_mask"],
                 labels=align_labels(word_ids, labels, LABEL2ID),
                 word_ids=word_ids,
+                subword_weights=subword_weights,
             ))
     return examples
 
@@ -295,6 +335,7 @@ class ATEDataset(Dataset):
             "input_ids": example.input_ids,
             "attention_mask": example.attention_mask,
             "labels": example.labels,
+            "weights": example.subword_weights,  # all 1.0 when rare-term weighting is off
             "example_index": index,#this used if we want to look up for something else use this index . 
         }
     #this is a must we need to know the max-token-size of example in batch bcs we will do dynamic padding 
@@ -321,10 +362,27 @@ class Collator:
     def __call__(self, features: list[dict]) -> dict:
         #remove the example_index you cannot input it to collator 
         indices = [feature.pop("example_index") for feature in features] 
+        # "weights" is not a field DataCollatorForTokenClassification knows how
+        # to pad (it only special-cases "labels" and the tokenizer's own model
+        # inputs) -- pop it out the same way, pad it by hand afterwards.
+        weights = [feature.pop("weights") for feature in features]
         #now input is just a [{"input_ids": [...], "attention_mask": [...], "labels": [...]}, "input_ids": [...], "attention_mask": [...], "labels": [...], "example_index": 12 ]
         #the collator will find longest sentence and do padding depending on it and stack each field into a tensor {"input_ids": tensor(B, L), "attention_mask": tensor(B, L), "labels": tensor(B, L)}
         #B is number of example in batch if you access the first example you will find 1 vector with size L number of subword positions in the longest sequence in this batch the 768 does not get here yet .
         batch = self.collator(features)
+
+        # Pad "weights" to the exact same (batch_max_length, side) the
+        # collator just used for "labels" -- IGNORE_WEIGHT (0.0) is the float
+        # analogue of label_pad_token_id (-100): a sentinel for "no real
+        # position here", never itself load-bearing for the loss mask.
+        max_len = batch["labels"].shape[1]
+        padding_side = self.collator.tokenizer.padding_side
+        padded_weights = []
+        for w in weights:
+            pad = [0.0] * (max_len - len(w))
+            padded_weights.append(pad + w if padding_side == "left" else w + pad)
+        batch["weights"] = torch.tensor(padded_weights, dtype=torch.float)
+
         #lets put indices back one index per example those indices are necssary bcs we need to go back to (file_id, sent_idx)
         batch["example_index"] = torch.tensor(indices, dtype=torch.long)
         return batch
@@ -435,6 +493,17 @@ def build_splits(train_cfg: TrainConfig, data_cfg: DataConfig | None = None,
         "test": (data_cfg.test_domain,),
     }
 
+    # Rare-term weighting: frequency is counted once, from the train domains
+    # only, before any Example is built -- never from dev/test (equi/htfl),
+    # and never per-sentence (a term's weight is constant across the split).
+    term_frequencies: dict[str, int] | None = None
+    if train_cfg.rare_term_weighting_enabled:
+        term_frequencies = count_term_frequencies(
+            domains["train"],
+            filter_max_tokens={d: train_cfg.filter_for(d, "train") for d in domains["train"]},
+            data_cfg=data_cfg,
+        )
+
     datasets: dict[str, ATEDataset] = {}
     loaders: dict[str, DataLoader] = {}
     for split, split_domains in domains.items():
@@ -447,6 +516,12 @@ def build_splits(train_cfg: TrainConfig, data_cfg: DataConfig | None = None,
                 max_length=train_cfg.max_length if train_cfg.truncation else None,
                 filter_max_tokens=train_cfg.filter_for(domain, split),
                 data_cfg=data_cfg,
+                # dev/test examples are never fed to train_step, so they get
+                # no term_frequencies -- build_examples() then leaves every
+                # weight at BASELINE_WEIGHT, a pure no-op.
+                term_frequencies=term_frequencies if split == "train" else None,
+                rare_term_formula=train_cfg.rare_term_formula,
+                rare_term_hapax_weight=train_cfg.rare_term_hapax_weight,
             ))
         dataset = ATEDataset(examples)
         datasets[split] = dataset
