@@ -175,6 +175,10 @@ def main() -> None:
                              "hyperparameters, so the encoder is a flag, not a config edit")
     parser.add_argument("--lr", type=float, default=None, help="override learning_rate")
     parser.add_argument("--weight-decay", type=float, default=None, help="override weight_decay")
+    parser.add_argument("--context-window", type=int, default=None,
+                        help="FLERT document context, dataset tokens per side. 0 is the "
+                             "sentence-level baseline. Context is attended and never "
+                             "scored; the sentence is budgeted against max_length first")
     parser.add_argument("--limit-train", type=int, default=None,
                         help="smoke only: train on the first N sentences")
     parser.add_argument("--skip-test", action="store_true", help="dev only, no htfl")
@@ -206,6 +210,8 @@ def main() -> None:
         overrides["learning_rate"] = args.lr
     if args.weight_decay is not None:
         overrides["weight_decay"] = args.weight_decay
+    if args.context_window is not None:
+        overrides["context_window"] = args.context_window
     if overrides:
         cfg = dataclasses.replace(cfg, **overrides)
         print("overrides: " + ", ".join(f"{k}={v}" for k, v in overrides.items()))
@@ -226,7 +232,8 @@ def main() -> None:
 
     run_id = (f"{datetime.now(timezone.utc):%Y%m%d-%H%M%S}"
               f"_{cfg.model_name.replace('/', '-')}_lr{cfg.learning_rate:g}"
-              f"_e{cfg.num_epochs}_seed{seed}{('_' + args.tag) if args.tag else ''}")
+              f"_e{cfg.num_epochs}_ctx{cfg.context_window}_seed{seed}"
+              f"{('_' + args.tag) if args.tag else ''}")
     print(f"run {run_id}\ndevice {device}"
           + (f" ({torch.cuda.get_device_name(0)})" if device.type == "cuda" else ""))
 

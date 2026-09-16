@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING
 import torch
 import transformers
 
-from src.data.align import recover_token_labels
+from src.data.dataset import recover_sentence_labels
 from src.eval.scorers import score_list , score_exact_spans
 from src.eval.spans import decode , count_invalid_tags
 from src.eval.surface import spans_to_unique_list , generate_flatten_spans_for_model_prediction
@@ -134,7 +134,10 @@ def evaluate(
                 index_sentence_in_file : int = example.sent_idx
                 #pred[index] is padded to the batch max; recover_token_labels walks
                 #word_ids, which is this example's own length, so padding is never read
-                model_labels = recover_token_labels(example.word_ids , pred[index] , len(example.tokens) , id2label)
+                #recover_sentence_labels wraps recover_token_labels and slices the
+                #sentence out of left+sentence+right. With context_window=0 the
+                #slice is the whole list, so this is the old call exactly.
+                model_labels = recover_sentence_labels(example , pred[index] , id2label)
                 #counted on model_labels, the same sequence decode is about to
                 #consume -- never on pred, whose continuation subwords and
                 #special tokens are discarded unread

@@ -71,6 +71,7 @@ class TrainConfig:
     filter_max_tokens: int
     filter_domains: tuple[str, ...]
     filter_splits: tuple[str, ...]
+    context_window: int         # FLERT context tokens per side; 0 = sentence-level
     raw: dict           # the file as-loaded, for the per-run results/ header
 
     def filter_for(self, domain: str, split: str) -> int | None:
@@ -126,6 +127,9 @@ def load_train_config(path=None) -> TrainConfig:
         filter_max_tokens=filt["max_tokens"],
         filter_domains=tuple(filt["domains"]),
         filter_splits=tuple(filt["splits"]),
+        # absent in every pre-FLERT config, and 0 reproduces sentence-level
+        # exactly -- so the 80+ runs already on record stay re-runnable
+        context_window=int(raw.get("context_window", 0)),
         raw=raw,
     )
 
@@ -162,6 +166,12 @@ class Example:
     sent_idx: int               # index into Document.sentences, pre-filter
     tokens: list[str]
     gold_labels: list[str]
+    # FLERT context. ``tokens`` stays the SENTENCE and nothing else: decode joins
+    # it to build a term string and spans index into it, so widening it would
+    # move every span key. The context lives beside it and is only ever fed to
+    # the tokenizer, scored nowhere.
+    left_context: list[str]
+    right_context: list[str]
     input_ids: list[int]
     attention_mask: list[int]
     labels: list[int]
@@ -170,6 +180,24 @@ class Example:
     @property
     def n_subwords(self) -> int:
         return len(self.input_ids)
+
+    @property
+    def n_left(self) -> int:
+        return len(self.left_context)
+
+    @property
+    def n_words(self) -> int:
+        """Length of the list ``word_ids`` indexes into: left + sentence + right.
+
+        ``recover_token_labels`` needs this, not ``len(tokens)`` -- with context on,
+        a word_id of 0 is the first CONTEXT token, not the first sentence token.
+        """
+        return len(self.left_context) + len(self.tokens) + len(self.right_context)
+
+    @property
+    def sentence_slice(self) -> slice:
+        """Where the sentence sits inside that list."""
+        return slice(self.n_left, self.n_left + len(self.tokens))
 
     @property
     def represented_indices(self) -> set[int]:
@@ -219,6 +247,77 @@ class Example:
         return (self.file_id, self.sent_idx)
 
 
+
+def _subword_counts(tokenizer, tokens: list[str]) -> list[int]:
+    """Subwords each dataset token costs. Read from ``word_ids``, never guessed."""
+    if not tokens:
+        return []
+    word_ids = tokenizer(tokens, is_split_into_words=True,
+                         add_special_tokens=False).word_ids()
+    counts = [0] * len(tokens)
+    for w in word_ids:
+        if w is not None:
+            counts[w] += 1
+    return counts
+
+
+def _fit(counts: list[int], budget: int, *, from_end: bool) -> int:
+    """How many tokens fit in ``budget`` subwords, taken from the end (left
+    context, nearest the sentence) or the start (right context)."""
+    used = taken = 0
+    order = range(len(counts) - 1, -1, -1) if from_end else range(len(counts))
+    for i in order:
+        if used + counts[i] > budget:
+            break
+        used += counts[i]
+        taken += 1
+    return taken
+
+
+def _trim_context(tokenizer, left, right, sentence, max_length):
+    """Fit context into whatever the SENTENCE leaves over.
+
+    The sentence is budgeted first and never trimmed here. Without this rule,
+    context prepended to a sentence pushes the sentence's own tail past the
+    truncation frontier, those tokens lose their labels, and recall drops for a
+    reason that is not the feature under test -- a context run would look worse
+    than the baseline because of bookkeeping.
+
+    A sentence that does not fit on its own gets no context and truncates exactly
+    as it did before, so the 8 sentences T6 measured behave identically.
+    """
+    n_special = tokenizer.num_special_tokens_to_add(pair=False)
+    room = max_length - n_special - sum(_subword_counts(tokenizer, sentence))
+    if room <= 0:
+        return [], []
+
+    left_counts = _subword_counts(tokenizer, left)
+    right_counts = _subword_counts(tokenizer, right)
+    if sum(left_counts) + sum(right_counts) <= room:
+        return left, right          # the common case: nothing to trim
+
+    # split the room, then hand whatever one side does not use to the other
+    half = room // 2
+    n_left = _fit(left_counts, half, from_end=True)
+    spent = sum(left_counts[len(left) - n_left:])
+    n_right = _fit(right_counts, room - spent, from_end=False)
+    return left[len(left) - n_left:] if n_left else [], right[:n_right]
+
+
+def recover_sentence_labels(example: "Example", position_label_ids, id2label) -> list[str]:
+    """``recover_token_labels`` over the full left+sentence+right list, sliced back
+    to the sentence.
+
+    A wrapper, not a reimplementation: the hand-written function in
+    ``src/data/align.py`` still does the work, and with ``context_window=0`` the
+    slice is the whole list, so the no-context path is unchanged.
+    """
+    from src.data.align import recover_token_labels
+    all_labels = recover_token_labels(example.word_ids, position_label_ids,
+                                      example.n_words, id2label)
+    return all_labels[example.sentence_slice]
+
+
 def build_examples(
     domain: str,
     *,
@@ -226,6 +325,7 @@ def build_examples(
     truncation: bool,
     max_length: int | None,
     filter_max_tokens: int | None,
+    context_window: int = 0,
     data_cfg: DataConfig | None = None,
 ) -> list[Example]:
     """Tokenize and align one domain.
@@ -245,32 +345,66 @@ def build_examples(
 
     examples: list[Example] = []
     for doc in documents:
+        # The document as one token list. Context is a token BUDGET, not a
+        # sentence count -- it can span several neighbours and stop mid-sentence --
+        # so flattening turns it into two slices instead of an accumulate-and-trim
+        # loop. Built from the UNFILTERED document: the wind filter is train-only,
+        # and drawing context from filtered text would construct the feature one
+        # way on train and another on dev/test. Measured cost: 6.7% of wind's
+        # context tokens come from the dropped <=2-token sentences, 1.4% of corp's.
+        flat = [t for sent_tokens, _ in doc.sentences for t in sent_tokens]
+        position = 0
+
         for sent_idx, (tokens, labels) in enumerate(doc.sentences):
+            n = len(tokens)
+            left = flat[max(0, position - context_window):position] if context_window else []
+            right = flat[position + n:position + n + context_window] if context_window else []
+            position += n
+
             # sent_idx is bound before the filter: turning the filter on or off
             # must not renumber sentences, or span keys stop matching
             # generate_flatten_spans and every exact-span number goes quietly
-            # wrong.
+            # wrong. `position` advances above for the same reason -- a filtered
+            # sentence still occupies its place in the document.
             if filter_max_tokens is not None and len(tokens) <= filter_max_tokens:
                 continue
 
+            if context_window and truncation:
+                left, right = _trim_context(tokenizer, left, right, tokens, max_length)
+
             encoding = tokenizer(
-                tokens,
+                list(left) + list(tokens) + list(right),
                 is_split_into_words=True,
                 truncation=truncation,
                 max_length=max_length,
             )
             word_ids = encoding.word_ids()
+            n_left = len(left)
+            # every position outside the sentence is -100: attended, never scored.
+            # align_labels is untouched -- it runs over the full list and the
+            # context entries are overwritten here.
+            label_ids = align_labels(word_ids, list(labels) if not context_window
+                                     else ["O"] * n_left + list(labels) + ["O"] * len(right),
+                                     LABEL2ID)
+            if context_window:
+                label_ids = [
+                    IGNORE_INDEX if (w is not None and not (n_left <= w < n_left + n))
+                    else lid
+                    for w, lid in zip(word_ids, label_ids)
+                ]
             examples.append(Example(
                 domain=domain,
                 file_id=doc.file_id,
                 sent_idx=sent_idx,
                 tokens=list(tokens),
                 gold_labels=list(labels),
+                left_context=list(left),
+                right_context=list(right),
                 #input_ids are indices that model will use them to look-up for emmeding vector that correspond to each model-token .
                 input_ids=encoding["input_ids"],
                 #A binary mask (1 for real tokens, 0 for padding) that instructs the encoder transformer to ignore padded positions during self-attention calculations.
                 attention_mask=encoding["attention_mask"],
-                labels=align_labels(word_ids, labels, LABEL2ID),
+                labels=label_ids,
                 word_ids=word_ids,
             ))
     return examples
@@ -446,6 +580,7 @@ def build_splits(train_cfg: TrainConfig, data_cfg: DataConfig | None = None,
                 truncation=train_cfg.truncation,
                 max_length=train_cfg.max_length if train_cfg.truncation else None,
                 filter_max_tokens=train_cfg.filter_for(domain, split),
+                context_window=train_cfg.context_window,
                 data_cfg=data_cfg,
             ))
         dataset = ATEDataset(examples)
