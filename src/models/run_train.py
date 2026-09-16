@@ -39,7 +39,7 @@ from src.data.dataset import (ID2LABEL, LABEL2ID, build_splits, get_tokenizer,
                               load_train_config)
 from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
-from src.eval.surface import generate_flatten_spans
+from src.eval.surface import generate_flatten_spans, write_term_list
 from src.models.train_loop import build_optimizer_and_scheduler, evaluate, train_step
 from src.stats.loading import load_config
 
@@ -183,6 +183,11 @@ def main() -> None:
                              "Off by default: T8-T10 are 55 runs and none of them needs a "
                              "checkpoint. T11's breakdowns do -- they need per-span "
                              "predictions from a concrete model.")
+    parser.add_argument("--dump-terms", action="store_true",
+                        help="write the predicted htfl term list to "
+                             "results/runs/<group>/terms_seed_<n>.txt, contract format. "
+                             "T11's breakdowns are set intersections against the gold key, "
+                             "so this list is all they need -- no checkpoint required")
     parser.add_argument("--tag", default="", help="suffix for the run id")
     parser.add_argument("--group", default="",
                         help="subdirectory under results/runs/ to write into. T9 gives "
@@ -339,6 +344,7 @@ def main() -> None:
     print(f"  best epoch {best_epoch} ({dev_domain} list_ann_f1 {best_equi_f1:.4f})"
           + ("  COLLAPSED" if record["collapsed"] else ""))
 
+    pred_terms = None
     if not args.skip_test:
         # htfl is evaluated ONCE per run, on the best-equi weights -- never per
         # epoch. Selection already happened above, on equi.
@@ -347,7 +353,10 @@ def main() -> None:
         test_gold_spans = generate_flatten_spans(test_domain)
         test = evaluate(model, splits.loaders["test"], splits.datasets["test"],
                         device=device, id2label=ID2LABEL, gold_lists=test_gold,
-                        gold_spans=test_gold_spans)
+                        gold_spans=test_gold_spans, return_terms=args.dump_terms)
+        # popped before the record is built: a set is not JSON-serialisable, and
+        # the terms belong in their own file, not in the run log
+        pred_terms = test.pop("pred_terms", None)
         record["test"] = test
         record["htfl_f1"] = test["list_ann_f1"]
         print(f"  {test_domain} list_ann_f1 {test['list_ann_f1']:.4f} "
@@ -385,6 +394,21 @@ def main() -> None:
         f"--group must be a relative path under results/runs/: {args.group!r}"
     out_dir = _RUNS_JSON / args.group if args.group else _RUNS_JSON
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # the T11 artifact. Contract format via write_term_list -- sorted, lowercased,
+    # one per line -- so it loads back through load_gold_list_into_set like any
+    # other term list, and the breakdowns are set operations against the gold key.
+    if pred_terms is not None:
+        assert len(pred_terms) == record["test"]["n_pred_types"], (
+            f'term list has {len(pred_terms)} entries but evaluate() reported '
+            f'{record["test"]["n_pred_types"]} predicted types')
+        terms_path = out_dir / f"terms_seed_{seed}.txt"
+        write_term_list(pred_terms, str(terms_path))
+        record["test_term_list"] = {"path": str(terms_path.relative_to(_REPO_ROOT)),
+                                    "n_terms": len(pred_terms)}
+        print(f"  wrote {len(pred_terms):,} predicted {test_domain} terms to "
+              f"{terms_path.relative_to(_REPO_ROOT)}")
+
     out = out_dir / f"seed_{seed}.json"
     out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out.relative_to(_REPO_ROOT)}")

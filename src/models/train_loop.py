@@ -112,6 +112,10 @@ def evaluate(
     #Loaded once by the caller, like gold_lists -- evaluate() never reads the
     #corpus. None gives list metrics only, which is what a smoke run wants.
     gold_spans: set[Span] | None = None,
+    #T11: hand the predicted unique list back so the caller can write it. Off by
+    #default -- it is wanted once per run, on htfl at the best epoch, and a
+    #2,700-term set carried through every dev epoch would land in the run JSON.
+    return_terms: bool = False,
 ) -> dict:
     model.eval()
     spans_used_for_uniqe_list = [] 
@@ -165,6 +169,9 @@ def evaluate(
     #the without_named_entities labels -- one set per domain. ANN/NES is a
     #property of the answer KEY and exists only in the list metric, so there is
     #exactly one exact-span number per split, not one per key.
+    if return_terms :
+        results["pred_terms"] = uniqe_list_predicted
+
     if gold_spans is not None :
         exact_span_precision , exact_span_recall , exact_span_f1 = score_exact_spans(model_flatten_spans , gold_spans)
         results["span_p"] = exact_span_precision
