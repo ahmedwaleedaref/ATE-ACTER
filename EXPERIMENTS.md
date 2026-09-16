@@ -897,3 +897,115 @@ Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
 which come from rounding P and R to 4 dp before combining. Same measurement,
 1 in the fourth decimal.
 -->
+
+---
+
+## E08 — T11, error analysis on the selected model
+
+**Entry written after the runs**, like E02, E04 and E05. No prediction was
+recorded in advance *for this run* — but the two predictions it resolves were
+both logged long before it, in `Data_stats.md` §8.2 and the T3 spec, which is
+what this entry exists to settle.
+
+**Purpose:** E05's cell saved no weights and no predictions, so T11's breakdowns
+had nothing to read. `{1e-5, 5}` is re-run with `--dump-terms`, which writes the
+predicted htfl unique list. Recall by length and by gold frequency are set
+intersections against the gold key, so the list is sufficient and no checkpoint
+is needed. Exact-span F1 and the invalid-tag counts come from `evaluate()`,
+wired for this run.
+
+**Config:** identical to E05's selected cell — `microsoft/deberta-v3-base`,
+LR 1e-5, 5 epochs, effective batch 16, warmup 10%, seeds 42–46. Kaggle T4.
+Artifacts in `results/runs/t11/deberta_lr1e-05_e5_terms/`.
+
+### It reproduces E05
+
+| | E08 | E05 |
+|---|--:|--:|
+| equi (dev) | 0.5592 ± 0.0090 | 0.5590 ± 0.0086 |
+| htfl (test) | 0.5782 ± 0.0230 | 0.5784 ± 0.0228 |
+
+**Three of five seeds reproduced bit-identically** — 44, 45 and 46 match E05 on
+best epoch and on every digit of both F1s. Seeds 42 and 43 drifted at the fourth
+decimal. So the nondeterminism E04 measured is real but narrower than a repeated
+seed suggested, and `{1e-5, 5}` is confirmed at a second sitting.
+
+### Prediction 1 — REFUTED
+
+`Data_stats.md` §8.2, logged contrarian: recall on multi-word htfl terms should
+exceed single-word, via head-position transfer.
+
+| length | gold | ceiling | recall | / ceiling |
+|---|--:|--:|--:|--:|
+| 1 | 1,029 | 0.8980 | 0.6503 ± 0.0273 | 0.724 |
+| 2 | 754 | 0.9549 | 0.6467 ± 0.0371 | 0.677 |
+| 3 | 366 | 0.9508 | 0.5973 ± 0.0332 | 0.628 |
+| 4+ | 190 | 0.9842 | 0.2621 ± 0.0365 | 0.266 |
+
+Single-word **0.6503 ± 0.0273** against multi-word **0.5771 ± 0.0324**. Recall
+falls monotonically with length, on the raw column and on the ceiling-normalised
+one. This is the standard ATE finding; the contrarian prediction is refuted, and
+§8.2 said in advance that this was the expected outcome.
+
+**The ceiling is not flat across length and the table must carry it.** Gold
+decode recovers 0.8980 of 1-token terms against 0.9842 of 4+, because nested
+terms are overwhelmingly short — 105 of the 160 unreachable htfl terms are
+single-token. Raw recall is therefore tilted ~6 points *toward* the prediction,
+and it still fails.
+
+**The 4+ cliff has a training-side explanation.** 4+ terms are 1.6% of training
+occurrences and 8.1% of the htfl key — a 5× under-representation (§5 of the
+breakdown). Note this does not license oversampling long terms in training:
+equi's 4+ share is **1.8%**, the lowest of all four domains, so that change has
+no dev signal and could only be justified on htfl.
+
+### Prediction 2 — REFUTED
+
+T3 spec: span F1 high with list F1 low — frequent terms found, rare types
+missed. The two landing close together "would be surprising".
+
+| metric | P | R | F1 |
+|---|--:|--:|--:|
+| unique-list | 0.5515 ± 0.0363 | 0.6093 ± 0.0278 | 0.5782 ± 0.0230 |
+| exact-span | 0.6729 ± 0.0354 | 0.5017 ± 0.0218 | 0.5746 ± 0.0242 |
+
+Gap, paired per seed: **−0.0036 ± 0.0041** — indistinguishable from zero.
+
+**The close F1s are arithmetic, not uniform performance.** P and R are inverted
+between the metrics. A type needs only one correct occurrence to count, so list
+recall exceeds span recall; a correct frequent term contributes ~50 span true
+positives but one type true positive, so span precision exceeds list precision.
+The two trade-offs happen to meet at the same F1.
+
+### Recall by gold frequency
+
+| frequency | gold | share | recall |
+|---|--:|--:|--:|
+| 0 — never a maximal span | 160 | 0.068 | 0.2288 ± 0.0175 |
+| 1 — singleton | 1,115 | 0.477 | 0.5440 ± 0.0363 |
+| ≥ 2 | 1,064 | 0.455 | 0.7350 ± 0.0250 |
+
+Frequent terms beat singletons by **19 points**. The singleton bucket is 47.7%
+of the key, so it holds far more recoverable mass than the 4+ bucket does.
+
+**`data_layout.md` §5.1 is too strong and this measures it.** It claims a term
+occurring only nested inside a longer term is one "no BIO tagger can ever emit".
+The model recovers **0.2288 ± 0.0175** of that bucket — 34 of 160 types. A tagger
+that segments differently from gold can emit a nested term as its own maximal
+span; it costs the longer term, but it is not impossible. `max_recall` bounds a
+tagger that reproduces gold segmentation, not an arbitrary one.
+
+### Invalid tag sequences — a CRF is not worth considering
+
+| pattern | count |
+|---|--:|
+| `I` opening a sentence | **0** in all five seeds |
+| `I` after `O` | 185.2 ± 29.3 |
+| predicted spans | 7,193 ± 335 |
+
+**0.0258 ± 0.0045 dangling runs per predicted span.** Gold htfl is (1, 0), so
+these are the model's alone. At 2.6%, with the dangling-I policy already dropping
+them in `decode`, a CRF would be constraining a violation the model barely
+commits. Closed.
+
+**Reading:**

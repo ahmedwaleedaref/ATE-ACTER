@@ -1,0 +1,235 @@
+{
+  "run_id": "20260916-111119_microsoft-deberta-v3-base_lr1e-05_e5_seed43",
+  "started": "2026-09-16T11:11:26+00:00",
+  "git": {
+    "commit": "884c7d9444d6a6c2da917b56be3233d91a31db7c",
+    "dirty": true
+  },
+  "device": "cuda",
+  "gpu": "Tesla T4",
+  "seed": 43,
+  "encoder_weight_hash": "eef90bafbd38f054c1a333c865eb54f238695d14935008d1906d19aaa8ec9e36",
+  "versions": {
+    "torch": "2.10.0+cu128",
+    "transformers": "5.16.1"
+  },
+  "cudnn_deterministic": false,
+  "config": {
+    "_purpose": "What one run does. configs/data.json says where the corpus is and how it is split; that file is stable all month and is read by week-1 code. This one varies per run and is copied into results/ with every experiment.",
+    "model_name": "microsoft/deberta-v3-base",
+    "hf_cache_dir": ".hf/hub",
+    "max_length": 256,
+    "truncation": true,
+    "effective_train_batch_size": 16,
+    "per_device_train_batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "_batch_note": "16 is the hyperparameter. 4 GB of VRAM is binding, so it is reached as 8 x 2 accumulation steps. T9's grid is stated in EFFECTIVE batch size; per-device size is a memory knob and must never be read as the hyperparameter. per_device * gradient_accumulation_steps == effective is asserted on load.",
+    "eval_batch_size": 32,
+    "learning_rate": 1e-05,
+    "num_epochs": 5,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "_clip_note": "torch.nn.utils.clip_grad_norm_ on the accumulated gradient, once per optimizer step, before optimizer.step(). 1.0 is the HF Trainer default, so it matches the published BERT fine-tuning recipes T5 compares against. Fixed for T7-T12: it is a constant of the setup, not a tuned hyperparameter. If it ever varies it becomes an experimental axis and needs its own row in the results.",
+    "lr_schedule": "linear",
+    "warmup_ratio": 0.1,
+    "seed": 43,
+    "device": "auto",
+    "log_every_steps": 50,
+    "save_checkpoint": false,
+    "_run_note": "device auto -> cuda when available, else cpu; never hardcoded, because T10 may run on Colab and a code edit between runs stops results being comparable. log_every_steps counts OPTIMIZER steps. Checkpoints go to /runs/<run_id>/ which is gitignored; the JSON log goes to results/runs/<run_id>.json which is tracked.",
+    "length_grouped_batching": true,
+    "_length_grouped_note": "Batches are formed from length-sorted megabatches so padding, and therefore peak activation memory, is bounded by the batch's own longest sentence rather than the corpus maximum. Order within an epoch still varies with the seed.",
+    "short_sentence_filter": {
+      "max_tokens": 2,
+      "domains": [
+        "wind"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    "_filter_note": "data_layout.md section 2. Applied by the wrapper after load_domain returns, never inside the loader, and passed to build_examples as an explicit parameter: set domains to [] to run with it off without editing code. It must never apply to equi or htfl.",
+    "filter_max_tokens": 2,
+    "filter_domains": [
+      "wind"
+    ],
+    "filter_splits": [
+      "train"
+    ]
+  },
+  "overrides": {
+    "model_name": "microsoft/deberta-v3-base",
+    "num_epochs": 5,
+    "learning_rate": 1e-05
+  },
+  "data": {
+    "train_domains": [
+      "corp",
+      "wind"
+    ],
+    "dev_domain": "equi",
+    "test_domain": "htfl",
+    "n_train": 4592,
+    "n_dev": 3090,
+    "n_test": 2432,
+    "micro_batches_per_epoch": 574,
+    "total_optimizer_steps": 1435,
+    "limit_train": null
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.3572311620580889,
+      "dev": {
+        "n_pred_spans": 5823,
+        "n_pred_types": 1326,
+        "n_i_sentence_initial": 0,
+        "n_i_after_o": 247,
+        "list_ann_p": 0.5060331825037707,
+        "list_ann_r": 0.5855148342059336,
+        "list_ann_f1": 0.5428802588996764,
+        "list_nes_p": 0.5135746606334841,
+        "list_nes_r": 0.43625880845611786,
+        "list_nes_f1": 0.4717700034638032,
+        "span_p": 0.740340030911901,
+        "span_r": 0.4976910644193027,
+        "span_f1": 0.5952364515015534
+      },
+      "equi_f1": 0.5428802588996764,
+      "equi_p": 0.5060331825037707,
+      "equi_r": 0.5855148342059336,
+      "seconds": 83.1
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.08393732496613932,
+      "dev": {
+        "n_pred_spans": 5005,
+        "n_pred_types": 1115,
+        "n_i_sentence_initial": 0,
+        "n_i_after_o": 159,
+        "list_ann_p": 0.5417040358744395,
+        "list_ann_r": 0.5270506108202443,
+        "list_ann_f1": 0.5342768686421937,
+        "list_nes_p": 0.5497757847533632,
+        "list_nes_r": 0.39269698910954515,
+        "list_nes_f1": 0.45814648729446933,
+        "span_p": 0.7298701298701299,
+        "span_r": 0.4217270838143616,
+        "span_f1": 0.5345723275042072
+      },
+      "equi_f1": 0.5342768686421937,
+      "equi_p": 0.5417040358744395,
+      "equi_r": 0.5270506108202443,
+      "seconds": 83.9
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.05412881492044069,
+      "dev": {
+        "n_pred_spans": 5382,
+        "n_pred_types": 1195,
+        "n_i_sentence_initial": 0,
+        "n_i_after_o": 182,
+        "list_ann_p": 0.5330543933054394,
+        "list_ann_r": 0.555846422338569,
+        "list_ann_f1": 0.5442118752669799,
+        "list_nes_p": 0.5405857740585774,
+        "list_nes_r": 0.4138372837924407,
+        "list_nes_f1": 0.46879535558780844,
+        "span_p": 0.7346711259754738,
+        "span_r": 0.4564765643038559,
+        "span_f1": 0.5630874394759328
+      },
+      "equi_f1": 0.5442118752669799,
+      "equi_p": 0.5330543933054394,
+      "equi_r": 0.555846422338569,
+      "seconds": 83.7
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.03982787587648892,
+      "dev": {
+        "n_pred_spans": 5800,
+        "n_pred_types": 1239,
+        "n_i_sentence_initial": 0,
+        "n_i_after_o": 139,
+        "list_ann_p": 0.5205811138014528,
+        "list_ann_r": 0.56282722513089,
+        "list_ann_f1": 0.5408805031446541,
+        "list_nes_p": 0.5262308313155771,
+        "list_nes_r": 0.4176809737347854,
+        "list_nes_f1": 0.46571428571428575,
+        "span_p": 0.7306896551724138,
+        "span_r": 0.48926344954975753,
+        "span_f1": 0.5860876780528281
+      },
+      "equi_f1": 0.5408805031446541,
+      "equi_p": 0.5205811138014528,
+      "equi_r": 0.56282722513089,
+      "seconds": 83.7
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.03326189683663873,
+      "dev": {
+        "n_pred_spans": 5118,
+        "n_pred_types": 1106,
+        "n_i_sentence_initial": 0,
+        "n_i_after_o": 127,
+        "list_ann_p": 0.5506329113924051,
+        "list_ann_r": 0.5314136125654451,
+        "list_ann_f1": 0.5408525754884548,
+        "list_nes_p": 0.5560578661844484,
+        "list_nes_r": 0.3939782190903267,
+        "list_nes_f1": 0.4611923509561305,
+        "span_p": 0.7330988667448222,
+        "span_r": 0.4331563149388132,
+        "span_f1": 0.5445573294629898
+      },
+      "equi_f1": 0.5408525754884548,
+      "equi_p": 0.5506329113924051,
+      "equi_r": 0.5314136125654451,
+      "seconds": 84.0
+    }
+  ],
+  "first_batch_indices": [
+    4439,
+    572,
+    108,
+    4257,
+    2755,
+    2562,
+    2144,
+    3652,
+    3718,
+    2285
+  ],
+  "best_epoch": 3,
+  "best_equi_f1": 0.5442118752669799,
+  "htfl_f1": 0.5783183952198037,
+  "collapsed": false,
+  "test": {
+    "n_pred_spans": 6910,
+    "n_pred_types": 2347,
+    "n_i_sentence_initial": 0,
+    "n_i_after_o": 186,
+    "list_ann_p": 0.5773327652322113,
+    "list_ann_r": 0.579307396323215,
+    "list_ann_f1": 0.5783183952198037,
+    "list_nes_p": 0.5896889646357052,
+    "list_nes_r": 0.5414710485133021,
+    "list_nes_f1": 0.5645523149092394,
+    "span_p": 0.6858176555716353,
+    "span_r": 0.4918015774180158,
+    "span_f1": 0.5728272694306782
+  },
+  "reason": "T11 error analysis: deberta {1e-5,5} re-run with term dump",
+  "realised_optimizer_steps": 1435,
+  "finished": "2026-09-16T11:18:44+00:00",
+  "wall_time_sec": 437.8,
+  "test_term_list": {
+    "path": "results/runs/t11/deberta_lr1e-05_e5/terms_seed_43.txt",
+    "n_terms": 2347
+  }
+}
