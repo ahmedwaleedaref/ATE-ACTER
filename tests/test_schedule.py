@@ -96,7 +96,7 @@ def test_train_config_reads_every_key_in_the_file(cfg):
     prose notes and are excluded.
     """
     stated = {k for k in cfg.raw if not k.startswith("_")}
-    nested = {"short_sentence_filter"}          # flattened into filter_* fields
+    nested = {"short_sentence_filter", "rare_term_weighting"}          # flattened into filter_* fields
     fields = {f.name for f in dataclasses.fields(cfg)}
     missing = (stated - nested) - fields
     assert not missing, f"configs/train.json states {sorted(missing)}, TrainConfig ignores them"
