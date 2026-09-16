@@ -39,6 +39,7 @@ from src.data.dataset import (ID2LABEL, LABEL2ID, build_splits, get_tokenizer,
                               load_train_config)
 from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
+from src.eval.surface import generate_flatten_spans
 from src.models.train_loop import build_optimizer_and_scheduler, evaluate, train_step
 from src.stats.loading import load_config
 
@@ -251,6 +252,10 @@ def main() -> None:
 
     dev_domain, test_domain = data_cfg.dev_domain, data_cfg.test_domain
     dev_gold = gold_for(dev_domain, data_cfg, eval_cfg)
+    # decoded gold spans, loaded once here for the same reason the gold lists
+    # are: evaluate() never touches the corpus. One set per domain -- exact-span
+    # F1 has no ANN/NES split, that distinction lives only in the unique lists.
+    dev_gold_spans = generate_flatten_spans(dev_domain)
 
     record = {
         "run_id": run_id,
@@ -299,7 +304,8 @@ def main() -> None:
                                step_counter=step_counter,
                                first_indices=record["first_batch_indices"] if epoch == 1 else None)
         dev = evaluate(model, splits.loaders["dev"], splits.datasets["dev"],
-                       device=device, id2label=ID2LABEL, gold_lists=dev_gold)
+                       device=device, id2label=ID2LABEL, gold_lists=dev_gold,
+                       gold_spans=dev_gold_spans)
         # ANN unique-list F1 is the headline metric (configs/eval.yaml), and the
         # per-seed statistic T8 fixes is the best epoch on equi under it
         equi_f1 = dev["list_ann_f1"]
@@ -338,8 +344,10 @@ def main() -> None:
         # epoch. Selection already happened above, on equi.
         model.load_state_dict(best_state)
         test_gold = gold_for(test_domain, data_cfg, eval_cfg)
+        test_gold_spans = generate_flatten_spans(test_domain)
         test = evaluate(model, splits.loaders["test"], splits.datasets["test"],
-                        device=device, id2label=ID2LABEL, gold_lists=test_gold)
+                        device=device, id2label=ID2LABEL, gold_lists=test_gold,
+                        gold_spans=test_gold_spans)
         record["test"] = test
         record["htfl_f1"] = test["list_ann_f1"]
         print(f"  {test_domain} list_ann_f1 {test['list_ann_f1']:.4f} "

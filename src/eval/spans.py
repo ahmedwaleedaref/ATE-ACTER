@@ -49,6 +49,48 @@ def decode(tokens: list[str], labels: list[str], scheme: str) -> list[tuple[int,
 
     return span_list
 
+def count_invalid_tags(labels: list[str], scheme: str) -> dict[str, int]:
+    """
+    Count the IOB2 violations in ONE sentence's label sequence.
+
+    labels : one label per DATASET token -- the recovered token labels from model predictions .
+    scheme : only "bio" is implemented. NOBI has different rules and must not
+             reuse this count.
+
+    IOB2 has exactly two illegal patterns, both about the PREDECESSOR:
+        - "I" with no predecessor       (sentence-initial)
+        - "I" whose predecessor is "O"
+    "I" after "B" and "I" after "I" are both legal.
+
+    Gold is strict IOB2 by measurement -- data_layout.md section 3. Summed over a
+    domain: corp (0, 0), equi (0, 0), wind (2, 0), htfl (1, 0), with 0 I-after-O
+    across all 222,281 tokens and three sentence-initial "I" corpus-wide. So any
+    nonzero count from a model is entirely the model's, with no contribution from
+    the data.
+    """
+    assert scheme == "bio", f"unsupported scheme: {scheme}"
+
+    i_sentence_initial: int = 0
+    i_after_o: int = 0
+
+    for index, label in enumerate(labels):
+
+        if label not in ("O", "B", "I"):
+            raise ValueError(f"unknown label {label!r} at index {index}")
+
+        if label != "I":
+            continue
+
+        if index == 0:
+            i_sentence_initial += 1
+        elif labels[index - 1] == "O":
+            i_after_o += 1
+
+    return {
+        "i_sentence_initial": i_sentence_initial,
+        "i_after_o": i_after_o,
+    }
+
 def encode(tokens: list[str], spans: list[tuple[int, int]], scheme: str ) : 
     """
     encode is inverse of decode it takes tokens and spans and generate the labels . 

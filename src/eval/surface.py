@@ -78,6 +78,19 @@ def generate_flatten_spans(domain: str):
 
     return set(flatten_spans)
 
+def generate_flatten_spans_for_model_prediction(model_sentences : list[tuple[str , int , list[tuple[int,int]]]] ):
+    flatten_spans : list[Span] = []
+    for sentence in model_sentences : 
+        file_name : str = sentence[0]
+        sentence_id : int = sentence[1]
+        spans = sentence[2]
+        for span in spans : 
+            flatt_span = (file_name , sentence_id , span[0] , span[1])
+            flatten_spans.append(flatt_span)
+    
+    assert len(flatten_spans) == len(set(flatten_spans)), "duplicate span keys — file_id or sent_idx collision"
+        
+    return set(flatten_spans) 
 
 def write_term_list(terms: set[str], path: str) -> None:
     """

@@ -15,13 +15,15 @@ learned building it.
 |---|---|---|
 | `decode` | `src/eval/spans.py` | `(tokens, labels, scheme) -> list[(start, end)]` |
 | `encode` | `src/eval/spans.py` | `(tokens, spans, scheme) -> list[str]` |
+| `count_invalid_tags` | `src/eval/spans.py` | `(labels, scheme) -> dict[str, int]` |
 | `spans_to_unique_list` | `src/eval/surface.py` | `(sentences) -> (set, n_spans, n_unique)` |
 | `generate_unique_list` | `src/eval/surface.py` | `(domain) -> (set, n_spans, n_unique)` |
 | `write_term_list` | `src/eval/surface.py` | `(terms, path)` |
 | `load_gold_list_into_set` | `src/eval/scorers.py` | `(path) -> set[str]` |
 | `score_list` | `src/eval/scorers.py` | `(pred, gold) -> (P, R, F1)` |
 | `score_exact_spans` | `src/eval/scorers.py` | `(pred, gold) -> (P, R, F1)` |
-| `generate_flatten_spans` | `src/eval/scorers.py` | `(domain) -> set[Span]` |
+| `generate_flatten_spans` | `src/eval/surface.py` | `(domain) -> set[Span]` |
+| `generate_flatten_spans_for_model_prediction` | `src/eval/surface.py` | `(sentences) -> set[Span]` |
 | `compute_ceilings` | `src/eval/run_eval.py` | `(domain, config) -> dict` |
 
 Plus `src/eval/score_baseline.py`, `configs/eval.yaml`, and 30 tests in `tests/`.
@@ -75,6 +77,23 @@ past a loader missing `.strip()`. Two bugs cancelling — and the output was not
 contract format, so T4's C-Value list and the week-2 model output would not have
 loaded. The strip belongs in the loader, where it is inert on gold TSVs and
 load-bearing on contract files.
+
+**Exact-span F1 has no ANN/NES key.** Gold spans are decoded from the
+`without_named_entities` labels — one set per domain — so there is exactly one
+exact-span number per split, while the list metric produces one per key. The
+ANN/NES distinction is a property of the answer key and exists only in the list
+metric. `evaluate()` therefore calls `score_exact_spans` once, outside its
+per-key loop, and writes `span_p` / `span_r` / `span_f1` without a suffix.
+
+**`count_invalid_tags` counts events, not tokens.** IOB2 has two illegal
+patterns, both about the predecessor: `I` with no predecessor, and `I` after
+`O`. Both counts fire on the first `I` of a dangling run and not on its
+continuations, so `O I I O` scores one — the model opened one term without a
+`B`. Counted on the recovered token labels, never on the per-subword argmax,
+whose continuation and special-token positions are discarded unread. Gold is
+strict IOB2 (§3.1), so the counter reproduces it exactly summed per domain —
+corp (0, 0), equi (0, 0), wind (2, 0), htfl (1, 0) — and any nonzero count from
+a model is the model's alone.
 
 **`scheme` is a parameter from the start.** Only `"bio"` is implemented;
 `assert scheme == "bio"`. Week 3's NOBI is a branch inside `encode` / `decode`,
