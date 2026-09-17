@@ -7,9 +7,6 @@ rather than hardcoded, so a future change to the split is picked up here too.
 ``equi`` (dev) and ``htfl`` (test) are never loaded by this module -- counting
 either would leak evaluation-domain information into a training-time signal.
 
-New file, not a modification of ``src/data/align.py``: CLAUDE.md reserves that
-module for ``align_labels`` / ``recover_token_labels`` / ``positive_rate``.
-``align_weights`` below mirrors ``align_labels`` in logic only.
 """
 
 from __future__ import annotations
@@ -41,9 +38,7 @@ def count_term_frequencies(
 
     ``filter_max_tokens`` maps domain -> the same ``<= N tokens`` threshold
     ``TrainConfig.filter_for(domain, "train")`` returns for that domain
-    (``None`` for no filtering), so a sentence the training loader drops is
-    dropped from the count too -- counting it would inflate frequencies for
-    terms the model never actually sees.
+    (``None`` for no filtering).
     """
     data_cfg = data_cfg or load_config()
     counts: Counter[str] = Counter()
@@ -86,10 +81,7 @@ def token_weights_for_sentence(
 ) -> list[float]:
     """One weight per DATASET token (pre-subword), via the same ``decode()``
     spans used everywhere else. Every token inside one span shares that
-    span's weight; "O" tokens get ``BASELINE_WEIGHT``. A term missing from
-    ``term_frequencies`` (should not happen for train-domain sentences, but
-    guards a caller that passes an incomplete table) also gets
-    ``BASELINE_WEIGHT`` rather than raising.
+    span's weight; "O" tokens get ``BASELINE_WEIGHT``.
     """
     weights = [BASELINE_WEIGHT] * len(tokens)
     for start, end in decode(tokens, labels, "bio"):
@@ -103,10 +95,7 @@ def token_weights_for_sentence(
 
 def align_weights(word_ids: list[int | None], token_weights: list[float]) -> list[float]:
     """Mirrors ``src.data.align.align_labels`` exactly, for floats instead of
-    label ids. The first subword of each dataset token carries its weight;
-    every continuation subword and special token gets ``IGNORE_WEIGHT`` (0.0)
-    -- those positions already carry ``labels == -100``, so this is a belt-
-    and-suspenders sentinel, never the thing the mask actually relies on.
+    label ids. The first subword of each dataset token carries its weight.
     """
     prev: int | None = None
     out: list[float] = []
