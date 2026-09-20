@@ -1009,3 +1009,113 @@ them in `decode`, a CRF would be constraining a violation the model barely
 commits. Closed.
 
 **Reading:**
+
+---
+
+## E09 — document-level context (FLERT), window 32
+
+**Prediction on record, from this conversation and not backfilled:** document
+context lifts recall on rare terms, more on equi than on htfl. **Both halves are
+wrong.** Context helped frequent terms roughly twice as much as singletons, and
+the largest gain of all was on long terms, which nobody predicted.
+
+**Purpose:** add left/right document context to each sentence — attended
+(mask 1), never scored (label `-100`) — and measure it against the E08 baseline.
+
+**Measured first, before any implementation** (`results/context_fill_rate.md`).
+Fraction of sentences receiving a *full* window:
+
+| window/side | corp | wind | equi | **htfl** |
+|---|--:|--:|--:|--:|
+| 32 | 0.96 | 0.99 | 0.94 | **0.64** |
+| 64 | 0.94 | 0.99 | 0.91 | **0.43** |
+| 128 | 0.90 | 0.98 | 0.85 | **0.14** |
+| 210 | 0.86 | 0.97 | 0.76 | **0.02** |
+
+htfl documents average 292 tokens against wind's 11,553, so the feature barely
+exists on the test domain at wide windows. **32 was chosen for that reason, not
+for accuracy** — widening the window widens the train/test shift in the feature
+itself. This is a distribution shift in the input being added, and it is named
+here whichever way the result falls.
+
+### Three cells, because the first comparison was confounded
+
+`deberta_ctx32` was run at **6** epochs against E08's 5, so it changed context
+*and* the schedule — 1,722 optimizer steps instead of 1,435, a longer warmup and
+a gentler decay. A control at context 0 / 6 epochs separates them.
+
+| | equi | htfl |
+|---|--:|--:|
+| ctx 0, 5 ep (E08) | 0.5592 ± 0.0090 | 0.5782 ± 0.0230 |
+| ctx 0, 6 ep (control) | 0.5592 ± 0.0056 | 0.5877 ± 0.0178 |
+| **ctx 32, 6 ep** | **0.5866 ± 0.0031** | **0.6013 ± 0.0058** |
+
+Paired on the seed, df = 4:
+
+| effect | equi | htfl |
+|---|---|---|
+| epochs alone | −0.0000, t 0.01, 1+/4− | +0.0096, t 0.84, 3+/2− |
+| **context alone** | **+0.0274, t 7.71, 5+/0−** | +0.0136, t 1.88, 5+/0− |
+| both together | +0.0274, t 5.51, 5+/0− | +0.0231, t 2.49, 5+/0− |
+
+**On equi the gain is entirely context.** The extra epoch contributes exactly
+zero — the two ctx-0 means agree to four decimals and the sign split runs 4 of 5
+*against* it. The two isolated effects sum to the combined figure, so they do not
+interact. t = 7.71 is the largest in this project. This also re-confirms E05's
+flat epoch axis on a third setting.
+
+**On htfl context is not established.** +0.0136 at t = 1.88 is below the 2.132
+suggestive band, though 5+/0− in direction. The combined +0.0231 reaches t = 2.49
+only by adding an epoch effect that is itself undetectable. **Stated plainly:
+context helps on dev decisively and is not established on test at n = 5** — which
+is what the fill rate predicted before the run.
+
+### Variance, which is the other result
+
+equi std **0.0090 → 0.0031**, htfl **0.0230 → 0.0058**. Best epoch goes from
+scattered to locked — `4,3,1,1,5` (E08) and `5,6,1,6,2` (control) against
+`5,5,5,5,6` with context. Six epochs *without* context leaves it scattered, so
+the stabilisation is context's doing and not the schedule's.
+
+### Breakdowns, ctx32 against E08
+
+| bucket | ctx32 | E08 | diff |
+|---|--:|--:|--:|
+| length 1 | 0.6696 ± 0.0232 | 0.6503 ± 0.0273 | +0.019 |
+| length 2 | 0.6310 ± 0.0169 | 0.6467 ± 0.0371 | −0.016 |
+| length 3 | 0.6224 ± 0.0228 | 0.5973 ± 0.0332 | +0.025 |
+| **length 4+** | **0.3368 ± 0.0283** | 0.2621 ± 0.0365 | **+0.075** |
+| freq 0 | 0.2100 ± 0.0511 | 0.2288 ± 0.0175 | −0.019 |
+| freq 1 (singleton) | 0.5552 ± 0.0206 | 0.5440 ± 0.0363 | +0.011 |
+| freq ≥ 2 | 0.7556 ± 0.0197 | 0.7350 ± 0.0250 | +0.021 |
+
+**The prediction is refuted in both halves.** Singletons gained +0.011 against
++0.021 for frequent terms — context helped the frequent bucket about twice as
+much, the opposite of the prediction. And the mechanism proposed for it was
+always weak: a singleton occurs once, so context supplies topic, never a second
+sighting of the term.
+
+**What context actually helped is length.** 4+ recall rose 0.2621 → 0.3368, the
+largest move in the table by a factor of three, and the 4+ bucket is exactly
+where the training distribution is thinnest (1.6% of training occurrences against
+8.1% of the htfl key, E08 §5). A context mechanism explains that better than a
+rare-term one.
+
+`I`-after-`O` did not worsen: 131–196 with context against 150–229 without.
+
+### Caveats
+
+**The control cell has no artifacts.** Kaggle cleared `/kaggle/working` before
+the version was saved, so ctx 0 / 6 ep exists only as console-transcribed
+headline numbers — no run JSONs, no term lists, no `span_f1`, no invalid-tag
+counts, and `src/aggregate.py` cannot read it. Same status as E04.
+
+**The within-htfl fill-rate check is not done.** htfl's 190 documents are not
+uniform, and whether the gain tracks fill rate inside htfl is what separates
+"context does not help there" from "context was not there". It needs
+per-document predictions; the term dump is deduplicated corpus-wide and cannot
+answer it.
+
+**Window 64 is untried.** It was to be run only if 32 helped. It does, on dev.
+
+**Reading:**
