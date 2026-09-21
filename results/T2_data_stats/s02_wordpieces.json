@@ -1,5 +1,5 @@
 {
-  "generated_by": "src/stats/s02_wordpieces.py",
+  "generated_by": "src/statistics/s02_wordpieces.py",
   "tokenizers": [
     {
       "name": "bert-base-cased",

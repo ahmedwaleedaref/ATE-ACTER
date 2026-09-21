@@ -22,7 +22,7 @@ from src.data.dataset import (
     get_tokenizer,
     load_train_config,
 )
-from src.stats.loading import load_config
+from src.statistics.loading import load_config
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_OUT = _REPO_ROOT / "results" / "t6_alignment.md"

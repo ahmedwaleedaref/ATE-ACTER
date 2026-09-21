@@ -22,7 +22,7 @@ from seqeval.scheme import IOB2
 
 from src.eval.scorers import score_exact_spans
 from src.eval.spans import decode, encode
-from src.stats.loading import load_domain
+from src.statistics.loading import load_domain
 
 _DOMAINS = ("corp", "equi", "wind", "htfl")
 _SEED = 1234

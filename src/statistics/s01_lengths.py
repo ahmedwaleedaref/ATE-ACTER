@@ -16,11 +16,11 @@ Integrity check (blocking): inventory ratio -- paired-file tokens /
 whole-domain-corpus tokens, same unit on both sides. Raises if wind's ratio
 reaches 0.30 (the signature of having loaded the unannotated wind corpus).
 
-Outputs, written to results/data_stats/ only after the check passes:
+Outputs, written to results/T2_data_stats/ only after the check passes:
   s01_lengths.md    -- the rendered tables (byte-identical to what is printed)
   s01_lengths.json  -- every raw number, plus config for provenance
 
-Run:  python -m src.stats.s01_lengths        (or: python src/stats/s01_lengths.py)
+Run:  python -m src.statistics.s01_lengths        (or: python src/statistics/s01_lengths.py)
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.stats.loading import (  # noqa: E402
+from src.statistics.loading import (  # noqa: E402
     DataConfig,
     inventory_ratios,
     load_config,
@@ -42,7 +42,7 @@ from src.stats.loading import (  # noqa: E402
 )
 
 PERCENTILES = (50, 90, 95, 99)
-_OUT_DIR = _REPO_ROOT / "results" / "data_stats"
+_OUT_DIR = _REPO_ROOT / "results" / "T2_data_stats"
 
 PERCENTILE_DEFINITION = (
     "sort ascending, nearest-rank; 0-based index = ceil(p/100 * n) - 1, "
@@ -172,7 +172,7 @@ def render(cfg, per_domain, pooled, ratios) -> str:
 
 def build_payload(cfg, per_domain, pooled, ratios) -> dict:
     return {
-        "generated_by": "src/stats/s01_lengths.py",
+        "generated_by": "src/statistics/s01_lengths.py",
         "config": {
             "data_root": str(cfg.data_root),
             "language": cfg.language,

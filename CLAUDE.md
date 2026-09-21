@@ -3,7 +3,7 @@
 - Pin every dependency version; no unpinned installs
 - Hand-written by the author — do not generate or refactor:
   - the evaluation harness (src/eval/)
-  - the loader (src/stats/loading.py)
+  - the loader (src/statistics/loading.py)
   - src/data/align.py — align_labels, recover_token_labels, positive_rate
   Exception, week 2 onward: the rest of src/data/ (dataset.py, run_gate.py)
   and the training loop are generated scaffolding around those. The rule is

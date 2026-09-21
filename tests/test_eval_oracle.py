@@ -11,7 +11,7 @@ covers argmax, recover_token_labels, decode, spans_to_unique_list, score_list,
 the example_index round trip, and the fact that padded positions never produce
 a span. If it passes, a bad score later is the model, not the plumbing.
 
-The ceilings are measured facts from ``results/ceilings.md`` (docs/data_layout.md
+The ceilings are measured facts from ``results/T3_eval_harness/ceilings.md`` (docs/data_layout.md
 section 5.5). They are not adjustable: if this test fails, the eval path is
 wrong, or a decision recorded in docs/ was changed without re-measuring.
 """
@@ -27,7 +27,7 @@ from src.data.dataset import (ATEDataset, ID2LABEL, build_dataloader, build_exam
 from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
 from src.models.train_loop import evaluate
-from src.stats.loading import load_config
+from src.statistics.loading import load_config
 
 # domain -> (n_spans, n_types, {key: (max_precision, max_recall)})
 CEILINGS = {

@@ -21,7 +21,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from src.stats.loading import load_config, load_domain
+from src.statistics.loading import load_config, load_domain
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_OUT = _REPO_ROOT / "results" / "context_fill_rate.md"
@@ -34,7 +34,7 @@ DECILES = (0, 10, 25, 50, 75, 90, 100)
 
 
 def percentile(sorted_values: list[float], p: int) -> float:
-    """Nearest-rank, matching src/stats/s01_lengths.py."""
+    """Nearest-rank, matching src/statistics/s01_lengths.py."""
     import math
     if not sorted_values:
         return float("nan")

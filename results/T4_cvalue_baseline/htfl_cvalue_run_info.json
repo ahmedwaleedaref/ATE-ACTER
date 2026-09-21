@@ -7,8 +7,8 @@
     "min_frequency": 2,
     "threshold": 1.0,
     "stopwords_path": null,
-    "output_path": "results/term_lists/htfl_cvalue_terms.txt",
-    "run_info_path": "results/term_lists/htfl_cvalue_run_info.json"
+    "output_path": "results/T4_cvalue_baseline/htfl_cvalue_terms.txt",
+    "run_info_path": "results/T4_cvalue_baseline/htfl_cvalue_run_info.json"
   },
   "target_domain": "htfl",
   "reference_corpus": "target_only",
@@ -18,5 +18,5 @@
   "n_candidates_raw": 33284,
   "n_candidates_after_min_frequency": 3319,
   "n_terms_output": 2454,
-  "output_path": "/home/amr/Desktop/MLA training/ATE-ACTER/results/term_lists/htfl_cvalue_terms.txt"
+  "output_path": "/home/amr/Desktop/MLA training/ATE-ACTER/results/T4_cvalue_baseline/htfl_cvalue_terms.txt"
 }

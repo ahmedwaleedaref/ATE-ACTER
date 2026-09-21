@@ -37,9 +37,9 @@ term list → `score_list`. A good score is not the goal.
 
 | | htfl unique-list F1 (ANN) |
 |---|--:|
-| BIO ceiling — `results/ceilings.md` | **0.9097** (max_P 0.8887, max_R 0.9316) |
+| BIO ceiling — `results/T3_eval_harness/ceilings.md` | **0.9097** (max_P 0.8887, max_R 0.9316) |
 | TermEval 2020 winner | 0.467 |
-| C-Value baseline — `results/baseline_cvalue.md` | 0.2003 (P 0.1941, R 0.2069) |
+| C-Value baseline — `results/T4_cvalue_baseline/baseline_cvalue.md` | 0.2003 (P 0.1941, R 0.2069) |
 | equi (dev) ceiling, for the dev number | 0.9523 |
 
 **What the data says to expect**, so the prediction is a prediction and not a guess:
@@ -47,9 +47,8 @@ term list → `score_list`. A good score is not the goal.
 - `Data_stats.md` §9.2 — training prior ≈ 0.14 against htfl's 0.2604. A model
   fits its training prior, so **recall suppressed on htfl, precision roughly
   unaffected** is the predicted shape.
-- §9.3 — type overlap between the training gold and htfl is **10 terms, 0.4%**
-  (and lower under the adopted split). Essentially nothing here can be lexical
-  memorisation.
+- §9.3 — type overlap between the training gold and htfl is **4 terms, 0.2%**
+  under the adopted split. Essentially nothing here can be lexical memorisation.
 - §8.2 — 23% of htfl's multi-word terms share a final token with a training
   term. That head-position transfer is the channel that does exist.
 - Training loss will plateau well above zero (`data_layout.md` §5.2b). Expected,
@@ -85,7 +84,7 @@ own maximal span are nested inside longer terms and still carry positive
 labels. The supervision is not contradictory, so nothing predicted a floor.
 Near-zero loss for a 110M-parameter model fitting 4,592 sentences over 1,435
 steps is ordinary and needs no explanation. It raises no memorisation question
-either: htfl shares 0.4% of its term types with the training keys, so a 0.52
+either: htfl shares 0.2% of its term types with the training keys, so a 0.52
 score cannot be retrieval — there is almost nothing to retrieve.
 
 **Reading:**
@@ -893,7 +892,7 @@ config is untunable here and keeping E06's.
 
 <!--
 Footnote on rounding: ceiling F1 recomputed from full-precision P and R is
-0.9096 (htfl) and 0.9523 (equi); Tasks_week2.md quotes 0.9097 and 0.9524,
+0.9096 (htfl) and 0.9523 (equi); Tasks.md quotes 0.9097 and 0.9524,
 which come from rounding P and R to 4 dp before combining. Same measurement,
 1 in the fourth decimal.
 -->

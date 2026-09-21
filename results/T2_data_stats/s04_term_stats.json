@@ -1,5 +1,5 @@
 {
-  "generated_by": "src/stats/s05_term_stats.py",
+  "generated_by": "src/statistics/s04_term_stats.py",
   "note": "tokenised gold lists only; the non-tokenised variant exists in every domain and is ignored",
   "part_a_term_length": {
     "corp": {

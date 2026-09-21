@@ -77,8 +77,8 @@ ACTER 1.2):
 | Heart failure | 45,788 | 45,788 | 55,467 |
 
 **[CONFIRMED — T2]** Raw `wc -w` on v1.5 reproduces the 1.2 figures to under
-0.3%, so the annotated file set did not change between versions. T5 can place
-this project's numbers next to the 2020 shared task without a corpus caveat.
+0.3%, so the annotated file set did not change between versions. `docs/prior_work.md` places this project's numbers next to the 2020 shared
+task without a corpus caveat.
 
 The fourth column is 10–18% higher because the sequential annotation stream
 splits punctuation into separate tokens. **The two units are not comparable** —
@@ -238,8 +238,8 @@ The model predicts term / not-term; it does not predict the category.
 **[CONFIRMED — T2]** Every domain ships **both** a tokenised and a
 non-tokenised variant of each key. **Use the tokenised variant only.** The
 non-tokenised list splits differently on hyphens and internal punctuation, so
-it cannot be matched against decoded spans. Pin the exact filename in the
-interface contract; do not describe it.
+it cannot be matched against decoded spans. Pin the exact filename in
+`configs/data.json` and build the path from it; do not describe it in prose.
 
 **[CONFIRMED — T3]** The two variants differ in entry count as well as content —
 corp terms+NE is **1,173 non-tokenised against 1,172 tokenised**, with 12 entries
@@ -406,7 +406,7 @@ learn, not a contradiction. Nothing here predicts a loss floor.
 In E01 training loss reached **0.0043** over 1,435 steps. A 110M-parameter
 model fitting 4,592 sentences to near-zero loss is ordinary and needs no
 special explanation. It also raises no memorisation question: type overlap
-between the training keys and htfl is 10 terms, **0.4%**, so a model scoring
+between the training keys and htfl is 4 terms, **0.2%**, so a model scoring
 0.52 on htfl cannot be retrieving memorised terms — there are almost none to
 retrieve.
 
@@ -503,7 +503,7 @@ Reproduced digit-for-digit by an independent implementation.
 | htfl | 9,636 | 2,452 | **0.8887** | **0.9316** | 0.8911 | 0.8549 |
 
 **htfl `max_recall` 0.9316 on the ANN key is the cap on every number this project
-reports.** Output in `results/ceilings.md`.
+reports.** Output in `results/T3_eval_harness/ceilings.md`.
 
 Three readings:
 
@@ -523,7 +523,7 @@ largest gold key.
 **equi has a shape no other domain has:** `max_recall` 0.9764 with `max_precision`
 0.9294. Almost everything in its key is reachable and almost nothing decoded is
 spurious. Further evidence for the §8.5 concern that equi is an unrepresentative
-validation domain for this test set — worth a paragraph in T5 if the literature
+validation domain for this test set — worth a paragraph in `docs/prior_work.md` if the literature
 has not said it.
 
 **Span/type ratios are 3.9–4.7**, not the ~2 predicted from the hapax rate during
@@ -576,8 +576,8 @@ baseline, and going beyond it is the contribution.
 Task planning lives in `TASKS.md`. Listed here are the questions about the data
 itself that are still unanswered, tagged with the task that resolves each.
 
-**Resolved by T2 and T3** — numbers and reasoning in `results/data_stats.md`
-and `results/ceilings.md`:
+**Resolved by T2 and T3** — numbers and reasoning in `docs/Data_stats.md`
+and `results/T3_eval_harness/ceilings.md`:
 
 - ~~Tokens per sentence distribution~~ → section 2; `max_length` set in section 8
 - ~~Line/token consistency vs `texts_tokenised`~~ → section 3, 241/241 identical
@@ -605,9 +605,9 @@ and `results/ceilings.md`:
   character-substring matching gives false hits (`art` in `heart failure`).
   **This is what decomposes htfl's measured `max_recall` gap** (0.9316 ANN,
   section 5.5) into its nested-term and discontinuous-fragment components.
-- **[T5]** Tran et al. (2024) English heart-failure F1 on both keys, and their
+- **[T14]** Tran et al. (2024) English heart-failure F1 on both keys, and their
   BIO-vs-NOBI recall delta
-- **[T5, no longer blocking]** How the comparison papers compute their F1 —
+- **[T14, no longer blocking]** How the comparison papers compute their F1 —
   deduplicated unique-list F1, or span/token-level. T3 now builds both metrics,
   so this determines which column the comparison sits in rather than gating the
   harness. Every number in the comparison table must still be labelled with its
@@ -685,7 +685,7 @@ hardest. It is a general-purpose encoder with a 128k vocabulary, **not** a
 biomedical one, so it introduces no leakage into the cross-domain claim.
 BioBERT, SciBERT and PubMedBERT must not be used for that reason.
 
-XLM-R is both the longest and the worst on htfl terms — relevant to T5, since
+XLM-R is both the longest and the worst on htfl terms — relevant to T14, since
 Tran et al. (2024) worked under a heavier length budget than this project.
 
 ### 8.4 Label alignment
@@ -762,29 +762,25 @@ Terms-only keys both sides, N = 2,339 htfl gold terms:
 
 | measure | count | % of htfl terms |
 |---|--:|--:|
-| **type overlap** — also a training gold entry | **10** | **0.4%** |
-| occurrence-weighted type overlap | 31 / 9,243 | 0.3% |
-| **text overlap** — sequence occurs in training text, any label | 99 | 4.2% |
-| … seen in text but never a labelled term there | 89 | 3.8% |
-| **head overlap** — final token matches a training term's | 302 | 23.1% (N=1,310 MW) |
+| **type overlap** — also a training gold entry | **4** | **0.2%** |
+| occurrence-weighted type overlap | 12 / 9,243 | 0.1% |
+| **text overlap** — sequence occurs in training text, any label | 63 | 2.7% |
+| … seen in text but never a labelled term there | 59 | 2.5% |
+| **head overlap** — final token matches a training term's | 245 | 18.7% (N=1,310 MW) |
 
-**Scope caveat.** These were computed with corp + equi + wind on the training
-side, before the split was fixed. Under the adopted split (corp + wind only) the
-figures are lower — equi alone contributed 6 of the 10 type overlaps. Not
-recomputed: the conclusion holds *a fortiori*. **Do not quote 0.4% as a
-split-matched number.** See `data_stats.md` §8.
+Training side is **corp + wind**, the adopted split. See `docs/Data_stats.md` §8.
 
-All ten type overlaps are generic: `bpm`, `chest`, `compliance`, `contracting`,
-`muscle`, `muscles`, `muscular`, `pad`, `rna`, `remote monitoring`. Nine are
-single-token. Overlap at 3+ tokens is exactly zero. Several are polysemes rather
-than shared terms — *compliance* is regulatory in corp and ventricular or
-adherence-related in htfl; *pad* is a wind component and, in cardiology,
-peripheral artery disease — so the measured overlap overstates the real one.
+All four type overlaps are generic: `compliance`, `contracting`,
+`remote monitoring`, `rna`. Three are single-token. Overlap at 3+ tokens is
+exactly zero. Two are polysemes rather than shared terms — *compliance* is
+regulatory in corp and ventricular or adherence-related in htfl; *contracting*
+is procurement in corp and cardiac muscle in htfl — so the measured overlap
+overstates the real one.
 
 **Essentially no reported score can be lexical memorisation.** Every result on
 htfl is a genuine cross-domain generalisation result, with no caveat required.
 
-**Head overlap is the transfer channel that does exist.** 23% of htfl's
+**Head overlap is the transfer channel that does exist.** 18.7% of htfl's
 multi-word terms share a final token with a training term — a model that
 learned `... failure` occupies a term-final position generalises to compounds
 it has never seen.
@@ -795,7 +791,7 @@ htfl key and have essentially no transfer channel; failures should concentrate
 there. **Logged as contrarian** — the standard ATE finding is the opposite, and
 htfl's single-word terms are also its most frequent. See `data_stats.md` §8.2.
 
-On the terms+NE key overlap roughly triples (type 1.3%, text 4.8%) — named
+On the terms+NE key overlap roughly triples (type 0.7%, text 3.1%) — named
 entities recur across domains. Keys are never mixed across the two sides.
 
 ### 9.4 htfl is harder than the training domains on every measured axis

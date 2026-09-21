@@ -11,7 +11,7 @@ roberta-vs-bert comparison carries no environment confound.
 | **equi (dev)** | **0.5063** | 0.0266 | 0.9523 | 0.532 |
 | htfl (test) | 0.5632 | 0.0124 | 0.9096 | 0.619 |
 
-Recorded in `EXPERIMENTS.md` E06 (this cell) and E07 (the LR grid around it).
+Recorded in `docs/EXPERIMENTS.md` E06 (this cell) and E07 (the LR grid around it).
 
 ## How this cell was chosen, precisely
 

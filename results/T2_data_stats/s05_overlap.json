@@ -1,13 +1,13 @@
 {
-  "generated_by": "src/stats/s06_overlap.py",
+  "generated_by": "src/statistics/s05_overlap.py",
   "note": "overlap denominated in htfl gold terms; terms-only keys, with a separate terms+NE comparison",
   "terms_only": {
     "n_htfl": 2339,
     "type": {
-      "n": 10,
+      "n": 4,
       "by_length": {
         "1": [
-          9,
+          3,
           1029
         ],
         "2": [
@@ -25,22 +25,18 @@
       }
     },
     "text": {
-      "n": 99,
-      "not_in_gold_n": 89
+      "n": 63,
+      "not_in_gold_n": 59
     },
     "head": {
       "n_mw": 1310,
-      "n": 302,
-      "not_type_n": 301
+      "n": 245,
+      "not_type_n": 244
     },
     "per_domain": {
       "corp": {
         "type_n": 2,
         "text_n": 39
-      },
-      "equi": {
-        "type_n": 6,
-        "text_n": 58
       },
       "wind": {
         "type_n": 2,
@@ -49,14 +45,14 @@
     },
     "occ_weighted": {
       "total": 9243,
-      "in_type": 31
+      "in_type": 12
     },
     "top20": [
       [
         "patients",
         598,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -112,7 +108,7 @@
         "patient",
         73,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -161,7 +157,7 @@
         "death",
         55,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -175,7 +171,7 @@
         "hospitalization",
         53,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -197,14 +193,14 @@
   "terms_nes": {
     "n_htfl": 2556,
     "type": {
-      "n": 32,
+      "n": 19,
       "by_length": {
         "1": [
-          26,
+          16,
           1132
         ],
         "2": [
-          6,
+          3,
           787
         ],
         "3": [
@@ -218,22 +214,18 @@
       }
     },
     "text": {
-      "n": 122,
-      "not_in_gold_n": 90
+      "n": 79,
+      "not_in_gold_n": 60
     },
     "head": {
       "n_mw": 1424,
-      "n": 356,
-      "not_type_n": 350
+      "n": 289,
+      "not_type_n": 286
     },
     "per_domain": {
       "corp": {
         "type_n": 13,
         "text_n": 49
-      },
-      "equi": {
-        "type_n": 18,
-        "text_n": 72
       },
       "wind": {
         "type_n": 13,
@@ -242,14 +234,14 @@
     },
     "occ_weighted": {
       "total": 9264,
-      "in_type": 45
+      "in_type": 26
     },
     "top20": [
       [
         "patients",
         598,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -305,7 +297,7 @@
         "patient",
         73,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -354,7 +346,7 @@
         "death",
         55,
         false,
-        true,
+        false,
         false
       ],
       [
@@ -368,7 +360,7 @@
         "hospitalization",
         53,
         false,
-        true,
+        false,
         false
       ],
       [

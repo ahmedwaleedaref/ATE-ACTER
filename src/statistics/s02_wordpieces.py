@@ -1,7 +1,7 @@
 """T2 item 1b -- wordpiece length statistic, four tokenizers, over the same
 annotated portion as s01. Reuses loading.load_domain and s01_lengths.percentile.
 Needs transformers, sentencepiece, protobuf; first run downloads vocab files
-only. Run: python -m src.stats.s02_wordpieces
+only. Run: python -m src.statistics.s02_wordpieces
 """
 
 from __future__ import annotations
@@ -17,10 +17,10 @@ if str(_REPO_ROOT) not in sys.path:
 
 from transformers import AutoTokenizer  # noqa: E402
 
-from src.stats.loading import load_config, load_domain  # noqa: E402
-from src.stats.s01_lengths import percentile  # noqa: E402
+from src.statistics.loading import load_config, load_domain  # noqa: E402
+from src.statistics.s01_lengths import percentile  # noqa: E402
 
-_OUT_DIR = _REPO_ROOT / "results" / "data_stats"
+_OUT_DIR = _REPO_ROOT / "results" / "T2_data_stats"
 PERCENTILES = (50, 90, 95, 99)
 
 # name, HF repo, pinned revision (main-branch commit), from_pretrained kwargs.
@@ -169,7 +169,7 @@ def main() -> None:
     print(report)
 
     payload = {
-        "generated_by": "src/stats/s02_wordpieces.py",
+        "generated_by": "src/statistics/s02_wordpieces.py",
         "tokenizers": [{"name": n, "repo": r, "revision": rev}
                        for n, r, rev, _ in TOKENIZERS],
         "per_tokenizer_domain": {

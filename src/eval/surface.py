@@ -1,9 +1,9 @@
 from src.eval.spans import decode
-from src.stats.loading import Document, load_domain
+from src.statistics.loading import Document, load_domain
 
 def spans_to_unique_list(sentences: list[tuple[list[str], list[tuple[int, int]]]]):
     """
-    Collapse decoded spans into a contract-format unique term list.
+    Collapse decoded spans into a unique term list.
 
     sentences : one (tokens, spans) pair per sentence; spans are (start, end)
                 with end EXCLUSIVE, as returned by decode()
@@ -94,7 +94,7 @@ def generate_flatten_spans_for_model_prediction(model_sentences : list[tuple[str
 
 def write_term_list(terms: set[str], path: str) -> None:
     """
-    Write a term list in contract format (Tasks.md, interface contract): one
+    Write a term list: one
     term per line, lowercased, deduplicated, UTF-8, sorted, no header, no index
     column, trailing newline.
 

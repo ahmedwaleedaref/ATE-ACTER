@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from src.stats.loading import (
+from src.statistics.loading import (
     DataConfig,
     annotation_dir,
     derive_text_path,
@@ -20,7 +20,7 @@ from src.stats.loading import (
     load_domain,
     parse_annotation_file,
 )
-from src.stats.s01_lengths import percentile, summarise_lengths
+from src.statistics.s01_lengths import percentile, summarise_lengths
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

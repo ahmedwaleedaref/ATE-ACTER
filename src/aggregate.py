@@ -24,7 +24,7 @@ _OUT = _REPO_ROOT / "results" / "t8_seed_variance.md"
 
 SEEDS = (42, 43, 44, 45, 46)
 
-# results/ceilings.md, ANN rows -- the max_recall/max_precision list ceilings.
+# results/T3_eval_harness/ceilings.md, ANN rows -- the max_recall/max_precision list ceilings.
 # Measured values, copied verbatim. A model's mean is only interpretable as a
 # fraction of what the list metric can award on that domain at all.
 CEILING = {"equi": 0.9523, "htfl": 0.9096}
@@ -53,7 +53,7 @@ GRIDS = {
         "inherited": {(3e-5, 5): ("results/runs", "E02")},
         "root": "t9",
         "cell": "lr{lr:g}_e{ep}",
-        # historical name: EXPERIMENTS.md E03 and results/t9_selected.md cite it
+        # historical name: docs/EXPERIMENTS.md E03 and results/t9_selected.md cite it
         "out": "t9_grid",
     },
     "deberta": {
@@ -61,7 +61,7 @@ GRIDS = {
         # 3e-5 is NOT a cell of this grid. {3e-5,5} is E04 -- a different question
         # (deberta at BERT's config, for the encoder comparison) whose run JSONs
         # were lost with the Colab session, and {3e-5,3} was never run. E04's
-        # numbers are recorded in EXPERIMENTS.md and cited there, not inherited
+        # numbers are recorded in docs/EXPERIMENTS.md and cited there, not inherited
         # here: a grid cell has to be backed by artifacts this tool can read.
         "lrs": (1e-5, 2e-5),
         "epochs": (3, 5),

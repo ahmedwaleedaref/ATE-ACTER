@@ -1,4 +1,4 @@
-"""Score a contract-format term list prediction (e.g. the T4 C-Value baseline)
+"""Score a term list prediction (e.g. the T4 C-Value baseline)
 through the unique-list F1 harness.
 
 This is a first look at a number, not a result: the frequency-corpus decision
@@ -13,10 +13,10 @@ This script does not modify the system that produced --pred and does not
 modify the harness it scores against (decode, encode, spans_to_unique_list,
 generate_unique_list, generate_flatten_spans, score_list, score_exact_spans,
 load_gold_list_into_set, write_term_list are all reused as-is). If the
-prediction file does not match the contract format, that is reported, not
+prediction file is malformed, that is reported, not
 repaired.
 
-Run:  python -m src.eval.score_baseline --pred results/term_lists/htfl_cvalue_terms.txt
+Run:  python -m src.eval.score_baseline --pred results/T4_cvalue_baseline/htfl_cvalue_terms.txt
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from pathlib import Path
 
 from src.eval.run_eval import _gold_key_path
 from src.eval.scorers import load_gold_list_into_set, score_list
-from src.stats.loading import load_config
+from src.statistics.loading import load_config
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_DOMAIN = "htfl"
@@ -38,7 +38,7 @@ _DEFAULT_OUT = _REPO_ROOT / "results" / "baseline_cvalue.md"
 # non-tokenised variants split hyphens and internal punctuation differently.
 _KEYS = ("ann", "nes")
 
-# BIO-tagger ceilings for htfl (results/ceilings.md, without_named_entities,
+# BIO-tagger ceilings for htfl (results/T3_eval_harness/ceilings.md, without_named_entities,
 # tokenised keys). For orientation only -- C-Value is not a tagger, produces
 # no spans, and is not bound by them. Do not present the baseline as a
 # fraction of these.
@@ -51,7 +51,7 @@ _UNTOKENISED_PATTERN = re.compile(r"\S['-]\S")
 
 
 def _validate_prediction_file(path: Path) -> tuple[list[str], int, int]:
-    """Check the RAW prediction file against the contract format -- one term
+    """Check the RAW prediction file -- one term
     per line, lowercased, deduplicated, UTF-8, no header, no index column --
     without repairing anything. load_gold_list_into_set() is not used here:
     it strips whitespace on load, which would silently absorb exactly the
@@ -113,7 +113,7 @@ def _render_report(domain: str, pred_path: Path, rows: list[dict], n_untokenised
         "",
         "**Frequency-corpus decision: UNRECORDED.** Which corpus C-Value counted "
         "term frequencies over -- annotated text only, or including the "
-        "unannotated portion as reference material (Tasks.md, T4) -- is not "
+        "unannotated portion as reference material (docs/Tasks.md, T4) -- is not "
         "recorded for this prediction file. Both are legitimate and are not "
         "comparable to each other. This is stated as open, not guessed at.",
         "",
@@ -125,7 +125,7 @@ def _render_report(domain: str, pred_path: Path, rows: list[dict], n_untokenised
             "**BIO-tagger ceilings, for orientation only:** on htfl, max_recall "
             f"is {c['ann']['max_recall']} (ANN) / {c['nes']['max_recall']} (NES); "
             f"max_precision is {c['ann']['max_precision']} (ANN) / "
-            f"{c['nes']['max_precision']} (NES) (results/ceilings.md). These are "
+            f"{c['nes']['max_precision']} (NES) (results/T3_eval_harness/ceilings.md). These are "
             "the caps for a BIO sequence tagger under this annotation scheme. "
             "C-Value is not a tagger, produces no spans, and is not bound by "
             "them -- listed here for context, not as a denominator for the "
@@ -135,7 +135,7 @@ def _render_report(domain: str, pred_path: Path, rows: list[dict], n_untokenised
     else:
         lines += [
             f"**BIO-tagger ceilings** are not reproduced here for {domain} -- "
-            "see results/ceilings.md.",
+            "see results/T3_eval_harness/ceilings.md.",
             "",
         ]
 
@@ -153,9 +153,9 @@ def _render_report(domain: str, pred_path: Path, rows: list[dict], n_untokenised
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Score a contract-format term list prediction against unique-list F1."
+        description="Score a term list prediction against unique-list F1."
     )
-    parser.add_argument("--pred", required=True, help="path to a term list file in contract format")
+    parser.add_argument("--pred", required=True, help="path to a term list file: one lowercased term per line")
     parser.add_argument("--domain", default=_DEFAULT_DOMAIN)
     parser.add_argument("--out", default=str(_DEFAULT_OUT))
     args = parser.parse_args()
@@ -165,17 +165,17 @@ def main() -> None:
 
     failures, n_lines, n_untokenised_looking = _validate_prediction_file(pred_path)
 
-    print(f"Validating {pred_path} against contract format ({n_lines} lines)...")
+    print(f"Validating {pred_path} ({n_lines} lines)...")
     print(
         f"  entries that look non-tokenised (apostrophe/hyphen, no surrounding "
         f"space): {n_untokenised_looking} (informational)"
     )
     if failures:
-        print("FAILED contract-format validation:")
+        print("FAILED format validation:")
         for failure in failures:
             print(f"  - {failure}")
         sys.exit(1)
-    print("  contract-format checks: OK")
+    print("  format checks: OK")
 
     # Loaded through the harness only after the raw file has already passed
     # validation above -- load_gold_list_into_set() strips whitespace, which

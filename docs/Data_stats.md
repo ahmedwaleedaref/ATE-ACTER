@@ -1,7 +1,7 @@
 # Data Statistics — T2
 
 Statistics over the annotated portion of ACTER v1.5, English. Computed by
-`src/stats/`, re-runnable. Data facts live in `docs/data_layout.md`; task
+`src/statistics/`, re-runnable. Data facts live in `docs/data_layout.md`; task
 planning in `Tasks.md`. This file records what was measured and what each
 number decides.
 
@@ -22,68 +22,23 @@ Setting `max_length` from the training domains alone can truncate longer
 sentences at test time. Real, but minor: `htfl` is measured here too, so the
 distribution is known on both sides.
 
-### 1.3 The actual problem: dataset tokens are not model tokens
+### 1.3 Dataset tokens are not model tokens
 
-ACTER's token stream is whitespace-tokenised, one token per line in the
-sequential annotation file. BERT does not consume that stream. Its WordPiece
-tokenizer splits each token into subword pieces drawn from a fixed 30k
-vocabulary.
+WordPiece splits each dataset token into subwords, so the length budget is counted
+in subwords, and the inflation is not uniform — domain terms fragment 2–3× harder
+than function words, which is why §5 reports it split by inside/outside a gold
+span rather than as one average. A gold label attaches to a dataset token, so the
+**first** subword carries it and every continuation is `-100`, with the mapping
+from `word_ids()` on the pre-split list and never from string matching. Decoded
+terms join the **original dataset tokens**, never detokenized wordpieces —
+`self`, `-`, `employed` would rejoin as `self - employed` and match no gold entry.
+Full contract in `data_layout.md` §8.4 and `src/data/align.py`.
 
-Domain vocabulary is not in that vocabulary. `remunerated`, a single token in
-`corp`, becomes something like `rem ##une ##rated` — one dataset token, three
-model positions. The split exists so the model can build a representation for
-a word it never saw during pretraining, out of pieces it did see.
-
-Two consequences follow, and both change what T2 has to measure.
-
-**Consequence 1 — the length budget is in the wrong unit.**
-
-BERT's 512-position limit counts subwords, not words. A sentence of 400
-dataset tokens may be 500+ subwords. Measuring whitespace tokens says nothing
-about whether a sentence fits.
-
-Worse, the inflation ratio is not constant. Function words inflate at ~1.0;
-domain terms inflate at 2–3x. So the tokens that consume the most budget are
-exactly the tokens carrying positive labels. The measurement must therefore
-report the inflation ratio *split by whether the token is inside a gold span*,
-not as a single corpus-wide average.
-
-**Consequence 2 — one label, several positions.**
-
-A gold label attaches to a dataset token. After tokenization that token spans
-several model positions. The label array does not change shape; what changes
-is which position carries it.
-
-Resolution, applied identically at training and inference time:
-
-- The **first** subword of each dataset token carries that token's label.
-- Every other subword is set to `-100`, which the loss function ignores.
-  Nothing is predicted there, nothing is scored there, no gradient flows from
-  there. `-100` is an exclusion marker, not a penalty.
-- At inference, the prediction for a dataset token is read from its **first**
-  subword position. The remaining positions are discarded unread.
-
-The mapping is not recovered by string matching. `word_ids()` from the fast
-tokenizer returns, for each subword position, the index of the input token it
-came from. This requires passing the pre-split token list with
-`is_split_into_words=True`, never a re-joined string.
-
-**Consequence 3 — subwords never reach the output.**
-
-The decoded term string is built by joining the **original dataset tokens**
-identified by a span, not by detokenizing wordpieces. Reassembling
-`self-employed` from `self`, `-`, `employed` yields `self - employed`, which
-does not match the gold list entry — a silent false negative plus a false
-positive, landing hardest on the fragmented domain vocabulary the task exists
-to extract.
-
-The model's job is to say *which* tokens form a term. It is never asked what
-those tokens say; that is already on disk in the exact form the gold list was
-built from.
+---
 
 ## 2. The loader
 
-All seven T2 statistics read the corpus through `src/stats/loading.py`. A
+All seven T2 statistics read the corpus through `src/statistics/loading.py`. A
 loader bug is therefore a bug in every statistic simultaneously, in the same
 direction, with no crash — which is why it is documented and tested before any
 number is reported.
@@ -108,10 +63,9 @@ EOF produces no empty sentence.
 **Everything raises.** There is no warn-and-continue path. A warning scrolls
 past; an exception stops the run.
 
-**Checks guard the config, not the corpus.** ACTER v1.5 is pinned at a tag and
-was inspected by hand, so the data cannot change. What can change is a path or
-a config value pointing somewhere wrong — the failure `Tasks.md` names as the
-T2 risk, and the one that produces plausible numbers rather than an error.
+**Checks guard the config, not the corpus.** The data never changes — it is
+pinned at a tag. A wrong path or config value does, and that is the failure that
+yields plausible numbers instead of an error.
 
 ### 2.2 Interface
 
@@ -137,13 +91,6 @@ file may legitimately contain no terms.
 token count, both whitespace-tokenised so the unit cancels. No external table
 and no version drift. `data_layout.md` §1 puts wind at ~52k annotated of ~314k
 total, so a ratio anywhere near 1.0 means the unannotated corpus was loaded.
-
-A superseded check compared the loaded count against §1's published word
-counts with a ±15% tolerance. That comparison was invalid: §1's figures are
-`wc -w` over raw non-tokenised `texts/`, while the loader counts the annotated
-stream with punctuation split into separate tokens, which inflates every
-domain by 10–18%. The tolerance was being asked to absorb a unit mismatch in a
-tripwire built to catch a 6× error. Replaced by the ratio above.
 
 ---
 
@@ -370,7 +317,7 @@ term from its first fragment plus context. `hyper` as the opening piece of a
 fragmented medical compound carries less than the near-whole token DeBERTa
 would produce. Whether that converts to F1 is unknown without training.
 
-XLM-R is both the longest and the worst on htfl terms. Relevant to T5: Tran
+XLM-R is both the longest and the worst on htfl terms. Relevant to T14: Tran
 et al. (2024) worked under a heavier length budget than this project will.
 
 **Decision: train BERT this month.** It is the ATE reference point, it keeps
@@ -383,7 +330,7 @@ PubMedBERT, which must not be used.
 
 ---
 
-## 6. s04 — label distribution
+## 6. s03 — label distribution
 
 Dataset-token space, no tokenizer. B, I, O counted separately — B is the term
 *occurrence* count, which §7 item 4 needs.
@@ -523,7 +470,7 @@ length 1.22. Dressage terms are overwhelmingly single words.
 
 ---
 
-## 7. s05 — term length and frequency (gold unique lists)
+## 7. s04 — term length and frequency (gold unique lists)
 
 Tokenised gold lists only. A non-tokenised `*_terms.tsv` variant exists in
 every domain and is ignored: only the tokenised list matches the corpus token
@@ -621,7 +568,7 @@ learn, not a contradiction. Nothing here predicts a loss floor.
 In E01 training loss reached **0.0043** over 1,435 steps. A 110M-parameter
 model fitting 4,592 sentences to near-zero loss is ordinary and needs no
 special explanation. It also raises no memorisation question: type overlap
-between the training keys and htfl is 10 terms, **0.4%**, so a model scoring
+between the training keys and htfl is 4 terms, **0.2%**, so a model scoring
 0.52 on htfl cannot be retrieving memorised terms — there are almost none to
 retrieve.
 
@@ -661,55 +608,46 @@ confirms `data_layout.md` §1 and validates the counting code.
 
 ---
 
-## 8. s06 — term-set overlap, training domains vs htfl
+## 8. s05 — term-set overlap, training domains vs htfl
 
 Terms-only keys (`without_named_entities`) on both sides. N = 2,339 htfl gold
-terms. Training side = corp + equi + wind. Token-sequence matching,
-lowercased.
+terms. Training side = **corp + wind**, the adopted split (§8.5). Token-sequence
+matching, lowercased.
 
 `Tasks.md` calls this the number that matters most: it bounds how much of any
 reported score could be memorisation rather than cross-domain generalisation.
 
-**Caveat on scope.** These figures were computed with corp + equi + wind on the
-training side. The adopted split (§8.5) trains on **corp + wind only**, with
-equi as the validation domain. Equi contributed 6 of the 10 type overlaps and
-58 of the 99 text overlaps, so the true figures under the adopted split are
-**lower** — likely around 0.2% type overlap. Deliberately not recomputed: the
-conclusion (memorisation is effectively impossible) holds *a fortiori* under a
-smaller overlap. **Do not quote 0.4% as a split-matched number.**
-
 | measure | count | % of htfl terms |
 |---|--:|--:|
-| **type overlap** — htfl term is also a training gold entry | **10** | **0.4%** (N=2,339) |
-| occurrence-weighted type overlap | 31 / 9,243 occ | 0.3% |
-| **text overlap** — sequence occurs in training annotated text, any label | 99 | 4.2% (N=2,339) |
-| … seen in text but never a labelled term there | 89 | 3.8% (N=2,339) |
-| **head overlap** — final token matches a training term's final token | 302 | 23.1% (N=1,310 multi-word) |
-| … not already a type match | 301 | 23.0% (N=1,310) |
+| **type overlap** — htfl term is also a training gold entry | **4** | **0.2%** (N=2,339) |
+| occurrence-weighted type overlap | 12 / 9,243 occ | 0.1% |
+| **text overlap** — sequence occurs in training annotated text, any label | 63 | 2.7% (N=2,339) |
+| … seen in text but never a labelled term there | 59 | 2.5% (N=2,339) |
+| **head overlap** — final token matches a training term's final token | 245 | 18.7% (N=1,310 multi-word) |
+| … not already a type match | 244 | 18.6% (N=1,310) |
 
-Per training domain alone: corp 2 type / 39 text, equi 6 / 58, wind 2 / 46.
+Per training domain alone: corp 2 type / 39 text, wind 2 / 46.
 
 ### 8.1 The domains are lexically near-disjoint
 
-**10 of 2,339 htfl gold terms appear in the training gold lists.** All ten are
-generic: `bpm`, `chest`, `compliance`, `contracting`, `muscle`, `muscles`,
-`muscular`, `pad`, `rna`, `remote monitoring` — anatomy and ordinary English
-that happens to be annotated in dressage or wind energy. None is medical
-terminology.
+**4 of 2,339 htfl gold terms appear in the training gold lists.** All four are
+generic: `compliance`, `contracting`, `remote monitoring`, `rna` — ordinary
+English and general technical vocabulary that happens to be annotated in
+corruption or wind energy. None is medical terminology.
 
-By length: 9 of the 10 are single-token. Type overlap at 3+ tokens is exactly
+By length: 3 of the 4 are single-token. Type overlap at 3+ tokens is exactly
 zero.
 
-**Several of the ten are polysemes, not shared terms.** In corp, *compliance*
-is regulatory; in htfl it is ventricular compliance or patient adherence.
-*Pad* in wind energy is a physical component; in cardiology, PAD is peripheral
-artery disease. The string matches, the concept does not — so the measured
-overlap **overstates** the real overlap, and the disjointness conclusion is
-stronger than the number suggests.
+**Two of the four are polysemes, not shared terms.** In corp, *compliance* is
+regulatory; in htfl it is ventricular compliance or patient adherence.
+*Contracting* in corp is procurement; in htfl it is cardiac muscle contracting.
+The string matches, the concept does not — so the measured overlap
+**overstates** the real overlap, and the disjointness conclusion is stronger
+than the number suggests.
 
-Text overlap is an order of magnitude higher in relative terms (4.2% vs 0.4%)
-and still negligible in absolute terms — the model saw 99 htfl term strings
-somewhere in training, 89 of them never as labelled examples.
+Text overlap is an order of magnitude higher in relative terms (2.7% vs 0.2%)
+and still negligible in absolute terms — the model saw 63 htfl term strings
+somewhere in training, 59 of them never as labelled examples.
 
 **Consequence: essentially no reported score can be lexical memorisation.**
 Every result on htfl is a genuine cross-domain generalisation result, with no
@@ -718,8 +656,8 @@ is that it is not a concern.
 
 ### 8.2 Head overlap is the transfer channel that does exist
 
-**23.1% of htfl's multi-word terms share a final token with some training
-term**, and 23.0% are not covered by type overlap at all.
+**18.7% of htfl's multi-word terms share a final token with some training
+term**, and 18.6% are not covered by type overlap at all.
 
 That is the mechanism by which anything transfers: a model that learned
 `... failure` or `... system` occupies a term-final position generalises to
@@ -763,8 +701,8 @@ any kind, and the training domains contain almost nothing of that term type.
 
 ### 8.4 Named entities inflate every measure
 
-terms+NE key on both sides, N = 2,556: type overlap 32 (1.3%), text overlap
-122 (4.8%), head overlap 356 of 1,424 (25.0%).
+terms+NE key on both sides, N = 2,556: type overlap 19 (0.7%), text overlap
+79 (3.1%), head overlap 289 of 1,424 (20.3%).
 
 Roughly triple the type overlap, as expected — organisation and place names
 recur across domains. Keys are never mixed across the two sides; doing so
@@ -800,7 +738,7 @@ representative validation domain for this test set: 55.7% single-word terms
 against htfl's 44% (§7.1), mean occurrence length 1.22 against 1.50 (§6.3), and
 by §4.1 the only single-peaked length distribution in the corpus. Early
 stopping on equi optimises for a term profile unlike htfl's. This comes with
-the standard split, not from any choice made here. **T5: check whether Lang et
+the standard split, not from any choice made here. **T14: check whether Lang et
 al. or Tran et al. discuss it.** If nobody has, it is worth a paragraph.
 
 ---
@@ -825,7 +763,7 @@ work exists (Tran et al. 2024, same test set — `data_layout.md` §5.4).
 
 What may be unclaimed is the narrower framing: first-occurrence locality and
 multi-scale chunking, on ACTER, under the TermEval 2020 protocol. Establishing
-that is **T5's job**. No novelty claim goes in the writeup until T5 reports.
+that is **T14's job**. No novelty claim goes in the writeup until T14 reports.
 
 ### 9.4 [RESOLVED BY DESIGN] How do the comparison papers compute their F1?
 
@@ -861,7 +799,7 @@ found and rare types missed — the expected shape at 47.7% hapax. The two close
 together would mean uniform performance across the frequency distribution,
 which would be surprising.
 
-**Still for T5:** record which unit and which key (ANN / NES) each published
+**Still for T14:** record which unit and which key (ANN / NES) each published
 number was measured in. Mixing units silently in the comparison table would
 make it wrong.
 
@@ -875,6 +813,6 @@ make it wrong.
 | ~~§7 T2-1c~~ | ~~inflation ratio, inside vs outside span~~ | **done — §5.3** |
 | ~~§7 T2-3~~ | ~~term length distribution~~ | **done — §7.1, cap at 4** |
 | ~~§7 T2-4~~ | ~~term frequency, hapax proportion~~ | **done — §7.2, §7.3** |
-| ~~§7 T2-5~~ | ~~term-set overlap, train ↔ htfl~~ | **done — §8, overlap is 0.4%** |
+| ~~§7 T2-5~~ | ~~term-set overlap, train ↔ htfl~~ | **done — §8, overlap is 0.2%** |
 | ~~§7 T2-6~~ | ~~positive-label proportion~~ | **done — §6** |
 | §7 T2-7 | nested-term count, split 1-token vs ≥2-token | NOBI's expected effect size — **deferred to week 3** |

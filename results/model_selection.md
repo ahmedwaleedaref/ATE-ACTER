@@ -14,7 +14,7 @@ ANN unique-list F1.
 | roberta-base | 3e-5 / 5ep | 0.5063 ± 0.0266 | 0.5632 ± 0.0124 |
 | **deberta-v3-base** | **1e-5 / 5ep** | **0.5590 ± 0.0086** | **0.5784 ± 0.0228** |
 
-Ceilings: equi 0.9523, htfl 0.9096 (`results/ceilings.md`). DeBERTa reaches
+Ceilings: equi 0.9523, htfl 0.9096 (`results/T3_eval_harness/ceilings.md`). DeBERTa reaches
 0.587 of the equi ceiling and 0.636 of htfl's.
 
 DeBERTa wins both domains, which resolves T10's logged prediction in its
@@ -46,9 +46,9 @@ the table above.
 
 | | |
 |---|---|
-| bert | `results/t9_selected.md`, EXPERIMENTS.md E03 |
-| deberta | `results/deberta_selected.md`, EXPERIMENTS.md E04–E05 |
-| roberta | `results/roberta_selected.md`, EXPERIMENTS.md E06–E07 |
+| bert | `results/t9_selected.md`, docs/EXPERIMENTS.md E03 |
+| deberta | `results/deberta_selected.md`, docs/EXPERIMENTS.md E04–E05 |
+| roberta | `results/roberta_selected.md`, docs/EXPERIMENTS.md E06–E07 |
 
 ## Three caveats this table cannot show
 

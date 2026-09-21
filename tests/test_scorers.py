@@ -9,7 +9,7 @@ import pytest
 from src.eval.run_eval import _gold_key_path
 from src.eval.scorers import load_gold_list_into_set, score_list
 from src.eval.surface import write_term_list
-from src.stats.loading import load_config
+from src.statistics.loading import load_config
 
 
 def test_identity_write_then_reload_matches_gold(tmp_path):
@@ -30,7 +30,7 @@ def test_identity_write_then_reload_matches_gold(tmp_path):
 
 
 def test_reloaded_terms_carry_no_whitespace(tmp_path):
-    """write_term_list emits contract-format lines (one term per line, no
+    """write_term_list emits one term per line, no
     extra column); load_gold_list_into_set must hand back bare terms with no
     newline, tab, or leading/trailing whitespace welded on. This is the
     assertion that would have caught the writer/loader normalisation

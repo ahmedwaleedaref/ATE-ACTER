@@ -1,6 +1,6 @@
 """Shared corpus loader for the T2 data-statistics items.
 
-Scope is locked in ``docs/data_layout.md`` and ``Tasks.md`` and is not
+Scope is locked in ``docs/data_layout.md`` and ``docs/Tasks.md`` and is not
 re-derived here:
 
   * English only.
@@ -18,12 +18,9 @@ The loaded token stream comes from the annotation file only -- never from
 ``texts_tokenised/``. ``inventory_ratios`` reads the text directories, but
 only to validate what was already loaded; the load itself never depends on it.
 
-ACTER v1.5 is pinned at a tag and was inspected by hand, so the corpus cannot
-change under us. The checks here do not guard against a malformed corpus;
-they guard against *our* config or paths pointing at the wrong place -- the
-failure named as the T2 risk in ``Tasks.md``, which yields plausible numbers
-rather than a crash. Every one of them raises immediately; there is no
-warn-and-continue path.
+The data never changes -- it is pinned at a tag. The checks here guard our own
+paths and config, which do, and which yield plausible numbers rather than a
+crash. Every one raises immediately; there is no warn-and-continue path.
 """
 
 from __future__ import annotations
@@ -32,7 +29,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-# Repo root = two levels up from this file (src/stats/loading.py).
+# Repo root = two levels up from this file (src/statistics/loading.py).
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_CONFIG = _REPO_ROOT / "configs" / "data.json"
 

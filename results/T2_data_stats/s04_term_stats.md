@@ -1,4 +1,4 @@
-# s05 -- term length and term frequency (gold unique lists)
+# s04 -- term length and term frequency (gold unique lists)
 
 Tokenised gold lists only; the non-tokenised `*_terms.tsv` / `*_terms_nes.tsv` variant exists in every domain and is ignored. Length = whitespace tokens; percentiles s01 nearest-rank; every `%` is of the row's `N`.
 

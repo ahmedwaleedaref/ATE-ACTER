@@ -1,10 +1,10 @@
 """T4 entry point. Loads the target domain through the shared T2 loader,
 runs candidate generation -> C-Value -> threshold, and writes:
 
-  <output_path>    the term list, contract format
+  <output_path>    the term list, one lowercased term per line
   <run_info_path>  provenance: which config, which corpus, how many tokens,
                     how many candidates survived each stage -- so the
-                    frequency-corpus decision (Tasks.md T4) is recorded
+                    frequency-corpus decision (docs/Tasks.md T4) is recorded
                     against a specific run, not just asserted in docs.
 
 Run:  python -m src.models.run_cvalue                      (uses configs/cvalue.json)
@@ -31,7 +31,7 @@ from src.models.cvalue import (  # noqa: E402
     threshold_terms,
     write_term_list,
 )
-from src.stats.loading import load_config, load_domain  # noqa: E402
+from src.statistics.loading import load_config, load_domain  # noqa: E402
 
 _DEFAULT_CVALUE_CONFIG = _REPO_ROOT / "configs" / "cvalue.json"
 

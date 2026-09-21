@@ -1,4 +1,4 @@
-# s04 -- label distribution and class imbalance
+# s03 -- label distribution and class imbalance
 
 Dataset-token space, no tokenizer. B / I / O counted separately -- B is the term-*occurrence* count (item 4 needs it). **Part A is a fixed invariant of ACTER v1.5, not a modelling signal**: a different positive rate downstream means broken label alignment.
 

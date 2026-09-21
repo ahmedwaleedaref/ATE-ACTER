@@ -59,7 +59,7 @@ inexpressible.
 the gold key. The reverse order leaves both in the set, and one is a guaranteed
 false positive on every sentence-initial term in the corpus.
 
-**`score_list` asserts, never normalises.** The contract says term lists arrive
+**`score_list` asserts, never normalises.** Term lists arrive
 lowercased and deduplicated, and §4 confirms zero uppercase entries in all eight
 gold files. If the scorer lowercased defensively, a casing bug in `decode` would
 be invisible in list F1 while still corrupting exact-span F1 — and the divergence
@@ -74,9 +74,10 @@ on stops being independent.
 **Whitespace stripping lives in the loader, not the writer.** Briefly
 `write_term_list` emitted a padding tab (`"term\t\n"`) so terms would round-trip
 past a loader missing `.strip()`. Two bugs cancelling — and the output was not
-contract format, so T4's C-Value list and the week-2 model output would not have
+the format the loader expects, so T4's C-Value list and the week-2 model
+output would not have
 loaded. The strip belongs in the loader, where it is inert on gold TSVs and
-load-bearing on contract files.
+load-bearing on predicted term lists.
 
 **Exact-span F1 has no ANN/NES key.** Gold spans are decoded from the
 `without_named_entities` labels — one set per domain — so there is exactly one
@@ -192,7 +193,7 @@ other.
 | List round-trip | a measurement, not 1.0 | produces the ceilings |
 | seqeval agreement | 6 dp, `mode='strict', scheme=IOB2` | scheme and convention drift |
 | Hand fixture | six numbers, both metrics | symmetric bugs — the external oracle |
-| Empty / zero-overlap / uppercase | guards | division by zero, contract violations |
+| Empty / zero-overlap / uppercase | guards | division by zero, malformed input |
 | IOB2 structural invariants | span count = `B` count; token sum | localises a decode failure fast |
 
 Pinned set sizes: corp 4,180 / equi 8,662 / wind 5,053 / htfl 9,636.
@@ -293,9 +294,9 @@ seeing results is how a project talks itself into a favourable framing.
 
 ## 7. Outputs
 
-- `results/ceilings.md` — 8 rows, header records key, label directory, scheme,
+- `results/T3_eval_harness/ceilings.md` — 8 rows, header records key, label directory, scheme,
   dangling-`I` policy
-- `results/baseline_cvalue.md` — C-Value scored through the harness, provisional
+- `results/T4_cvalue_baseline/baseline_cvalue.md` — C-Value scored through the harness, provisional
 
 ---
 

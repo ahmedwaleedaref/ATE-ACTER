@@ -4,7 +4,7 @@ Reuses loading.load_domain, no tokenizer. Part A is a fixed invariant of ACTER
 v1.5: a dataloader that later reports a different positive rate has broken its
 label alignment. Part B splits sentences short (<=2 tok) / prose (>=3 tok) to
 decide whether wind's gold terms live in its table-cell fragments.
-Run: python -m src.stats.s04_label_distribution
+Run: python -m src.statistics.s03_label_distribution
 """
 
 from __future__ import annotations
@@ -18,9 +18,9 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.stats.loading import load_config, load_domain  # noqa: E402
+from src.statistics.loading import load_config, load_domain  # noqa: E402
 
-_OUT_DIR = _REPO_ROOT / "results" / "data_stats"
+_OUT_DIR = _REPO_ROOT / "results" / "T2_data_stats"
 
 
 def _dist(B, I, O, n_sent, n_zero, n_docs):
@@ -73,7 +73,7 @@ def collect(cfg):
 
 
 def build_markdown(domains, per, buckets, top):
-    L = ["# s04 -- label distribution and class imbalance", "",
+    L = ["# s03 -- label distribution and class imbalance", "",
          "Dataset-token space, no tokenizer. B / I / O counted separately -- B is "
          "the term-*occurrence* count (item 4 needs it). **Part A is a fixed "
          "invariant of ACTER v1.5, not a modelling signal**: a different positive "
@@ -128,18 +128,18 @@ def main():
     print()
     print(report)
 
-    payload = {"generated_by": "src/stats/s04_label_distribution.py",
+    payload = {"generated_by": "src/statistics/s03_label_distribution.py",
                "note": ("fixed invariant of ACTER v1.5; a different positive rate "
                         "downstream means broken label alignment"),
                "per_domain": per, "short_prose_split": buckets,
                "wind_short_bucket_top_sentences":
                    [{"count": c, "tokens": t, "labels": lab} for t, lab, c in top]}
     _OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (_OUT_DIR / "s04_label_distribution.md").write_text(report + "\n", encoding="utf-8")
-    (_OUT_DIR / "s04_label_distribution.json").write_text(
+    (_OUT_DIR / "s03_label_distribution.md").write_text(report + "\n", encoding="utf-8")
+    (_OUT_DIR / "s03_label_distribution.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"\n[s04] wrote {_OUT_DIR / 's04_label_distribution.md'}")
-    print(f"[s04] wrote {_OUT_DIR / 's04_label_distribution.json'}")
+    print(f"\n[s03] wrote {_OUT_DIR / 's03_label_distribution.md'}")
+    print(f"[s03] wrote {_OUT_DIR / 's03_label_distribution.json'}")
 
 
 if __name__ == "__main__":

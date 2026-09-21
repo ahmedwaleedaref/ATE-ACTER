@@ -2,7 +2,7 @@
 
 Completeness statistics and inputs to T4 (C-Value). Tokenised gold lists only.
 Reuses loading.load_domain and s01_lengths.percentile.
-Run: python -m src.stats.s05_term_stats
+Run: python -m src.statistics.s04_term_stats
 """
 
 from __future__ import annotations
@@ -16,10 +16,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.stats.loading import load_config, load_domain  # noqa: E402
-from src.stats.s01_lengths import percentile  # noqa: E402
+from src.statistics.loading import load_config, load_domain  # noqa: E402
+from src.statistics.s01_lengths import percentile  # noqa: E402
 
-_OUT_DIR = _REPO_ROOT / "results" / "data_stats"
+_OUT_DIR = _REPO_ROOT / "results" / "T2_data_stats"
 _BUCKETS = ("1", "2", "3", "4", "5", "6", "7", "8+")
 _KEYS = (("terms", "terms"), ("terms_nes", "terms+NE"))
 
@@ -128,7 +128,7 @@ def collect(cfg):
 
 
 def build_markdown(domains, part_a, part_b):
-    L = ["# s05 -- term length and term frequency (gold unique lists)", "",
+    L = ["# s04 -- term length and term frequency (gold unique lists)", "",
          "Tokenised gold lists only; the non-tokenised `*_terms.tsv` / `*_terms_nes.tsv` variant exists in every domain and is ignored. Length = whitespace tokens; percentiles s01 nearest-rank; every `%` is of the row's `N`.", "",
          "## Part A -- term length", "",
          "`terms` / `terms+NE` = gold key excluding / including named entities. Bucket cells `count (pct)`. `upper` = entries with an uppercase char (§4 says the lists are lowercased); `dup` = entries minus distinct lowercased forms.", "",
@@ -183,16 +183,16 @@ def main():
     domains, part_a, part_b = collect(cfg)
     report = build_markdown(domains, part_a, part_b)
     print(report)
-    payload = {"generated_by": "src/stats/s05_term_stats.py",
+    payload = {"generated_by": "src/statistics/s04_term_stats.py",
                "note": ("tokenised gold lists only; the non-tokenised variant "
                         "exists in every domain and is ignored"),
                "part_a_term_length": part_a, "part_b_term_frequency": part_b}
     _OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (_OUT_DIR / "s05_term_stats.md").write_text(report + "\n", encoding="utf-8")
-    (_OUT_DIR / "s05_term_stats.json").write_text(
+    (_OUT_DIR / "s04_term_stats.md").write_text(report + "\n", encoding="utf-8")
+    (_OUT_DIR / "s04_term_stats.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"\n[s05] wrote {_OUT_DIR / 's05_term_stats.md'}")
-    print(f"[s05] wrote {_OUT_DIR / 's05_term_stats.json'}")
+    print(f"\n[s04] wrote {_OUT_DIR / 's04_term_stats.md'}")
+    print(f"[s04] wrote {_OUT_DIR / 's04_term_stats.json'}")
 
 
 if __name__ == "__main__":

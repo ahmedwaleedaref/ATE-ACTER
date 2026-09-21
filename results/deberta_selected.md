@@ -3,7 +3,7 @@
 **`microsoft/deberta-v3-base`, LR 1e-5, 5 epochs.** Effective batch 16, warmup
 10%, AdamW weight decay 0.01, max_grad_norm 1.0 — everything except LR and
 epochs as E01. Selected on **equi**, ANN unique-list F1, per-seed statistic =
-best epoch on equi. Full record in `EXPERIMENTS.md` E05.
+best epoch on equi. Full record in `docs/EXPERIMENTS.md` E05.
 
 ## Selection number
 

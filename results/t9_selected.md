@@ -5,7 +5,7 @@ AdamW weight decay 0.01, max_grad_norm 1.0 — all as E01. This is what
 `configs/train.json` already holds; no file change was needed.
 
 Selected on **equi**, ANN unique-list F1, per-seed statistic = best epoch on
-equi. Full record in `EXPERIMENTS.md` E03.
+equi. Full record in `docs/EXPERIMENTS.md` E03.
 
 ## Selection number
 

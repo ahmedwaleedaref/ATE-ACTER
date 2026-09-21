@@ -18,11 +18,11 @@ import yaml
 
 from src.eval.scorers import load_gold_list_into_set, score_list
 from src.eval.surface import generate_unique_list
-from src.stats.loading import DataConfig, load_config
+from src.statistics.loading import DataConfig, load_config
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_DOMAINS = ("corp", "equi", "wind", "htfl")
-_DEFAULT_OUT = _REPO_ROOT / "results" / "ceilings.md"
+_DEFAULT_OUT = _REPO_ROOT / "results" / "T3_eval_harness" / "ceilings.md"
 _DEFAULT_EVAL_CONFIG = _REPO_ROOT / "configs" / "eval.yaml"
 
 # configs/eval.yaml records the decisions this run reports (headline/secondary

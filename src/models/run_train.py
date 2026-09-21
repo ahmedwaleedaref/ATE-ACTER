@@ -41,7 +41,7 @@ from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
 from src.eval.surface import generate_flatten_spans, write_term_list
 from src.models.train_loop import build_optimizer_and_scheduler, evaluate, train_step
-from src.stats.loading import load_config
+from src.statistics.loading import load_config
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _RUNS_JSON = _REPO_ROOT / "results" / "runs"
@@ -189,7 +189,7 @@ def main() -> None:
                              "predictions from a concrete model.")
     parser.add_argument("--dump-terms", action="store_true",
                         help="write the predicted htfl term list to "
-                             "results/runs/<group>/terms_seed_<n>.txt, contract format. "
+                             "results/runs/<group>/terms_seed_<n>.txt, one term per line. "
                              "T11's breakdowns are set intersections against the gold key, "
                              "so this list is all they need -- no checkpoint required")
     parser.add_argument("--tag", default="", help="suffix for the run id")
@@ -346,7 +346,7 @@ def main() -> None:
     record["best_epoch"] = best_epoch
     record["best_equi_f1"] = best_equi_f1
     # flat, majority-class output: every token O, nothing decoded. Recorded and
-    # kept -- Tasks_week2.md T8 -- never dropped and never re-rolled.
+    # kept -- docs/Tasks.md T8 -- never dropped and never re-rolled.
     record["collapsed"] = (best_equi_f1 == 0.0)
     print(f"  best epoch {best_epoch} ({dev_domain} list_ann_f1 {best_equi_f1:.4f})"
           + ("  COLLAPSED" if record["collapsed"] else ""))
@@ -402,7 +402,7 @@ def main() -> None:
     out_dir = _RUNS_JSON / args.group if args.group else _RUNS_JSON
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # the T11 artifact. Contract format via write_term_list -- sorted, lowercased,
+    # the T11 artifact. Written by write_term_list -- sorted, lowercased,
     # one per line -- so it loads back through load_gold_list_into_set like any
     # other term list, and the breakdowns are set operations against the gold key.
     if pred_terms is not None:

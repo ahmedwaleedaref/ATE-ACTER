@@ -22,14 +22,14 @@ from pathlib import Path
 from src.eval.run_eval import _gold_key_path, load_eval_config
 from src.eval.scorers import load_gold_list_into_set
 from src.eval.spans import decode
-from src.stats.loading import load_config, load_domain
+from src.statistics.loading import load_config, load_domain
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# results/ceilings.md, ANN rows. Measured, copied verbatim.
+# results/T3_eval_harness/ceilings.md, ANN rows. Measured, copied verbatim.
 CEILING = {"equi": 0.9523, "htfl": 0.9096}
 
-# EXPERIMENTS.md E05, the cell this run reproduces. Quoted for the drift check,
+# docs/EXPERIMENTS.md E05, the cell this run reproduces. Quoted for the drift check,
 # never overwritten.
 E05 = {"equi_mean": 0.5590, "equi_std": 0.0086, "htfl_mean": 0.5784, "htfl_std": 0.0228}
 

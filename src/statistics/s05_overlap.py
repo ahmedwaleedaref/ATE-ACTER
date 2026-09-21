@@ -2,7 +2,7 @@
 
 Three overlaps denominated in htfl gold terms: type (shared list entry), text
 (sequence in the training annotated stream), head (shared final token). Terms-only
-keys; a terms+NE table follows. Reuses loading.load_domain + s05_term_stats.
+keys; a terms+NE table follows. Reuses loading.load_domain + s04_term_stats.
 """
 
 from __future__ import annotations
@@ -16,10 +16,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.stats.loading import load_config, load_domain  # noqa: E402
-from src.stats.s05_term_stats import ngram_counts, read_terms, unique_lists_dir  # noqa: E402
+from src.statistics.loading import load_config, load_domain  # noqa: E402
+from src.statistics.s04_term_stats import ngram_counts, read_terms, unique_lists_dir  # noqa: E402
 
-_OUT_DIR = _REPO_ROOT / "results" / "data_stats"
+_OUT_DIR = _REPO_ROOT / "results" / "T2_data_stats"
 _LEN = ("1", "2", "3", "4+")
 
 
@@ -125,8 +125,9 @@ def build_markdown(train, res):
     o = res["terms_only"]
     n = o["n_htfl"]
     t, h, ow = o["text"], o["head"], o["occ_weighted"]
-    L = ["# s06 -- term-set overlap, training domains vs htfl", "",
-         f"Terms-only keys (`without_named_entities`), N = {n} htfl gold terms; a terms+NE table follows. Training side = corp + equi + wind gold lists / annotated streams combined. Token-sequence matching, lowercased. Every `%` carries its `N`.", "",
+    train_side = " + ".join(train)   # never hardcoded: the split moved once already
+    L = ["# s05 -- term-set overlap, training domains vs htfl", "",
+         f"Terms-only keys (`without_named_entities`), N = {n} htfl gold terms; a terms+NE table follows. Training side = {train_side} gold lists / annotated streams combined. Token-sequence matching, lowercased. Every `%` carries its `N`.", "",
          "## 1. Type overlap -- htfl terms that are also training gold entries", "",
          "| measure | count | pct |", "|---|--:|--:|",
          f"| htfl ∩ training gold | {o['type']['n']} | {pct(o['type']['n'], n)} |", "",
@@ -160,7 +161,7 @@ def build_markdown(train, res):
         L.append(f"| `{term}` | {a} | {flag[ty]} | {flag[tx]} | {flag[hd]} |")
 
     L += ["", "## 6. Occurrence-weighted type overlap", "",
-          "htfl annotated term occurrences (s05 count (a)) belonging to terms present in the training gold lists.", "",
+          "htfl annotated term occurrences (s04 count (a)) belonging to terms present in the training gold lists.", "",
           "| set | occurrences | pct |", "|---|--:|--:|",
           f"| all htfl gold terms | {ow['total']} | {pct(ow['total'], ow['total'])} |",
           f"| in training gold types | {ow['in_type']} | {pct(ow['in_type'], ow['total'])} |"]
@@ -183,16 +184,16 @@ def main():
     train, _, res = collect(cfg)
     report = build_markdown(train, res)
     print(report)
-    payload = {"generated_by": "src/stats/s06_overlap.py",
+    payload = {"generated_by": "src/statistics/s05_overlap.py",
                "note": ("overlap denominated in htfl gold terms; terms-only "
                         "keys, with a separate terms+NE comparison"),
                "terms_only": res["terms_only"], "terms_nes": res["terms_nes"]}
     _OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (_OUT_DIR / "s06_overlap.md").write_text(report + "\n", encoding="utf-8")
-    (_OUT_DIR / "s06_overlap.json").write_text(
+    (_OUT_DIR / "s05_overlap.md").write_text(report + "\n", encoding="utf-8")
+    (_OUT_DIR / "s05_overlap.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"\n[s06] wrote {_OUT_DIR / 's06_overlap.md'}")
-    print(f"[s06] wrote {_OUT_DIR / 's06_overlap.json'}")
+    print(f"\n[s05] wrote {_OUT_DIR / 's05_overlap.md'}")
+    print(f"[s05] wrote {_OUT_DIR / 's05_overlap.json'}")
 
 
 if __name__ == "__main__":

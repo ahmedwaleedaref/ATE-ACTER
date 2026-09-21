@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from src.eval.scorers import score_exact_spans
 from src.eval.spans import decode, encode
-from src.stats.loading import Document, load_domain
+from src.statistics.loading import Document, load_domain
 
 # Three sentence-initial "I" labels exist in the gold data, all cases of a term
 # split across a spurious sentence boundary (wind_en_01 x2, htfl_en_171 x1).

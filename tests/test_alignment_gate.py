@@ -42,7 +42,7 @@ from src.data.dataset import (
     get_tokenizer,
     load_train_config,
 )
-from src.stats.loading import load_config, load_domain
+from src.statistics.loading import load_config, load_domain
 
 DOMAINS = ["corp", "equi", "wind", "htfl"]
 

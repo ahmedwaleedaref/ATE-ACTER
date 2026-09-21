@@ -2,7 +2,7 @@
 
 `microsoft/deberta-v3-base`, LR 1e-5, 32 context tokens per side, 6 epochs,
 seeds 42–46. Context is attended (mask 1) and never scored (label `-100`).
-Full record in `EXPERIMENTS.md` E09.
+Full record in `docs/EXPERIMENTS.md` E09.
 
 ## Verdict
 

@@ -1,6 +1,6 @@
 """Week-2 dataloader: tokenize, align, filter, collate, batch.
 
-Wraps ``src/stats/loading.py``. Nothing here reads the corpus from disk --
+Wraps ``src/statistics/loading.py``. Nothing here reads the corpus from disk --
 ``load_domain`` remains the only code that does, and it is untouched. Nothing
 here decodes or scores either: predictions go back out through
 ``src/data/align.py::recover_token_labels`` and then through the T3 harness in
@@ -32,7 +32,7 @@ from torch.utils.data import DataLoader, Dataset, Sampler
 from transformers import AutoTokenizer, DataCollatorForTokenClassification
 
 from src.data.align import ID2LABEL, IGNORE_INDEX, LABEL2ID, align_labels
-from src.stats.loading import DataConfig, load_config, load_domain
+from src.statistics.loading import DataConfig, load_config, load_domain
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_TRAIN_CONFIG = _REPO_ROOT / "configs" / "train.json"

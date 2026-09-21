@@ -1,5 +1,5 @@
 """
-T4 -- C-Value baseline: candidate generation -> C-Value -> threshold -> term list in the contract format
+T4 -- C-Value baseline: candidate generation -> C-Value -> threshold -> term list: one lowercased term per line
 
 No training or gold labels are used. C-Value uses frequency/nesting over raw text only.
 
@@ -189,7 +189,7 @@ def compute_cvalue(
     return scores
 
 
-# Threshold + contract-format output
+# Threshold + term-list output
 
 def threshold_terms(scores: dict[str, float], threshold: float) -> list[str]:
     """Keep scores >= threshold and return sorted, deduplicated terms."""

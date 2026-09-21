@@ -192,7 +192,7 @@ cutoff.
 ## 2. Algorithm
 
 ```
-sentences (tokens, labels)        -- labels unused; loaded via src.stats.loading
+sentences (tokens, labels)        -- labels unused; loaded via src.statistics.loading
    |
    | [generate_candidates(min_n, max_n, stopwords)]
    v  
@@ -221,7 +221,7 @@ keep candidates with score >= threshold, dedup, sort
    |
    | [write_term_list]
    v  
-contract format: one term per line, lowercased, deduplicated, UTF-8,
+one term per line, lowercased, deduplicated, UTF-8,
 no header, no index column
 ```
 
@@ -288,7 +288,7 @@ recorded as a known limitation rather than patched indefinitely.
 | `min_frequency` | drop candidate types below this raw frequency before nesting/scoring |
 | `threshold` | minimum C-Value score to appear in the output term list |
 | `stopwords_path` | `null` for the built-in list, or a path to a custom one-word-per-line file |
-| `output_path` | where the contract-format term list is written |
+| `output_path` | where the term list is written |
 | `run_info_path` | where per-run provenance (counts, config used) is written |
 
 Nothing in `src/models/cvalue.py` or `run_cvalue.py` hardcodes a domain,

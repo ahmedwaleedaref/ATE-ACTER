@@ -1,11 +1,10 @@
 {
-  "generated_by": "src/stats/s01_lengths.py",
+  "generated_by": "src/statistics/s01_lengths.py",
   "config": {
     "data_root": "/home/ahmed-walled/Projects/ATE-ACTER/ate-acter/data/raw/ACTER",
     "language": "en",
     "train_domains": [
       "corp",
-      "equi",
       "wind"
     ],
     "test_domain": "htfl",

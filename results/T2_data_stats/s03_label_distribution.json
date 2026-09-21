@@ -1,5 +1,5 @@
 {
-  "generated_by": "src/stats/s04_label_distribution.py",
+  "generated_by": "src/statistics/s03_label_distribution.py",
   "note": "fixed invariant of ACTER v1.5; a different positive rate downstream means broken label alignment",
   "per_domain": {
     "corp": {
